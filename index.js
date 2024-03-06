@@ -19,7 +19,7 @@ tl.set('.navigation-dropdown-bg-wrapper', { display: "block" })
 $(document).ready(function() {
     var isTimelinePlaying = false;
 
-    $('.btn-test').click(function() {
+    $('.navigation_menu-button').click(function() {
         if (isTimelinePlaying) {
             tl.reverse();
             isTimelinePlaying = false;
