@@ -1,27 +1,60 @@
-// Navigation Background
+// Initialize GSAP
+gsap.registerPlugin();
+
+// GSAP timeline navigation desktop
+var tl = gsap.timeline();
+
+tl.set('.navigation-dropdown-bg-wrapper', { display: "block" })
+  .to('.navigation-dropdown-slide', { duration: 0.5, opacity: 1, y: "0%", ease: "power2.out" })
+  .to('.navigation-bg-main', { duration: 0.5, opacity: 1, ease: "power2.out" }, "-=0.5")
+  .to('.hr-navigation', { duration: 0.5, y: "6rem", ease: "power2.out" }, "-=0.5")
+  .to('.navigation-bg-title', { duration: 0.5, y: "0%", ease: "power2.out" }, "-=0.5")
+;
+
+
+// Navigation Mobile
+$(document).ready(function() {
+    var isTimelinePlaying = false;
+
+    $('.btn-test').click(function() {
+        if (isTimelinePlaying) {
+            tl.reverse();
+            isTimelinePlaying = false;
+        } else {
+            tl.play();
+            isTimelinePlaying = true;
+        }
+    });
+});
+
+
+
+// Navigation Background Desktop & Nav links active
 $(document).ready(function() {
     // Function to add or remove class based on the state of .navigation_dropdown-toggle
     function updateClasses() {
         if ($('.navigation_dropdown-toggle').hasClass('w--open')) {
-            $('.navigation-dropdown-bg').addClass('is-active');
+            tl.play();
         } else {
-            $('.navigation-dropdown-bg').removeClass('is-active');
+            tl.reverse() && $('.nav-link').removeClass('is-inactive') && $('.navigation_dropdown-toggle').removeClass('is-inactive');
         }
     }
+
     
     // Initial call to update classes
     updateClasses(); 
 
-    // Navigation background
+ // Navigation background
     const observer = new MutationObserver(function(mutationsList, observer) {
-        for(let mutation of mutationsList) {
-            // Check if the mutation involves changes to the class attribute
-            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                // Update classes when class attribute changes
-                updateClasses();
-            }
+    for(let mutation of mutationsList) {
+        // Check if the mutation involves changes to the class attribute
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+            // Update classes when class attribute changes
+            updateClasses();
         }
-    });
+    }
+});
+
 
     // Start observing changes to attributes of elements with class 'navigation_dropdown-toggle'
     observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['class'] });
@@ -226,4 +259,176 @@ function investorsHoverOut() {
     }
 }
 
+// Navigation news hover
+$(document).ready(function() {
+    $('.nav-link.is-news').hover(function() {
+        newsHoverIn();
+    }, function() {
+        newsHoverOut();
+    });
+});
 
+// News hover in
+function newsHoverIn() {
+    if ($('.nav-link.is-news').hasClass('is-inactive')) {
+        $('.nav-link.is-news').removeClass('is-inactive');
+    }
+}
+
+// News hover out
+function newsHoverOut() {
+    if ($('.navigation_dropdown-toggle').hasClass('w--open')) {
+        $('.nav-link.is-news').addClass('is-inactive');
+    } else {
+        $('.nav-link.is-news').removeClass('is-inactive');
+    }
+}
+
+// Navigation contact hover
+$(document).ready(function() {
+    $('.nav-link.is-contact').hover(function() {
+        contactHoverIn();
+    }, function() {
+        contactHoverOut();
+    });
+});
+
+// Contact hover in
+function contactHoverIn() {
+    if ($('.nav-link.is-contact').hasClass('is-inactive')) {
+        $('.nav-link.is-contact').removeClass('is-inactive');
+    }
+}
+
+// Contact hover out
+function contactHoverOut() {
+    if ($('.navigation_dropdown-toggle').hasClass('w--open')) {
+        $('.nav-link.is-contact').addClass('is-inactive');
+    } else {
+        $('.nav-link.is-contact').removeClass('is-inactive');
+    }
+}
+
+// Navigation our story hover image
+$(document).ready(function() {
+    $('.nav-link-secondary.is-our_story').hover(function() {
+        ourStoryHoverIn();
+    }, function() {
+        ourStoryHoverOut();
+    });
+});
+
+// Our story hover in
+function ourStoryHoverIn() {
+    ($('.nav-dropdown-img.is-our_story').addClass('is-active'))
+}
+
+// Our story hover out
+function ourStoryHoverOut() {
+    setTimeout(function() {
+        $('.nav-dropdown-img.is-our_story').removeClass('is-active');
+    }, 100);
+}
+
+
+// Navigation our team hover image
+$(document).ready(function() {
+    $('.nav-link-secondary.is-our_team').hover(function() {
+        ourTeamHoverIn();
+    }, function() {
+        ourTeamHoverOut();
+    });
+});
+
+// Our team hover in
+function ourTeamHoverIn() {
+    ($('.nav-dropdown-img.is-our_team').addClass('is-active'))
+}
+
+// Our team hover out
+function ourTeamHoverOut() {
+    setTimeout(function() {
+        $('.nav-dropdown-img.is-our_team').removeClass('is-active');
+    }, 100);
+}
+
+
+// Navigation our clients hover image
+$(document).ready(function() {
+    $('.nav-link-secondary.is-our_clients').hover(function() {
+        ourClientsHoverIn();
+    }, function() {
+        ourClientsHoverOut();
+    });
+});
+
+// Our clients hover in
+function ourClientsHoverIn() {
+    ($('.nav-dropdown-img.is-our_clients').addClass('is-active'))
+}
+
+// Our clients hover out
+function ourClientsHoverOut() {
+    setTimeout(function() {
+        $('.nav-dropdown-img.is-our_clients').removeClass('is-active');
+    }, 100);
+}
+
+
+// Navigation ESG hover image
+$(document).ready(function() {
+    $('.nav-link-secondary.is-esg').hover(function() {
+        esgHoverIn();
+    }, function() {
+        esgHoverOut();
+    });
+});
+
+// ESG hover in
+function esgHoverIn() {
+    ($('.nav-dropdown-img.is-esg').addClass('is-active'))
+}
+
+// ESG hover out
+function esgHoverOut() {
+    setTimeout(function() {
+        $('.nav-dropdown-img.is-esg').removeClass('is-active');
+    }, 100);
+}
+
+
+// Navigation IVE Care hover image
+$(document).ready(function() {
+    $('.nav-link-secondary.is-ive_care').hover(function() {
+        iveCareHoverIn();
+    }, function() {
+        iveCareHoverOut();
+    });
+});
+
+// IVE Care hover in
+function iveCareHoverIn() {
+    ($('.nav-dropdown-img.is-ive_care').addClass('is-active'))
+}
+
+// IVE Care hover out
+function iveCareHoverOut() {
+    setTimeout(function() {
+        $('.nav-dropdown-img.is-ive_care').removeClass('is-active');
+    }, 100);
+}
+
+
+// Navigation secondary hover in/out
+$(document).ready(function() {
+    $('.nav-link-secondary').hover(
+        function() {
+            // Hover in
+            $('.nav-link-secondary').not($(this)).addClass('is-inactive');
+        },
+        function() {
+            // Hover out
+            $('.nav-link-secondary').not($(this)).removeClass('is-inactive');
+        }
+    );
+});
