@@ -1,6 +1,3 @@
-// Update
-
-
 // Initialize GSAP
 gsap.registerPlugin();
 
@@ -14,161 +11,223 @@ tl.set('.navigation-dropdown-bg-wrapper', { display: "block" })
   .to('.navigation-bg-title', { duration: 0.5, y: "0%", ease: "power2.out" }, "-=0.5")
 ;
 
-
-// Navigation Mobile
+// Force reload tablet and mobile
 $(document).ready(function() {
-    var isTimelinePlaying = false;
+    // Flag to track whether the page has been refreshed
+    var pageRefreshed = false;
 
-    $('.navigation_menu-button').click(function() {
-        if (isTimelinePlaying) {
-            tl.reverse();
-            isTimelinePlaying = false;
-        } else {
-            tl.play();
-            isTimelinePlaying = true;
+    // Function to check window width and reload if necessary
+    function checkWindowWidth() {
+        if ($(window).width() < 991 && !pageRefreshed) {
+            location.reload(); // Reload the page if window width is less than 991px and page hasn't been refreshed yet
+            pageRefreshed = true; // Set the flag to true to indicate that the page has been refreshed
         }
+    }
+
+    // Call the function on page load if the initial width is below 991 pixels
+    if ($(window).width() < 991) {
+        pageRefreshed = true; // Set the flag to true to indicate that the page doesn't need to be refreshed
+    } else {
+        checkWindowWidth(); // Otherwise, check the window width
+    }
+
+    // Add an event listener to check window width on resize
+    $(window).resize(function() {
+        checkWindowWidth();
     });
 });
 
 
+
+// Mobile Navigation Start
+
+$(document).ready(function() {
+    if ($(window).width() < 991) {
+        // Function to add or remove class based on the state of .navigation_dropdown-toggle
+        function updateNavMobile() {
+            var navButton = $('.navigation_menu-button.w-nav-button');
+            var navButtonText = $('.nav-mobile-menu-btn-text');
+
+            if (navButton.hasClass('w--open')) {
+                tl.play();
+                navButtonText.text('Close');
+            } else {
+                tl.reverse();
+                navButtonText.text('Menu');
+            }
+        }
+
+        // Initial call to update classes
+        updateNavMobile(); 
+
+        // Navigation background
+        const observer = new MutationObserver(function(mutationsList, observer) {
+            for(let mutation of mutationsList) {
+                // Check if the mutation involves changes to the class attribute
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    // Update classes when class attribute changes
+                    updateNavMobile();
+                }
+            }
+        });
+
+        // Start observing changes to attributes of elements with class 'navigation_dropdown-toggle'
+        observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['class'] });
+    }
+});
+
+
+
+
+// Mobile Navigation End
+
+// Desktop Navigation Start
 
 // Navigation Background Desktop & Nav links active
 $(document).ready(function() {
-    // Function to add or remove class based on the state of .navigation_dropdown-toggle
-    function updateClasses() {
-        if ($('.navigation_dropdown-toggle').hasClass('w--open')) {
-            tl.play();
-        } else {
-            tl.reverse() && $('.nav-link').removeClass('is-inactive') && $('.navigation_dropdown-toggle').removeClass('is-inactive');
+    if ($(window).width() > 991) {
+        // Function to add or remove class based on the state of .navigation_dropdown-toggle
+        function updateClasses() {
+            if ($('.navigation_dropdown-toggle').hasClass('w--open')) {
+                tl.play();
+            } else {
+                tl.reverse() && $('.nav-link').removeClass('is-inactive') && $('.navigation_dropdown-toggle').removeClass('is-inactive');
+            }
         }
-    }
 
-    
-    // Initial call to update classes
-    updateClasses(); 
+        // Initial call to update classes
+        updateClasses(); 
 
- // Navigation background
-    const observer = new MutationObserver(function(mutationsList, observer) {
-    for(let mutation of mutationsList) {
-        // Check if the mutation involves changes to the class attribute
-        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-            // Update classes when class attribute changes
-            updateClasses();
-        }
+        // Navigation background
+        const observer = new MutationObserver(function(mutationsList, observer) {
+            for(let mutation of mutationsList) {
+                // Check if the mutation involves changes to the class attribute
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    // Update classes when class attribute changes
+                    updateClasses();
+                }
+            }
+        });
+
+        // Start observing changes to attributes of elements with class 'navigation_dropdown-toggle'
+        observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['class'] });
     }
 });
 
 
-    // Start observing changes to attributes of elements with class 'navigation_dropdown-toggle'
-    observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['class'] });
-});
 
-
-// Navigation open
+// Navigation open desktop
 $(document).ready(function() {
-    $('.navigation_dropdown-toggle.is-about').click(function() {
-        // Adding a delay to prevent no open class found
-        setTimeout(function() {
-            updateAbout();
-        }, 110);
-    });
-    $('.navigation_dropdown-toggle.is-services').click(function() {
-        // Adding a delay to prevent no open class found
-        setTimeout(function() {
-            updateServices();
-        }, 110);
-    });
-    $('.navigation_dropdown-toggle.is-case_studies').click(function() {
-        // Adding a delay to prevent no open class found
-        setTimeout(function() {
-            updateCasestudies();
-        }, 110);
-    });
-    $('.navigation_dropdown-toggle.is-investors').click(function() {
-        // Adding a delay to prevent no open class found
-        setTimeout(function() {
-            updateInvestors();
-        }, 110);
-    });
+    if ($(window).width() > 991) {
+        $('.navigation_dropdown-toggle.is-about').click(function() {
+            // Adding a delay to prevent no open class found
+            setTimeout(function() {
+                updateAbout();
+            }, 110);
+        });
+        $('.navigation_dropdown-toggle.is-services').click(function() {
+            // Adding a delay to prevent no open class found
+            setTimeout(function() {
+                updateServices();
+            }, 110);
+        });
+        $('.navigation_dropdown-toggle.is-case_studies').click(function() {
+            // Adding a delay to prevent no open class found
+            setTimeout(function() {
+                updateCasestudies();
+            }, 110);
+        });
+        $('.navigation_dropdown-toggle.is-investors').click(function() {
+            // Adding a delay to prevent no open class found
+            setTimeout(function() {
+                updateInvestors();
+            }, 110);
+        });
+         // Navigation about open
+         function updateAbout() {
+            if ($('.navigation_dropdown-toggle.is-about').hasClass('w--open')) {
+                $('.navigation_dropdown-toggle.is-about').removeClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-services').addClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-case_studies').addClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-investors').addClass('is-inactive');
+                $('.nav-link.is-news').addClass('is-inactive');
+                $('.nav-link.is-contact').addClass('is-inactive');
+            } else {
+                $('.navigation_dropdown-toggle.is-services').removeClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-case_studies').removeClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-investors').removeClass('is-inactive');
+                $('.nav-link.is-news').removeClass('is-inactive');
+                $('.nav-link.is-contact').removeClass('is-inactive');
+            }
+        }
+
+        // Navigation services open
+        function updateServices() {
+            if ($('.navigation_dropdown-toggle.is-services').hasClass('w--open')) {
+                $('.navigation_dropdown-toggle.is-services').removeClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-about').addClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-case_studies').addClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-investors').addClass('is-inactive');
+                $('.nav-link.is-news').addClass('is-inactive');
+                $('.nav-link.is-contact').addClass('is-inactive');
+            } else {
+                $('.navigation_dropdown-toggle.is-about').removeClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-case_studies').removeClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-investors').removeClass('is-inactive');
+                $('.nav-link.is-news').removeClass('is-inactive');
+                $('.nav-link.is-contact').removeClass('is-inactive');
+            }
+        }   
+
+        // Navigation case studies open
+        function updateCasestudies() {
+            if ($('.navigation_dropdown-toggle.is-case_studies').hasClass('w--open')) {
+                $('.navigation_dropdown-toggle.is-case_studies').removeClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-about').addClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-services').addClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-investors').addClass('is-inactive');
+                $('.nav-link.is-news').addClass('is-inactive');
+                $('.nav-link.is-contact').addClass('is-inactive');
+            } else {
+                $('.navigation_dropdown-toggle.is-about').removeClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-services').removeClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-investors').removeClass('is-inactive');
+                $('.nav-link.is-news').removeClass('is-inactive');
+                $('.nav-link.is-contact').removeClass('is-inactive');
+            }
+        }    
+
+        // Navigation investors open
+        function updateInvestors() {
+            if ($('.navigation_dropdown-toggle.is-investors').hasClass('w--open')) {
+                $('.navigation_dropdown-toggle.is-investors').removeClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-about').addClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-services').addClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-case_studies').addClass('is-inactive');
+                $('.nav-link.is-news').addClass('is-inactive');
+                $('.nav-link.is-contact').addClass('is-inactive');
+            } else {
+                $('.navigation_dropdown-toggle.is-about').removeClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-services').removeClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-case_studies').removeClass('is-inactive');
+                $('.nav-link.is-news').removeClass('is-inactive');
+                $('.nav-link.is-contact').removeClass('is-inactive');
+            }
+        }
+    }
 });
 
-// Navigation about open
-function updateAbout() {
-    if ($('.navigation_dropdown-toggle.is-about').hasClass('w--open')) {
-    		$('.navigation_dropdown-toggle.is-about').removeClass('is-inactive');
-        $('.navigation_dropdown-toggle.is-services').addClass('is-inactive');
-        $('.navigation_dropdown-toggle.is-case_studies').addClass('is-inactive');
-        $('.navigation_dropdown-toggle.is-investors').addClass('is-inactive');
-        $('.nav-link.is-news').addClass('is-inactive');
-        $('.nav-link.is-contact').addClass('is-inactive');
-    } else {
-        $('.navigation_dropdown-toggle.is-services').removeClass('is-inactive');
-        $('.navigation_dropdown-toggle.is-case_studies').removeClass('is-inactive');
-        $('.navigation_dropdown-toggle.is-investors').removeClass('is-inactive');
-        $('.nav-link.is-news').removeClass('is-inactive');
-        $('.nav-link.is-contact').removeClass('is-inactive');
-    }
-}
 
-// Navigation services open
-function updateServices() {
-    if ($('.navigation_dropdown-toggle.is-services').hasClass('w--open')) {
-    		$('.navigation_dropdown-toggle.is-services').removeClass('is-inactive');
-        $('.navigation_dropdown-toggle.is-about').addClass('is-inactive');
-        $('.navigation_dropdown-toggle.is-case_studies').addClass('is-inactive');
-        $('.navigation_dropdown-toggle.is-investors').addClass('is-inactive');
-        $('.nav-link.is-news').addClass('is-inactive');
-        $('.nav-link.is-contact').addClass('is-inactive');
-    } else {
-        $('.navigation_dropdown-toggle.is-about').removeClass('is-inactive');
-        $('.navigation_dropdown-toggle.is-case_studies').removeClass('is-inactive');
-        $('.navigation_dropdown-toggle.is-investors').removeClass('is-inactive');
-        $('.nav-link.is-news').removeClass('is-inactive');
-        $('.nav-link.is-contact').removeClass('is-inactive');
-    }
-}   
-// Navigation case studies open
-function updateCasestudies() {
-    if ($('.navigation_dropdown-toggle.is-case_studies').hasClass('w--open')) {
-    		$('.navigation_dropdown-toggle.is-case_studies').removeClass('is-inactive');
-        $('.navigation_dropdown-toggle.is-about').addClass('is-inactive');
-        $('.navigation_dropdown-toggle.is-services').addClass('is-inactive');
-        $('.navigation_dropdown-toggle.is-investors').addClass('is-inactive');
-        $('.nav-link.is-news').addClass('is-inactive');
-        $('.nav-link.is-contact').addClass('is-inactive');
-    } else {
-        $('.navigation_dropdown-toggle.is-about').removeClass('is-inactive');
-        $('.navigation_dropdown-toggle.is-services').removeClass('is-inactive');
-        $('.navigation_dropdown-toggle.is-investors').removeClass('is-inactive');
-        $('.nav-link.is-news').removeClass('is-inactive');
-        $('.nav-link.is-contact').removeClass('is-inactive');
-    }
-}    
-// Navigation investors open
-function updateInvestors() {
-    if ($('.navigation_dropdown-toggle.is-investors').hasClass('w--open')) {
-    		$('.navigation_dropdown-toggle.is-investors').removeClass('is-inactive');
-        $('.navigation_dropdown-toggle.is-about').addClass('is-inactive');
-        $('.navigation_dropdown-toggle.is-services').addClass('is-inactive');
-        $('.navigation_dropdown-toggle.is-case_studies').addClass('is-inactive');
-        $('.nav-link.is-news').addClass('is-inactive');
-        $('.nav-link.is-contact').addClass('is-inactive');
-    } else {
-        $('.navigation_dropdown-toggle.is-about').removeClass('is-inactive');
-        $('.navigation_dropdown-toggle.is-services').removeClass('is-inactive');
-        $('.navigation_dropdown-toggle.is-case_studies').removeClass('is-inactive');
-        $('.nav-link.is-news').removeClass('is-inactive');
-        $('.nav-link.is-contact').removeClass('is-inactive');
-    }
-}
 
 // Navigation about hover
 $(document).ready(function() {
-    $('.navigation_dropdown-toggle.is-about').hover(function() {
-        aboutHoverIn();
-    }, function() {
-        aboutHoverOut();
-    });
+    if ($(window).width() >= 991) {
+        $('.navigation_dropdown-toggle.is-about').hover(function() {
+            aboutHoverIn();
+        }, function() {
+            aboutHoverOut();
+        });
+    }
 });
 
 // About hover in
@@ -182,18 +241,20 @@ function aboutHoverIn() {
 function aboutHoverOut() {
     if ($('.navigation_dropdown-toggle.is-about').hasClass('w--open')) {
         $('.navigation_dropdown-toggle.is-about').removeClass('is-inactive');
-    } else if ($('.navigation_dropdown-toggle.is-services').hasClass('w--open') || $('.navigation_dropdown-toggle.is-case_studies').hasClass('w--open') || $('.navigation_dropdown-toggle.is-investors').hasClass('w--open') )  {
+    } else if ($('.navigation_dropdown-toggle.is-services').hasClass('w--open') || $('.navigation_dropdown-toggle.is-case_studies').hasClass('w--open') || $('.navigation_dropdown-toggle.is-investors').hasClass('w--open')) {
         $('.navigation_dropdown-toggle.is-about').addClass('is-inactive');
     }
 }
 
 // Navigation services hover
 $(document).ready(function() {
-    $('.navigation_dropdown-toggle.is-services').hover(function() {
-        servicesHoverIn();
-    }, function() {
-        servicesHoverOut();
-    });
+    if ($(window).width() >= 991) {
+        $('.navigation_dropdown-toggle.is-services').hover(function() {
+            servicesHoverIn();
+        }, function() {
+            servicesHoverOut();
+        });
+    }
 });
 
 // Services hover in
@@ -207,18 +268,20 @@ function servicesHoverIn() {
 function servicesHoverOut() {
     if ($('.navigation_dropdown-toggle.is-services').hasClass('w--open')) {
         $('.navigation_dropdown-toggle.is-services').removeClass('is-inactive');
-    } else if ($('.navigation_dropdown-toggle.is-about').hasClass('w--open') || $('.navigation_dropdown-toggle.is-case_studies').hasClass('w--open') || $('.navigation_dropdown-toggle.is-investors').hasClass('w--open') )  {
+    } else if ($('.navigation_dropdown-toggle.is-about').hasClass('w--open') || $('.navigation_dropdown-toggle.is-case_studies').hasClass('w--open') || $('.navigation_dropdown-toggle.is-investors').hasClass('w--open')) {
         $('.navigation_dropdown-toggle.is-services').addClass('is-inactive');
     }
 }
 
 // Navigation case studies hover
 $(document).ready(function() {
-    $('.navigation_dropdown-toggle.is-case_studies').hover(function() {
-        casestudiesHoverIn();
-    }, function() {
-        casestudiesHoverOut();
-    });
+    if ($(window).width() >= 991) {
+        $('.navigation_dropdown-toggle.is-case_studies').hover(function() {
+            casestudiesHoverIn();
+        }, function() {
+            casestudiesHoverOut();
+        });
+    }
 });
 
 // Case studies hover in
@@ -232,18 +295,20 @@ function casestudiesHoverIn() {
 function casestudiesHoverOut() {
     if ($('.navigation_dropdown-toggle.is-case_studies').hasClass('w--open')) {
         $('.navigation_dropdown-toggle.is-case_studies').removeClass('is-inactive');
-    } else if ($('.navigation_dropdown-toggle.is-about').hasClass('w--open') || $('.navigation_dropdown-toggle.is-services').hasClass('w--open') || $('.navigation_dropdown-toggle.is-investors').hasClass('w--open') )  {
+    } else if ($('.navigation_dropdown-toggle.is-about').hasClass('w--open') || $('.navigation_dropdown-toggle.is-services').hasClass('w--open') || $('.navigation_dropdown-toggle.is-investors').hasClass('w--open')) {
         $('.navigation_dropdown-toggle.is-case_studies').addClass('is-inactive');
     }
 }
 
 // Navigation investors hover
 $(document).ready(function() {
-    $('.navigation_dropdown-toggle.is-investors').hover(function() {
-        investorsHoverIn();
-    }, function() {
-        investorsHoverOut();
-    });
+    if ($(window).width() >= 991) {
+        $('.navigation_dropdown-toggle.is-investors').hover(function() {
+            investorsHoverIn();
+        }, function() {
+            investorsHoverOut();
+        });
+    }
 });
 
 // Investors hover in
@@ -257,18 +322,20 @@ function investorsHoverIn() {
 function investorsHoverOut() {
     if ($('.navigation_dropdown-toggle.is-investors').hasClass('w--open')) {
         $('.navigation_dropdown-toggle.is-investors').removeClass('is-inactive');
-    } else if ($('.navigation_dropdown-toggle.is-about').hasClass('w--open') || $('.navigation_dropdown-toggle.is-services').hasClass('w--open') || $('.navigation_dropdown-toggle.is-case_studies').hasClass('w--open') )  {
+    } else if ($('.navigation_dropdown-toggle.is-about').hasClass('w--open') || $('.navigation_dropdown-toggle.is-services').hasClass('w--open') || $('.navigation_dropdown-toggle.is-case_studies').hasClass('w--open')) {
         $('.navigation_dropdown-toggle.is-investors').addClass('is-inactive');
     }
 }
 
 // Navigation news hover
 $(document).ready(function() {
-    $('.nav-link.is-news').hover(function() {
-        newsHoverIn();
-    }, function() {
-        newsHoverOut();
-    });
+    if ($(window).width() >= 991) {
+        $('.nav-link.is-news').hover(function() {
+            newsHoverIn();
+        }, function() {
+            newsHoverOut();
+        });
+    }
 });
 
 // News hover in
@@ -289,11 +356,13 @@ function newsHoverOut() {
 
 // Navigation contact hover
 $(document).ready(function() {
-    $('.nav-link.is-contact').hover(function() {
-        contactHoverIn();
-    }, function() {
-        contactHoverOut();
-    });
+    if ($(window).width() >= 991) {
+        $('.nav-link.is-contact').hover(function() {
+            contactHoverIn();
+        }, function() {
+            contactHoverOut();
+        });
+    }
 });
 
 // Contact hover in
@@ -314,11 +383,13 @@ function contactHoverOut() {
 
 // Navigation our story hover image
 $(document).ready(function() {
-    $('.nav-link-secondary.is-our_story').hover(function() {
-        ourStoryHoverIn();
-    }, function() {
-        ourStoryHoverOut();
-    });
+    if ($(window).width() >= 991) {
+        $('.nav-link-secondary.is-our_story').hover(function() {
+            ourStoryHoverIn();
+        }, function() {
+            ourStoryHoverOut();
+        });
+    }
 });
 
 // Our story hover in
@@ -336,11 +407,13 @@ function ourStoryHoverOut() {
 
 // Navigation our team hover image
 $(document).ready(function() {
-    $('.nav-link-secondary.is-our_team').hover(function() {
-        ourTeamHoverIn();
-    }, function() {
-        ourTeamHoverOut();
-    });
+    if ($(window).width() >= 991) {
+        $('.nav-link-secondary.is-our_team').hover(function() {
+            ourTeamHoverIn();
+        }, function() {
+            ourTeamHoverOut();
+        });
+    }
 });
 
 // Our team hover in
@@ -358,11 +431,13 @@ function ourTeamHoverOut() {
 
 // Navigation our clients hover image
 $(document).ready(function() {
-    $('.nav-link-secondary.is-our_clients').hover(function() {
-        ourClientsHoverIn();
-    }, function() {
-        ourClientsHoverOut();
-    });
+    if ($(window).width() >= 991) {
+        $('.nav-link-secondary.is-our_clients').hover(function() {
+            ourClientsHoverIn();
+        }, function() {
+            ourClientsHoverOut();
+        });
+    }
 });
 
 // Our clients hover in
@@ -380,11 +455,13 @@ function ourClientsHoverOut() {
 
 // Navigation ESG hover image
 $(document).ready(function() {
-    $('.nav-link-secondary.is-esg').hover(function() {
-        esgHoverIn();
-    }, function() {
-        esgHoverOut();
-    });
+    if ($(window).width() >= 991) {
+        $('.nav-link-secondary.is-esg').hover(function() {
+            esgHoverIn();
+        }, function() {
+            esgHoverOut();
+        });
+    }
 });
 
 // ESG hover in
@@ -402,11 +479,13 @@ function esgHoverOut() {
 
 // Navigation IVE Care hover image
 $(document).ready(function() {
-    $('.nav-link-secondary.is-ive_care').hover(function() {
-        iveCareHoverIn();
-    }, function() {
-        iveCareHoverOut();
-    });
+    if ($(window).width() >= 991) {
+        $('.nav-link-secondary.is-ive_care').hover(function() {
+            iveCareHoverIn();
+        }, function() {
+            iveCareHoverOut();
+        });
+    }
 });
 
 // IVE Care hover in
@@ -424,14 +503,18 @@ function iveCareHoverOut() {
 
 // Navigation secondary hover in/out
 $(document).ready(function() {
-    $('.nav-link-secondary').hover(
-        function() {
-            // Hover in
-            $('.nav-link-secondary').not($(this)).addClass('is-inactive');
-        },
-        function() {
-            // Hover out
-            $('.nav-link-secondary').not($(this)).removeClass('is-inactive');
-        }
-    );
+    if ($(window).width() >= 991) {
+        $('.nav-link-secondary').hover(
+            function() {
+                // Hover in
+                $('.nav-link-secondary').not($(this)).addClass('is-inactive');
+            },
+            function() {
+                // Hover out
+                $('.nav-link-secondary').not($(this)).removeClass('is-inactive');
+            }
+        );
+    }
 });
+
+// Desktop Navigation End
