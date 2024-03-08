@@ -1,5 +1,82 @@
 // Initialize GSAP
 gsap.registerPlugin();
+gsap.registerPlugin(ScrollTrigger);
+
+// GSAP Scrolltrigger
+ScrollTrigger.defaults({
+  markers: true,
+});
+
+// GSAP Horizontal scroll
+let tlMain = gsap
+  .timeline({
+    scrollTrigger: {
+      trigger: ".section-height",
+      start: "top top",
+      end: "98% bottom",
+      scrub: 1
+    }
+  })
+  .to(".track", {
+    xPercent: -100,
+    ease: "none"
+  });
+
+// Optional - Set sticky section heights based on inner content width
+// Makes scroll timing feel more natural
+function setTrackHeights() {
+    $(".section-height").each(function (index) {
+      let trackWidth = $(this).find(".track").outerWidth();
+      $(this).height(trackWidth);
+    });
+  }
+  setTrackHeights();
+  window.addEventListener("resize", function () {
+    setTrackHeights();
+  });
+
+// GSAP home hero waymaker scale
+$(".scroll-track.is-home_hero").each(function (index) {
+  let triggerElement = $(this);
+  let targetElement = $(".image-overlay-layer");
+
+  let tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: triggerElement,
+      // trigger element - viewport
+      start: "top bottom",
+      end: "bottom top",
+      scrub: 1,
+    },
+  });
+  tl.to(targetElement, {
+    scale: "20",
+    x: "-500%",
+    y: "60%",
+    duration: 1,
+  });
+});
+
+// GSAP home hero text fade
+$(".scroll-track.is-home_hero").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".home-hero-content-wrapper");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top bottom",
+        end: "top 50%",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      opacity: "0",
+      filter: "blur(20px)",
+      duration: 1,
+    });
+  });
 
 // GSAP timeline navigation desktop
 var tl = gsap.timeline();
@@ -10,6 +87,46 @@ tl.set('.navigation-dropdown-bg-wrapper', { display: "block" })
   .to('.hr-navigation', { duration: 0.5, y: "6rem", ease: "power2.out" }, "-=0.5")
   .to('.navigation-bg-title', { duration: 0.5, y: "0%", ease: "power2.out" }, "-=0.5")
 ;
+
+// Home hero title animation
+let typeSplit = new SplitType(".title-home-hero.is-animate", {
+    types: "words, chars",
+    tagName: "span"
+  });
+  
+  $(".home-hero-heading-wrapper").each(function (index) {
+    let headings = $(this).find(".title-home-hero.is-animate");
+    let tl = gsap.timeline({ repeat: -1 });
+    tl.set($(this), { opacity: 1 });
+    headings.each(function (index) {
+      if (index > 0) {
+        tl.from($(this).find(".char"), { yPercent: 110, stagger: { amount: 0.4 }, duration: 0.4 }, "<0.1");
+      }
+      if (index < headings.length - 1) {
+        tl.to($(this).find(".char"), { delay: 1, yPercent: -110, stagger: { amount: 0.4 }, duration: 0.4 });
+      }
+    });
+  });
+
+// Image scale full projects
+$(".image_full-content-wrapper").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".image-full_screen");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      scale: "1",
+      duration: 1,
+    });
+  });
 
 // Force reload tablet and mobile
 $(document).ready(function() {
