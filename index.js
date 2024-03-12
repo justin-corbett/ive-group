@@ -4,7 +4,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 // GSAP Scrolltrigger
 ScrollTrigger.defaults({
-  markers: true,
+  markers: false,
 });
 
 // GSAP Horizontal scroll
@@ -20,7 +20,7 @@ let tlMain = gsap
   .to(".track", {
     xPercent: -100,
     ease: "none"
-  });
+});
 
 // Optional - Set sticky section heights based on inner content width
 // Makes scroll timing feel more natural
@@ -33,7 +33,7 @@ function setTrackHeights() {
   setTrackHeights();
   window.addEventListener("resize", function () {
     setTrackHeights();
-  });
+});
 
 // GSAP home hero waymaker scale
 $(".scroll-track.is-home_hero").each(function (index) {
@@ -57,6 +57,404 @@ $(".scroll-track.is-home_hero").each(function (index) {
   });
 });
 
+// Horizontal rule 
+$(".horizontal-rule").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(element);
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top bottom",
+      },
+    });
+    tl.from(targetElement, {
+      width: "0%",
+      duration: 1,
+      ease: "power1.out",
+    });
+});
+
+// News list image hover
+$(".news-list-link").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".image");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                scale: 1.05,
+                filter: "blur(10px)",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                scale: 1,
+                filter: "blur(0px)",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
+// News list image hover – cursor
+$(".news-list-link").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".cursor-hover");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 1,
+                duration: 0.2,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 0,
+                duration: 0.2,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
+// Case study list image hover – landscape
+$(".image-case_study_list-landscape").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".image");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                scale: 1.05,
+                filter: "blur(10px)",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                scale: 1,
+                filter: "blur(0px)",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
+// Case study list image hover – portrait
+$(".image-case_study_list-portrait").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".image");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                scale: 1.05,
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                scale: 1,
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
+// Case study list image hover – landscape – cursor
+$(".image-case_study_list-landscape").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".cursor-hover");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 1,
+                duration: 0.2,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 0,
+                duration: 0.2,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
+// Button Hover BG
+$(".button").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".button-inner");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 0,
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 1,
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
+// Button Hover Text
+$(".button").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".button-text");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                color: "#fff",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                color: "#0e0566",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
+// Button Dark Hover BG
+$(".button-dark").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".button-inner-dark");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 0,
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 1,
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
+// Button Dark Hover Text
+$(".button-dark").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".button-text-dark");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                color: "#0e0566",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                color: "#fff",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
+// Button Icon Hover BG
+$(".button-icon").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".button-icon-inner");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 0,
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 1,
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
+// Button Icon Hover Waymaker
+$(".button-icon").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".button-icon-waymaker");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                color: "#fff",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                color: "#0e0566",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
+// Button Icon Dark Hover BG
+$(".button-icon-dark").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".button-icon-inner-dark");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 0,
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 1,
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
+// Button Icon Dark Hover Waymaker
+$(".button-icon-dark").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".button-icon-waymaker-dark");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                color: "#0e0566",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                color: "#fff",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
+// Button White Hover
+$(".button-white").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".button-white-inner");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 0,
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 1,
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
+// Button White Hover Text
+$(".button-white").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".button-text");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                color: "#fff",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                color: "#0e0566",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
 // GSAP home hero text fade
 $(".scroll-track.is-home_hero").each(function (index) {
     let triggerElement = $(this);
@@ -76,7 +474,47 @@ $(".scroll-track.is-home_hero").each(function (index) {
       filter: "blur(20px)",
       duration: 1,
     });
-  });
+});
+
+// GSAP Navigation BG Gradient Fade In
+$(".scroll-track.is-home_hero").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".navigation-bg-gradient");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top bottom",
+        end: "top 50%",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      opacity: "100%",
+      duration: 1,
+    });
+});
+
+// Home Video Cursor Fade In
+$(".horizontal-spacer").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".cursor-hover-video");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top 75%",
+        end: "top 25%",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      opacity: "100%",
+      duration: 1,
+    });
+});
 
 // GSAP timeline navigation desktop
 var tl = gsap.timeline();
@@ -106,7 +544,7 @@ let typeSplit = new SplitType(".title-home-hero.is-animate", {
         tl.to($(this).find(".char"), { delay: 1, yPercent: -110, stagger: { amount: 0.4 }, duration: 0.4 });
       }
     });
-  });
+});
 
 // Image scale full projects
 $(".image_full-content-wrapper").each(function (index) {
@@ -126,7 +564,27 @@ $(".image_full-content-wrapper").each(function (index) {
       scale: "1",
       duration: 1,
     });
-  });
+});
+
+// Image scale full footer
+$(".image_full-footer").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".image-full_screen-footer");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      scale: "1",
+      duration: 1,
+    });
+});
 
 // Force reload tablet and mobile
 $(document).ready(function() {
@@ -629,6 +1087,22 @@ $(document).ready(function() {
             function() {
                 // Hover out
                 $('.nav-link-secondary').not($(this)).removeClass('is-inactive');
+            }
+        );
+    }
+});
+
+// Footer primary links hover in/out
+$(document).ready(function() {
+    if ($(window).width() >= 991) {
+        $('.footer-link-primary').hover(
+            function() {
+                // Hover in
+                $('.footer-link-primary').not($(this)).addClass('is-inactive');
+            },
+            function() {
+                // Hover out
+                $('.footer-link-primary').not($(this)).removeClass('is-inactive');
             }
         );
     }
