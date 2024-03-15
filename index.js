@@ -72,6 +72,7 @@ $(".horizontal-rule").each(function (index, element) {
     tl.from(targetElement, {
       width: "0%",
       duration: 1,
+      delay: 0.1,
       ease: "power1.out",
     });
 });
@@ -107,6 +108,31 @@ $(".news-list-link").each(function (index, element) {
 $(".news-list-link").each(function (index, element) {
     let triggerElement = $(this);
     let targetElement = $(this).find(".cursor-hover");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 1,
+                duration: 0.2,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 0,
+                duration: 0.2,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
+// Service Gallery – cursor
+$(".splide").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".cursor-drag");
 
     $(triggerElement).hover(
         function() { // Hover in
@@ -476,6 +502,26 @@ $(".scroll-track.is-home_hero").each(function (index) {
     });
 });
 
+// GSAP Navigation BG Gradient Fade In – Services
+$(".section-services_overview").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".navigation-bg-gradient");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top bottom",
+        end: "top top",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      opacity: "100%",
+      duration: 1,
+    });
+});
+
 // GSAP Navigation BG Gradient Fade In
 $(".scroll-track.is-home_hero").each(function (index) {
     let triggerElement = $(this);
@@ -566,10 +612,90 @@ $(".image_full-content-wrapper").each(function (index) {
     });
 });
 
+// Image scale CTA team member
+$(".cta-team-image-wrapper").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".cta-team_image");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      scale: "1",
+      duration: 1,
+    });
+});
+
+// Image scale service feature
+$(".feature_image-wrapper").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".feature_image");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      scale: "1",
+      duration: 1,
+    });
+});
+
 // Image scale full footer
 $(".image_full-footer").each(function (index) {
     let triggerElement = $(this);
     let targetElement = $(".image-full_screen-footer");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      scale: "1",
+      duration: 1,
+    });
+});
+
+// Image scale services – service page
+$(".image_full-services").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".image-full_screen-services");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      scale: "1",
+      duration: 1,
+    });
+});
+
+// Image scale case studies – service page
+$(".image_full-case_studies").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".image-full_screen-case_studies");
   
     let tl = gsap.timeline({
       scrollTrigger: {
@@ -1109,3 +1235,129 @@ $(document).ready(function() {
 });
 
 // Desktop Navigation End
+
+// Loader And Page Transition Start
+
+// GSAP timeline function for pageload
+function loaderOnPageLoad() {
+
+    // Add a delay before stopping the scroll (adjust the delay time as needed)
+    setTimeout(function() {
+    window.SScroll.call.stop();
+    }, 1000); // 1000 milliseconds = 1 second
+    
+    // Create a GSAP timeline
+    let tl = gsap.timeline();
+  
+    // Add animations to the timeline
+    tl.to(".logo-loader", {
+        y: "0%",
+        duration: 0.4,
+        delay: 0.2,
+        ease: 'power1.out'
+      })
+      .to(".loader_background-gradient-1", {
+        y: "-100%",
+        duration: 1.5,
+        delay: 0.8,
+        ease: 'power2.out',
+      })
+      .to(".loader_background-gradient-2", {
+        y: "-100%",
+        duration: 1.5,
+        delay: 0,
+        ease: 'power2.out',
+      }, "<+0.2")
+      .to(".loader_background-gradient-3", {
+        y: "-100%",
+        duration: 1.5,
+        delay: 0,
+        ease: 'power2.out',
+      }, "<+0.2")
+      .to(".loader_background-gradient-4", {
+        y: "-100%",
+        duration: 1.5,
+        delay: 0,
+        ease: 'power2.out',
+      }, "<+0.2")
+      .to(".loader_background", {
+        y: "-100%",
+        duration: 1.5,
+        delay: 0,
+        ease: 'power2.out',
+        onComplete: () => {
+            gsap.set(".loader", { display: "none" });
+            }
+      }, "<+0.3")
+      .to(".logo-loader", {
+        y: "-100%",
+        duration: 0.2,
+        delay: 0,
+        ease: 'power1.out',
+        onComplete: () => {
+            window.SScroll.call.start();
+            }
+      }, "<")
+      
+  
+    // Return the timeline
+    return tl;
+}
+
+// GSAP timeline function for click event
+  function loaderOnLinkClick(destination) {
+    gsap.set(".loader", { display: "block" });
+    gsap.fromTo(
+      ".loader_background", {
+        y: "100%"
+      }, {
+        y: "0%",
+        duration: 1,
+        ease: 'power2.out',
+        onComplete: () => {
+          window.location = destination;
+        }
+      }
+    );
+  }
+  
+// Call loaderOnPageLoad when the page loads
+  $(document).ready(function () {
+    loaderOnPageLoad();
+  
+// Code for click event
+    $(document).on("click", "a", function (e) {
+      if (
+        $(this).prop("hostname") === window.location.host &&
+        $(this).attr("href").indexOf("#") === -1 &&
+        $(this).attr("target") !== "_blank"
+      ) {
+        e.preventDefault();
+        let destination = $(this).attr("href");
+        gsap.set(".loader", { display: "block" });
+  
+        // Call loaderOnLinkClick when a link is clicked
+        loaderOnLinkClick(destination);
+      }
+    });
+  
+// On click of the back button
+    window.onpageshow = function (event) {
+      if (event.persisted) {
+        window.location.reload();
+      }
+    }
+  });
+
+// Loader And Page Transition End
+
+
+// Scroll to top on page refresh
+document.addEventListener("DOMContentLoaded", function() {
+    const scrollTopButton = document.querySelector('.scroll-top');
+    
+    if (scrollTopButton) {
+      const clickEvent = new Event('click');
+      scrollTopButton.dispatchEvent(clickEvent);
+    }
+});
