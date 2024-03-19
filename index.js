@@ -231,6 +231,31 @@ $(".image-case_study_list-landscape").each(function (index, element) {
     );
 });
 
+// Service list hover – cursor
+$(".service-image-wrapper").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".cursor-hover");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 1,
+                duration: 0.2,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 0,
+                duration: 0.2,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
 // Button Hover BG
 $(".button").each(function (index, element) {
     let triggerElement = $(this);
@@ -522,7 +547,7 @@ $(".section-services_overview").each(function (index) {
     });
 });
 
-// GSAP Navigation BG Gradient Fade In
+// Navigation Home BG Gradient Fade In
 $(".scroll-track.is-home_hero").each(function (index) {
     let triggerElement = $(this);
     let targetElement = $(".navigation-bg-gradient");
@@ -533,6 +558,26 @@ $(".scroll-track.is-home_hero").each(function (index) {
         // trigger element - viewport
         start: "top bottom",
         end: "top 50%",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      opacity: "100%",
+      duration: 1,
+    });
+});
+
+// Navigation News BG Gradient Fade In
+$(".image_full-news_featured").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".navigation-bg-gradient");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top 50%",
+        end: "bottom top",
         scrub: 1,
       },
     });
@@ -611,6 +656,27 @@ $(".image_full-content-wrapper").each(function (index) {
       duration: 1,
     });
 });
+
+// Image scale full news hero
+$(".image_full-news_featured").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".image-full_screen.is-news_featured");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      scale: "1",
+      duration: 1,
+    });
+});
+
 
 // Image scale CTA team member
 $(".cta-team-image-wrapper").each(function (index) {
