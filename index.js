@@ -104,8 +104,87 @@ $(".news-list-link").each(function (index, element) {
     );
 });
 
+// News featured image hover
+$(".news_featured-link").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".image");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                scale: 1.05,
+                filter: "blur(10px)",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                scale: 1,
+                filter: "blur(0px)",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
+// Service list image hover
+$(".service-list_item-link").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".service-list-image");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                scale: 1.05,
+                filter: "blur(10px)",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                scale: 1,
+                filter: "blur(0px)",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
 // News list image hover – cursor
 $(".news-list-link").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".cursor-hover");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 1,
+                duration: 0.2,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 0,
+                duration: 0.2,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
+// News featured image hover – cursor
+$(".news_featured-link").each(function (index, element) {
     let triggerElement = $(this);
     let targetElement = $(this).find(".cursor-hover");
 
@@ -567,8 +646,8 @@ $(".scroll-track.is-home_hero").each(function (index) {
     });
 });
 
-// Navigation News BG Gradient Fade In
-$(".image_full-news_featured").each(function (index) {
+// Navigation Hero Secondary BG Gradient Fade In
+$(".image_full-hero_secondary").each(function (index) {
     let triggerElement = $(this);
     let targetElement = $(".navigation-bg-gradient");
   
@@ -657,10 +736,10 @@ $(".image_full-content-wrapper").each(function (index) {
     });
 });
 
-// Image scale full news hero
-$(".image_full-news_featured").each(function (index) {
+// Image scale hero secondary
+$(".image_full-hero_secondary").each(function (index) {
     let triggerElement = $(this);
-    let targetElement = $(".image-full_screen.is-news_featured");
+    let targetElement = $(".image-full_screen.is-hero_secondary");
   
     let tl = gsap.timeline({
       scrollTrigger: {
@@ -1378,7 +1457,7 @@ function loaderOnPageLoad() {
         y: "100%"
       }, {
         y: "0%",
-        duration: 1,
+        duration: 0.5,
         ease: 'power2.out',
         onComplete: () => {
           window.location = destination;
