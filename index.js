@@ -686,6 +686,26 @@ $(".horizontal-spacer").each(function (index) {
     });
 });
 
+// ESG Video Cursor Fade In
+$(".image_full-hero_secondary").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".cursor-hover-video");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top 75%",
+        end: "top 25%",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      opacity: "100%",
+      duration: 1,
+    });
+});
+
 // GSAP timeline navigation desktop
 var tl = gsap.timeline();
 
