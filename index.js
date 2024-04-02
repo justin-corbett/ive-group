@@ -695,7 +695,7 @@ $(".image_full-hero_secondary").each(function (index) {
       scrollTrigger: {
         trigger: triggerElement,
         // trigger element - viewport
-        start: "top 75%",
+        start: "top 50%",
         end: "top 25%",
         scrub: 1,
       },
@@ -817,10 +817,50 @@ $(".feature_image-wrapper").each(function (index) {
     });
 });
 
+// Image scale feature image 2
+$(".feature_image-2-wrapper").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".feature_image-2");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      scale: "1",
+      duration: 1,
+    });
+});
+
 // Image scale full footer
 $(".image_full-footer").each(function (index) {
     let triggerElement = $(this);
     let targetElement = $(".image-full_screen-footer");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      scale: "1",
+      duration: 1,
+    });
+});
+
+// Image scale full esg
+$(".image_full-esg").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".image-full_screen-esg");
   
     let tl = gsap.timeline({
       scrollTrigger: {
