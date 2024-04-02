@@ -837,6 +837,46 @@ $(".feature_image-2-wrapper").each(function (index) {
     });
 });
 
+// Image scale feature image 3
+$(".feature_image-3-wrapper").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".feature_image-3");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      scale: "1",
+      duration: 1,
+    });
+});
+
+// Image scale feature image 4
+$(".feature_image-4-wrapper").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".feature_image-4");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      scale: "1",
+      duration: 1,
+    });
+});
+
 // Image scale full footer
 $(".image_full-footer").each(function (index) {
     let triggerElement = $(this);
