@@ -363,7 +363,7 @@ $(".service-image-wrapper").each(function (index, element) {
 });
 
 // About / Service Page list hover – cursor
-$(".values-image-wrapper").each(function (index, element) {
+$(".list-image-link").each(function (index, element) {
     let triggerElement = $(this);
     let targetElement = $(this).find(".cursor-hover");
 
