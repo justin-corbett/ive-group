@@ -387,8 +387,6 @@ $(".values-image-wrapper").each(function (index, element) {
     );
 });
 
-values-image-wrapper
-
 // Button Hover BG
 $(".button").each(function (index, element) {
     let triggerElement = $(this);
