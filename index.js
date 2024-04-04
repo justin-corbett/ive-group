@@ -158,6 +158,33 @@ $(".service-list_item-link").each(function (index, element) {
     );
 });
 
+// list image link hover
+$(".list-image-link").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".list_image");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                scale: 1.05,
+                filter: "blur(10px)",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                scale: 1,
+                filter: "blur(0px)",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
 // News list image hover – cursor
 $(".news-list-link").each(function (index, element) {
     let triggerElement = $(this);
@@ -334,6 +361,33 @@ $(".service-image-wrapper").each(function (index, element) {
         }
     );
 });
+
+// About / Service Page list hover – cursor
+$(".values-image-wrapper").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".cursor-hover");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 1,
+                duration: 0.2,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 0,
+                duration: 0.2,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
+values-image-wrapper
 
 // Button Hover BG
 $(".button").each(function (index, element) {
