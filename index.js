@@ -897,6 +897,26 @@ $(".image_full-footer").each(function (index) {
     });
 });
 
+// Image scale ive care wellbeing
+$(".image_full-ive_care-wellbeing").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".image-full_screen-ive_care-wellbeing");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      scale: "1",
+      duration: 1,
+    });
+});
+
 // Image scale full esg
 $(".image_full-esg").each(function (index) {
     let triggerElement = $(this);
