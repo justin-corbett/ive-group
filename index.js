@@ -38,7 +38,7 @@ function setTrackHeights() {
 // GSAP home hero waymaker scale
 $(".scroll-track.is-home_hero").each(function (index) {
   let triggerElement = $(this);
-  let targetElement = $(".image-overlay-layer");
+  let targetElement = $(".ive-waymaker");
 
   let tl = gsap.timeline({
     scrollTrigger: {
@@ -158,7 +158,7 @@ $(".service-list_item-link").each(function (index, element) {
     );
 });
 
-// list image link hover
+// About/Services list image link hover
 $(".list-image-link").each(function (index, element) {
     let triggerElement = $(this);
     let targetElement = $(this).find(".list_image");
