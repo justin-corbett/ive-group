@@ -8,7 +8,7 @@ ScrollTrigger.defaults({
 });
 
 // GSAP Horizontal scroll
-if ($(window).width() < 768) {
+if ($(window).width() > 768) {
 let tlMain = gsap
   .timeline({
     scrollTrigger: {
@@ -26,7 +26,7 @@ let tlMain = gsap
 
 // Optional - Set sticky section heights based on inner content width
 // Makes scroll timing feel more natural
-if ($(window).width() < 768) {
+if ($(window).width() > 768) {
 function setTrackHeights() {
     $(".section-height").each(function (index) {
       let trackWidth = $(this).find(".track").outerWidth();
