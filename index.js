@@ -35,27 +35,54 @@ function setTrackHeights() {
     setTrackHeights();
 });
 
-// GSAP home hero waymaker scale
-$(".scroll-track.is-home_hero").each(function (index) {
-  let triggerElement = $(this);
-  let targetElement = $(".ive-waymaker");
+// Home hero waymaker scale – desktop
+if ($(window).width() > 991) {
+    $(".scroll-track.is-home_hero").each(function (index) {
+      let triggerElement = $(this);
+      let targetElement = $(".ive-waymaker");
+  
+      let tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: triggerElement,
+          // trigger element - viewport
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1,
+        },
+      });
+      tl.to(targetElement, {
+        scale: "20",
+        x: "-500%",
+        y: "60%",
+        duration: 1,
+      });
+    });
+}
 
-  let tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: triggerElement,
-      // trigger element - viewport
-      start: "top bottom",
-      end: "bottom top",
-      scrub: 1,
-    },
-  });
-  tl.to(targetElement, {
-    scale: "20",
-    x: "-500%",
-    y: "60%",
-    duration: 1,
-  });
-});
+// Home hero waymaker scale – mobile
+if ($(window).width() < 768) {
+    $(".scroll-track.is-home_hero").each(function (index) {
+      let triggerElement = $(this);
+      let targetElement = $(".ive-waymaker");
+  
+      let tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: triggerElement,
+          // trigger element - viewport
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1,
+        },
+      });
+      tl.to(targetElement, {
+        scale: "20",
+        x: "0%",
+        y: "-300%",
+        duration: 1,
+      });
+    });
+}
+  
 
 // Horizontal rule 
 $(".horizontal-rule").each(function (index, element) {
