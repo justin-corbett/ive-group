@@ -57,7 +57,7 @@ if ($(window).width() > 991) {
       tl.to(targetElement, {
         scale: "20",
         x: "-500%",
-        y: "60%",
+        y: "75%",
         duration: 1,
       });
     });
