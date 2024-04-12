@@ -7,13 +7,17 @@ ScrollTrigger.defaults({
   markers: false,
 });
 
-// VIdeo hide until loaded
+// BG Video hide until loaded
 document.addEventListener('DOMContentLoaded', function() {
     var videos = document.getElementsByClassName('video-bg');
     for (var i = 0; i < videos.length; i++) {
         videos[i].style.display = 'none'; // Hide the video initially
         videos[i].addEventListener('loadeddata', function() {
             this.style.display = 'block'; // Show the video when it's fully loaded
+            this.autoplay = true; // Autoplay the video
+            this.loop = true; // Set the video to loop
+            this.muted = true; // Mute the video
+            this.playsInline = true; // Ensure the video plays inline
         });
     }
 });
