@@ -7,8 +7,8 @@ ScrollTrigger.defaults({
   markers: false,
 });
 
-// GSAP Horizontal scroll
-if ($(window).width() > 768) {
+// GSAP Horizontal scroll – Desktop
+if ($(window).width() > 991) {
 let tlMain = gsap
   .timeline({
     scrollTrigger: {
@@ -62,6 +62,31 @@ if ($(window).width() > 991) {
       });
     });
 }
+
+// Home hero waymaker scale – tablet
+if ($(window).width() > 767 && $(window).width() < 992) {
+    $(".scroll-track.is-home_hero").each(function (index) {
+      let triggerElement = $(this);
+      let targetElement = $(".ive-waymaker");
+  
+      let tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: triggerElement,
+          // trigger element - viewport
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1,
+        },
+      });
+      tl.to(targetElement, {
+        scale: "20",
+        x: "0%",
+        y: "-500%",
+        duration: 1,
+      });
+    });
+}
+
 
 // Home hero waymaker scale – mobile
 if ($(window).width() < 768) {
