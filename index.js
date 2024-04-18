@@ -794,6 +794,18 @@ $(".horizontal-spacer").each(function (index) {
     });
 });
 
+// 404 cursor hover in/out
+gsap.set(".cursor-hover-video", { opacity: 0 }); // Initial opacity set to 0
+
+$(".scroller").hover(
+  function() {
+    gsap.to(".cursor-hover-video", { opacity: 1, duration: 0.3 }); // On hover, change opacity to 100%
+  },
+  function() {
+    gsap.to(".cursor-hover-video", { opacity: 0, duration: 0.3 }); // On hover out, change opacity back to 0%
+  }
+);
+
 // ESG Video Cursor Fade In
 $(".image_full-hero_secondary").each(function (index) {
     let triggerElement = $(this);
@@ -1723,7 +1735,6 @@ function loaderOnPageLoad() {
   });
 
 // Loader And Page Transition End
-
 
 // Scroll to top on page refresh
 document.addEventListener("DOMContentLoaded", function() {
