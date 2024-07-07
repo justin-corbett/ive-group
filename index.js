@@ -39,6 +39,7 @@ function setTrackHeights() {
 });
 }
 
+/*
 // Home hero waymaker scale – desktop
 if ($(window).width() > 991) {
     $(".scroll-track.is-home_hero").each(function (index) {
@@ -62,6 +63,7 @@ if ($(window).width() > 991) {
       });
     });
 }
+
 
 // Home hero waymaker scale – tablet
 if ($(window).width() > 767 && $(window).width() < 992) {
@@ -111,7 +113,7 @@ if ($(window).width() < 768) {
       });
     });
 }
-  
+*/
 
 // Horizontal rule 
 $(".horizontal-rule").each(function (index, element) {
@@ -693,6 +695,7 @@ $(".button-white").each(function (index, element) {
     );
 });
 
+
 // GSAP home hero text fade
 $(".scroll-track.is-home_hero").each(function (index) {
     let triggerElement = $(this);
@@ -702,8 +705,8 @@ $(".scroll-track.is-home_hero").each(function (index) {
       scrollTrigger: {
         trigger: triggerElement,
         // trigger element - viewport
-        start: "top bottom",
-        end: "top 50%",
+        start: "top top",
+        end: "bottom 50%",
         scrub: 1,
       },
     });
@@ -713,6 +716,7 @@ $(".scroll-track.is-home_hero").each(function (index) {
       duration: 1,
     });
 });
+
 
 // GSAP Navigation BG Gradient Fade In – Services
 $(".section-services_overview").each(function (index) {
@@ -743,8 +747,8 @@ $(".scroll-track.is-home_hero").each(function (index) {
       scrollTrigger: {
         trigger: triggerElement,
         // trigger element - viewport
-        start: "top bottom",
-        end: "top 50%",
+        start: "top top",
+        end: "bottom bottom",
         scrub: 1,
       },
     });
@@ -774,6 +778,7 @@ $(".image_full-hero_secondary").each(function (index) {
     });
 });
 
+/*
 // Home Video Cursor Fade In
 $(".horizontal-spacer").each(function (index) {
     let triggerElement = $(this);
@@ -793,9 +798,13 @@ $(".horizontal-spacer").each(function (index) {
       duration: 1,
     });
 });
+*/
 
+
+/*
 // 404 cursor hover in/out
 gsap.set(".cursor-hover-video", { opacity: 0 }); // Initial opacity set to 0
+*/
 
 $(".scroller").hover(
   function() {
@@ -1745,3 +1754,54 @@ document.addEventListener("DOMContentLoaded", function() {
       scrollTopButton.dispatchEvent(clickEvent);
     }
 });
+
+// GSAP FLIP
+window.addEventListener("DOMContentLoaded", (event) => {
+    // SETUP PLUGINS
+    gsap.registerPlugin(ScrollTrigger, Flip);
+    ScrollTrigger.normalizeScroll(true);
+    // SETUP ELEMENTS
+    let zoneEl = $("[js-scrollflip-element='zone']"),
+      targetEl = $("[js-scrollflip-element='target']").first();
+    // SETUP TIMELINE
+    let tl;
+    function createTimeline() {
+      if (tl) {
+        tl.kill();
+        gsap.set(targetEl, { clearProps: "all" });
+      }
+      tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: zoneEl.first(),
+          start: "center 75%",
+          endTrigger: zoneEl.last(),
+          end: "bottom bottom",
+          scrub: true
+        }
+      });
+      zoneEl.each(function (index) {
+        let nextZoneEl = zoneEl.eq(index + 1);
+        if (nextZoneEl.length) {
+          let nextZoneDistance =
+            nextZoneEl.offset().top + nextZoneEl.innerHeight() / 2;
+          let thisZoneDistance = $(this).offset().top + $(this).innerHeight() / 2;
+          let zoneDifference = nextZoneDistance - thisZoneDistance;
+          tl.add(
+            Flip.fit(targetEl[0], nextZoneEl[0], {
+              duration: zoneDifference,
+              ease: "power1.inOut"
+            })
+          );
+        }
+      });
+    }
+    createTimeline();
+    // SETUP RESIZE
+    let resizeTimer;
+    window.addEventListener("resize", function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () {
+        createTimeline();
+      }, 250);
+    });
+  });
