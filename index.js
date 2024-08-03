@@ -39,81 +39,6 @@ function setTrackHeights() {
 });
 }
 
-/*
-// Home hero waymaker scale – desktop
-if ($(window).width() > 991) {
-    $(".scroll-track.is-home_hero").each(function (index) {
-      let triggerElement = $(this);
-      let targetElement = $(".ive-waymaker");
-  
-      let tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: triggerElement,
-          // trigger element - viewport
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1,
-        },
-      });
-      tl.to(targetElement, {
-        scale: "20",
-        x: "-500%",
-        y: "100%",
-        duration: 1,
-      });
-    });
-}
-
-
-// Home hero waymaker scale – tablet
-if ($(window).width() > 767 && $(window).width() < 992) {
-    $(".scroll-track.is-home_hero").each(function (index) {
-      let triggerElement = $(this);
-      let targetElement = $(".ive-waymaker");
-  
-      let tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: triggerElement,
-          // trigger element - viewport
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1,
-        },
-      });
-      tl.to(targetElement, {
-        scale: "20",
-        x: "0%",
-        y: "-500%",
-        duration: 1,
-      });
-    });
-}
-
-
-// Home hero waymaker scale – mobile
-if ($(window).width() < 768) {
-    $(".scroll-track.is-home_hero").each(function (index) {
-      let triggerElement = $(this);
-      let targetElement = $(".ive-waymaker");
-  
-      let tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: triggerElement,
-          // trigger element - viewport
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1,
-        },
-      });
-      tl.to(targetElement, {
-        scale: "20",
-        x: "0%",
-        y: "-300%",
-        duration: 1,
-      });
-    });
-}
-*/
 
 // Horizontal rule 
 $(".horizontal-rule").each(function (index, element) {
@@ -835,7 +760,7 @@ $(".image_full-hero_secondary").each(function (index) {
     });
 });
 
-// GSAP timeline navigation desktop
+// Navigation desktop
 var tl = gsap.timeline();
 
 tl.set('.navigation-dropdown-bg-wrapper', { display: "block" })
@@ -853,7 +778,7 @@ let typeSplit = new SplitType(".title-home-hero.is-animate", {
   
   $(".home-hero-heading-wrapper").each(function (index) {
     let headings = $(this).find(".title-home-hero.is-animate");
-    let tl = gsap.timeline({ repeat: -1 });
+    let tl = gsap.timeline({ repeat: -1, delay: 1.5 }); // Adding the delay here
     tl.set($(this), { opacity: 1 });
     headings.each(function (index) {
       if (index > 0) {
@@ -863,7 +788,8 @@ let typeSplit = new SplitType(".title-home-hero.is-animate", {
         tl.to($(this).find(".char"), { delay: 1, yPercent: -110, stagger: { amount: 0.4 }, duration: 0.4 });
       }
     });
-});
+  });
+  
 
 // Image scale full projects
 $(".image_full-content-wrapper").each(function (index) {
@@ -1102,6 +1028,27 @@ $(".image_full-case_studies").each(function (index) {
     });
     tl.to(targetElement, {
       scale: "1",
+      duration: 1,
+    });
+});
+
+// Footer scroll into view – Top navigation fade out
+$(".section-footer").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".navigation");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top 75%",
+        end: "top 25%",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      opacity: "0",
+      y: "-100%",
       duration: 1,
     });
 });
@@ -1773,7 +1720,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
       tl = gsap.timeline({
         scrollTrigger: {
           trigger: zoneEl.first(),
-          start: "center 75%",
+          start: "top 50%",
           endTrigger: zoneEl.last(),
           end: "bottom bottom",
           scrub: true
