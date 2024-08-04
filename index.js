@@ -1048,7 +1048,6 @@ $(".section-footer").each(function (index) {
     });
     tl.to(targetElement, {
       opacity: "0",
-      y: "-100%",
       duration: 1,
     });
 });
