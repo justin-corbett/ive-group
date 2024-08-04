@@ -778,7 +778,7 @@ let typeSplit = new SplitType(".title-home-hero.is-animate", {
   
   $(".home-hero-heading-wrapper").each(function (index) {
     let headings = $(this).find(".title-home-hero.is-animate");
-    let tl = gsap.timeline({ repeat: -1, delay: 1.5 }); // Adding the delay here
+    let tl = gsap.timeline({ repeat: -1, delay: 2.5 }); // Adding the delay here
     tl.set($(this), { opacity: 1 });
     headings.each(function (index) {
       if (index > 0) {
