@@ -1752,18 +1752,17 @@ window.addEventListener("DOMContentLoaded", (event) => {
     });
 });
 
-// Home images fade in/out repeating
-function fadeImage(){
-    let master = gsap.timeline({ repeat: 30 });
-  
+// Home images fade in/out repeating animation 
+function fadeImage() {
+    let master = gsap.timeline({ repeat: -1 });
+
     const images = document.querySelectorAll(".image-array");
     images.forEach((image) => {
-      let tl = gsap.timeline();
-      tl.to(image, { autoAlpha: 1 })
-        .to(image, { autoAlpha: 0 });
-      master.add(tl, "-=.5");
+        let tl = gsap.timeline();
+        tl.to(image, { autoAlpha: 1, duration: 1 })
+          .to(image, { autoAlpha: 0, duration: 1 });
+        master.add(tl, "-=0.5");
     });
-  }
-  
-  fadeImage();
+}
 
+fadeImage();
