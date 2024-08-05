@@ -1750,4 +1750,26 @@ window.addEventListener("DOMContentLoaded", (event) => {
         createTimeline();
       }, 250);
     });
-  });
+});
+
+// Home images fade in/out repeating
+function startImageFadeInOut() {
+    const imageArray = document.querySelectorAll('.image-array');
+    const duration = 2; // duration for each fade in/out
+    const delay = 1; // delay before fading in the next image
+
+    imageArray.forEach((image, i) => {
+        gsap.to(image, {
+            opacity: 1,
+            duration: duration,
+            delay: i * (duration + delay),
+            repeat: -1,
+            yoyo: true,
+            repeatDelay: (imageArray.length - 1) * (duration + delay),
+        });
+    });
+}
+
+// Call the function to start the animation
+document.addEventListener('DOMContentLoaded', startImageFadeInOut);
+
