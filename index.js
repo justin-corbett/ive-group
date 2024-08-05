@@ -1752,6 +1752,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
     });
 });
 
+
 // Function to animate images
 function animateImages() {
     // Select all images with the class .image-array
@@ -1762,16 +1763,16 @@ function animateImages() {
       gsap.set(image, { opacity: 0 });
     });
   
-    // Ensure the first image always has opacity 1 and z-index 0
+    // Ensure the first image is visible initially
     if (images.length > 0) {
-      gsap.set(images[0], { opacity: 1, zIndex: 0 });
+      gsap.set(images[0], { opacity: 1 });
     }
   
     // Create a GSAP timeline
     const tl = gsap.timeline({ repeat: -1 });
   
-    // Transition speed (faster for testing)
-    const transitionSpeed = 2; // 0.5 seconds
+    // Transition speed (2.5 seconds for each image)
+    const transitionSpeed = 2.5; // 2.5 seconds
   
     // Add fade in and fade out animations to the timeline with overlap equal to the transition speed
     images.forEach((image, index) => {
@@ -1780,8 +1781,21 @@ function animateImages() {
           .to(image, { opacity: 0, duration: transitionSpeed }, (index * transitionSpeed) + transitionSpeed);
       }
     });
+  
+    // Ensure the last image fades out and the first image fades in seamlessly
+    tl.to(images[0], { opacity: 1, duration: transitionSpeed }, images.length * transitionSpeed)
+      .to(images[0], { opacity: 1, duration: 0 }, (images.length * transitionSpeed) + transitionSpeed);
   }
   
   // Call the function to start the animation
   animateImages();
+  
+  // Handle window resize for responsive design
+  let resizeTimer;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      animateImages();
+    }, 250);
+  });
 
