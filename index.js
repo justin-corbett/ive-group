@@ -1753,23 +1753,17 @@ window.addEventListener("DOMContentLoaded", (event) => {
 });
 
 // Home images fade in/out repeating
-function startImageFadeInOut() {
-    const imageArray = document.querySelectorAll('.image-array');
-    const duration = 2; // duration for each fade in/out
-    const delay = 1; // delay before fading in the next image
-
-    imageArray.forEach((image, i) => {
-        gsap.to(image, {
-            opacity: 1,
-            duration: duration,
-            delay: i * (duration + delay),
-            repeat: -1,
-            yoyo: true,
-            repeatDelay: (imageArray.length - 1) * (duration + delay),
-        });
+function fadeImage(){
+    let master = gsap.timeline({ repeat: 30 });
+  
+    const images = document.querySelectorAll(".image-array");
+    images.forEach((image) => {
+      let tl = gsap.timeline();
+      tl.to(image, { autoAlpha: 1 })
+        .to(image, { autoAlpha: 0 });
+      master.add(tl, "-=.5");
     });
-}
-
-// Call the function to start the animation
-document.addEventListener('DOMContentLoaded', startImageFadeInOut);
+  }
+  
+  fadeImage();
 
