@@ -1752,18 +1752,36 @@ window.addEventListener("DOMContentLoaded", (event) => {
     });
 });
 
-// Home images fade in/out repeating animation
-function fadeImage() {
-    let master = gsap.timeline({ repeat: -1 });
-
-    const images = document.querySelectorAll(".image-array");
-    images.forEach((image, index) => {
-        let tl = gsap.timeline({ repeat: 1, yoyo: true, repeatDelay: images.length - 1 });
-        tl.to(image, { autoAlpha: 1, duration: 2 })
-          .to(image, { autoAlpha: 0, duration: 2 });
-        master.add(tl, index * 2); // Stagger the start time by the duration (2 seconds) of each animation
+// Function to animate images
+function animateImages() {
+    // Select all images with the class .image-array
+    const images = document.querySelectorAll('.image-array');
+  
+    // Set initial opacity of each image to 0
+    images.forEach(image => {
+      gsap.set(image, { opacity: 0 });
     });
-}
-
-fadeImage();
+  
+    // Ensure the first image always has opacity 1 and z-index 0
+    if (images.length > 0) {
+      gsap.set(images[0], { opacity: 1, zIndex: 0 });
+    }
+  
+    // Create a GSAP timeline
+    const tl = gsap.timeline({ repeat: -1 });
+  
+    // Transition speed (faster for testing)
+    const transitionSpeed = 2; // 0.5 seconds
+  
+    // Add fade in and fade out animations to the timeline with overlap equal to the transition speed
+    images.forEach((image, index) => {
+      if (index > 0) {
+        tl.to(image, { opacity: 1, duration: transitionSpeed }, index * transitionSpeed)
+          .to(image, { opacity: 0, duration: transitionSpeed }, (index * transitionSpeed) + transitionSpeed);
+      }
+    });
+  }
+  
+  // Call the function to start the animation
+  animateImages();
 
