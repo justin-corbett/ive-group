@@ -1081,21 +1081,16 @@ $(document).ready(function() {
 */
 
 // Force reload on any change of the browser width
-$(document).ready(function() {
-    // Flag to track whether the page has been refreshed
-    let pageRefreshed = false;
+document.addEventListener('DOMContentLoaded', () => {
+    let resizeTimeout;
   
-    // Function to reload the page
     function reloadPage() {
-      if (!pageRefreshed) {
-        location.reload(); // Reload the page
-        pageRefreshed = true; // Set the flag to true to indicate that the page has been refreshed
-      }
+      location.reload();
     }
   
-    // Add an event listener to reload the page on window resize
-    $(window).resize(function() {
-      reloadPage();
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(reloadPage, 250);
     });
   });
 
