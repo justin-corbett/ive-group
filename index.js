@@ -1078,21 +1078,10 @@ $(document).ready(function() {
         checkWindowWidth();
     });
 });
+
 */
 
-// Force reload on any change of the browser width
-document.addEventListener('DOMContentLoaded', () => {
-    let resizeTimeout;
-  
-    function reloadPage() {
-      location.reload();
-    }
-  
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(reloadPage, 250);
-    });
-  });
+
 
 
 // Mobile Navigation Start
