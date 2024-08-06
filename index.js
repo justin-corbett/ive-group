@@ -1,7 +1,7 @@
 // Initialize GSAP
 gsap.registerPlugin();
-gsap.registerPlugin(ScrollTrigger);
-
+gsap.registerPlugin(ScrollTrigger, Flip);
+    
 // GSAP Scrolltrigger
 ScrollTrigger.defaults({
   markers: false,
@@ -1110,10 +1110,12 @@ $(document).ready(function() {
 
             if (navButton.hasClass('w--open')) {
                 tl.play();
+                lenis.stop()	
                 navButtonText.text('Close');
                 
             } else {
                 tl.reverse();
+                lenis.start()	
                 navButtonText.text('Menu');
                 
             }
@@ -1655,7 +1657,7 @@ function loaderOnPageLoad() {
         delay: 0,
         ease: 'power1.out',
         onComplete: () => {
-            window.SScroll.call.start();
+            
             }
       }, "<")
       
@@ -1721,14 +1723,14 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
+
 // GSAP FLIP
 window.addEventListener("DOMContentLoaded", (event) => {
-    // SETUP PLUGINS
-    gsap.registerPlugin(ScrollTrigger, Flip);
-    ScrollTrigger.normalizeScroll(true);
+    
     // SETUP ELEMENTS
     let zoneEl = $("[js-scrollflip-element='zone']"),
       targetEl = $("[js-scrollflip-element='target']").first();
+
     // SETUP TIMELINE
     let tl;
     function createTimeline() {
@@ -1762,6 +1764,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
       });
     }
     createTimeline();
+
     // SETUP RESIZE
     let resizeTimer;
     window.addEventListener("resize", function () {
@@ -1773,7 +1776,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
 });
 
 
-// Function to animate images
+// Function to animate all images title .image-array in a loop  
 function animateImages() {
     // Select all images with the class .image-array
     const images = document.querySelectorAll('.image-array');
@@ -1818,5 +1821,22 @@ function animateImages() {
       animateImages();
     }, 250);
 });
+
+
+// Lenis smooth scroll
+const lenis = new Lenis()
+
+lenis.on('scroll', (e) => {
+  console.log(e)
+  ScrollTrigger.update()
+})
+
+gsap.ticker.add((time) => {
+  lenis.raf(time * 1000)
+})
+
+gsap.ticker.lagSmoothing(0)
+
+
   
 
