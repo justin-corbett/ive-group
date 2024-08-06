@@ -1052,6 +1052,7 @@ $(".section-footer").each(function (index) {
     });
 });
 
+/*
 // Force reload tablet and mobile
 $(document).ready(function() {
     // Flag to track whether the page has been refreshed
@@ -1077,11 +1078,29 @@ $(document).ready(function() {
         checkWindowWidth();
     });
 });
+*/
 
+// Force reload on any change of the browser width
+$(document).ready(function() {
+    // Flag to track whether the page has been refreshed
+    let pageRefreshed = false;
+  
+    // Function to reload the page
+    function reloadPage() {
+      if (!pageRefreshed) {
+        location.reload(); // Reload the page
+        pageRefreshed = true; // Set the flag to true to indicate that the page has been refreshed
+      }
+    }
+  
+    // Add an event listener to reload the page on window resize
+    $(window).resize(function() {
+      reloadPage();
+    });
+  });
 
 
 // Mobile Navigation Start
-
 $(document).ready(function() {
     if ($(window).width() < 991) {
         // Function to add or remove class based on the state of .navigation_dropdown-toggle
@@ -1092,9 +1111,11 @@ $(document).ready(function() {
             if (navButton.hasClass('w--open')) {
                 tl.play();
                 navButtonText.text('Close');
+                
             } else {
                 tl.reverse();
                 navButtonText.text('Menu');
+                
             }
         }
 
@@ -1118,12 +1139,7 @@ $(document).ready(function() {
 });
 
 
-
-
-// Mobile Navigation End
-
 // Desktop Navigation Start
-
 // Navigation Background Desktop & Nav links active
 $(document).ready(function() {
     if ($(window).width() > 991) {
@@ -1576,15 +1592,19 @@ $(document).ready(function() {
 
 // Desktop Navigation End
 
+/*
+// Add a delay before stopping the scroll (adjust the delay time as needed)
+    setTimeout(function() {
+    window.SScroll.call.stop();
+    }, 1000); // 1000 milliseconds = 1 second
+*/
+
+
+
 // Loader And Page Transition Start
 
 // GSAP timeline function for pageload
 function loaderOnPageLoad() {
-
-    // Add a delay before stopping the scroll (adjust the delay time as needed)
-    setTimeout(function() {
-    window.SScroll.call.stop();
-    }, 1000); // 1000 milliseconds = 1 second
     
     // Create a GSAP timeline
     let tl = gsap.timeline();
@@ -1797,5 +1817,6 @@ function animateImages() {
     resizeTimer = setTimeout(function () {
       animateImages();
     }, 250);
-  });
+});
+  
 
