@@ -1591,7 +1591,7 @@ $(document).ready(function() {
 
 // GSAP timeline function for pageload
 function loaderOnPageLoad() {
-    
+ 
     // Create a GSAP timeline
     let tl = gsap.timeline();
   
@@ -1600,8 +1600,12 @@ function loaderOnPageLoad() {
         y: "0%",
         duration: 0.4,
         delay: 0.2,
-        ease: 'power1.out'
-      })
+        ease: 'power1.out',
+        onComplete: () => {
+            lenis.scrollTo('#top');   
+        }
+    }, "<+0.3")
+      
       .to(".loader_background-gradient-1", {
         y: "-100%",
         duration: 1.5,
@@ -1641,7 +1645,7 @@ function loaderOnPageLoad() {
         delay: 0,
         ease: 'power1.out',
         onComplete: () => {
-            
+            lenis.start()
             }
       }, "<")
       
@@ -1704,6 +1708,8 @@ document.addEventListener("DOMContentLoaded", function() {
     if (scrollTopButton) {
       const clickEvent = new Event('click');
       scrollTopButton.dispatchEvent(clickEvent);
+      
+      
     }
 });
 
@@ -1820,6 +1826,40 @@ gsap.ticker.add((time) => {
 })
 
 gsap.ticker.lagSmoothing(0)
+
+
+
+
+// Page refresh on resize
+// Define breakpoints
+const breakpoints = [479, 767, 991, 1239, 1439, 1919];
+
+// Store the initial window width
+let initialWidth = window.innerWidth;
+
+// Function to check if the width crosses any breakpoints
+function shouldRefresh(newWidth) {
+  for (let breakpoint of breakpoints) {
+    if ((initialWidth <= breakpoint && newWidth > breakpoint) ||
+        (initialWidth > breakpoint && newWidth <= breakpoint)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// Add event listener for resize
+window.addEventListener('resize', function () {
+  let newWidth = window.innerWidth;
+  if (shouldRefresh(newWidth)) {
+    window.location.reload();
+  }
+});
+
+// Footer back to top botton
+document.querySelector('.text-link.is-back_to_top').addEventListener('click', function() {
+    lenis.scrollTo('#top');
+});
 
 
   
