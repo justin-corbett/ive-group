@@ -1631,9 +1631,6 @@ function loaderOnPageLoad() {
         duration: 1.5,
         delay: 0.8,
         ease: 'power2.out',
-        onComplete: () => {
-            gsap.set(".section-home-services", { display: "block" });
-            }
       })
       .to(".loader_background-gradient-2", {
         y: "-100%",
@@ -1669,7 +1666,7 @@ function loaderOnPageLoad() {
         ease: 'power1.out',
         onComplete: () => {
             lenis.start()
-        
+            gsap.set(".section-home-services", { display: "block" });
             }
       }, "<")
       
