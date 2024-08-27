@@ -7,37 +7,49 @@ ScrollTrigger.defaults({
   markers: false,
 });
 
-// GSAP Horizontal scroll – Desktop
-if ($(window).width() > 991) {
-let tlMain = gsap
-  .timeline({
-    scrollTrigger: {
-      trigger: ".section-height",
-      start: "top top",
-      end: "98% bottom",
-      scrub: 1
-    }
-  })
-  .to(".track", {
-    xPercent: -100,
-    ease: "none"
+// GSAP Horizontal Scroll – Desktop
+$(document).ready(function () {
+    loaderOnPageLoad().then(() => {
+        // Use gsap.delayedCall to introduce a slight delay
+        gsap.delayedCall(0, () => { // Adjust the delay as needed
+            if ($(window).width() > 991) {
+                setTrackHeights(); // Set heights before initializing ScrollTrigger
+                let tlMain = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: ".section-height",
+                        start: "top top",
+                        end: "98% bottom",
+                        scrub: 1,
+                    },
+                })
+                .to(".track", { 
+                    xPercent: -100, 
+                    ease: "none",
+                });
+            }
+        });
+    });
 });
-}
+
+
+
 
 // Optional - Set sticky section heights based on inner content width
 // Makes scroll timing feel more natural
-if ($(window).width() > 768) {
 function setTrackHeights() {
     $(".section-height").each(function (index) {
       let trackWidth = $(this).find(".track").outerWidth();
       $(this).height(trackWidth);
     });
   }
-  setTrackHeights();
+  
   window.addEventListener("resize", function () {
-    setTrackHeights();
+    if ($(window).width() > 991) {
+        setTrackHeights();
+    }
 });
-}
+
+  
 
 
 // Horizontal rule 
@@ -1594,6 +1606,10 @@ function loaderOnPageLoad() {
  
     // Create a GSAP timeline
     let tl = gsap.timeline();
+
+     // Stops flicker on homepage
+     gsap.set(".section-home-services", { display: "none" });
+
   
     // Add animations to the timeline
     tl.to(".logo-loader", {
@@ -1602,7 +1618,11 @@ function loaderOnPageLoad() {
         delay: 0.2,
         ease: 'power1.out',
         onComplete: () => {
-            lenis.scrollTo('#top');   
+            lenis.scrollTo('#top', {
+                onComplete: () => {
+                  lenis.stop(); // Stops the scroll animation
+                }
+              });
         }
     }, "<+0.3")
       
@@ -1611,6 +1631,9 @@ function loaderOnPageLoad() {
         duration: 1.5,
         delay: 0.8,
         ease: 'power2.out',
+        onComplete: () => {
+            gsap.set(".section-home-services", { display: "block" });
+            }
       })
       .to(".loader_background-gradient-2", {
         y: "-100%",
@@ -1646,6 +1669,7 @@ function loaderOnPageLoad() {
         ease: 'power1.out',
         onComplete: () => {
             lenis.start()
+        
             }
       }, "<")
       
