@@ -31,9 +31,6 @@ $(document).ready(function () {
     });
 });
 
-
-
-
 // Optional - Set sticky section heights based on inner content width
 // Makes scroll timing feel more natural
 function setTrackHeights() {
@@ -1093,9 +1090,6 @@ $(document).ready(function() {
 
 */
 
-
-
-
 // Mobile Navigation Start
 $(document).ready(function() {
     if ($(window).width() < 991) {
@@ -1135,7 +1129,6 @@ $(document).ready(function() {
         observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['class'] });
     }
 });
-
 
 // Desktop Navigation Start
 // Navigation Background Desktop & Nav links active
