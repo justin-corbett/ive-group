@@ -59,12 +59,14 @@ $(".horizontal-rule").each(function (index, element) {
         trigger: triggerElement,
         // trigger element - viewport
         start: "top bottom",
+        end: "bottom top", // Animation ends when the top of the element fully leaves the viewport
+        toggleActions: "play none none reset", // Reset animation when scrolling back up
       },
     });
     tl.from(targetElement, {
       width: "0%",
       duration: 1,
-      delay: 0.1,
+      delay: 0.2,
       ease: "power1.out",
     });
 });
@@ -1871,9 +1873,81 @@ window.addEventListener('resize', function () {
 });
 
 // Footer back to top botton
-document.querySelector('.text-link.is-back_to_top').addEventListener('click', function() {
-    lenis.scrollTo('#top');
+document.querySelector('.text-link.is-back_to_top').addEventListener('click', function () {
+    lenis.scrollTo('#top', {
+      duration: 2.5, // Duration in seconds (e.g., 2 seconds for a slower animation)
+    });
 });
+
+// GSAP Slplit Text – Animations
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+      const wordElements = document.querySelectorAll("[data-split-words]");
+      const lineElements = document.querySelectorAll("[data-split-lines]");
+  
+      if (wordElements.length === 0 && lineElements.length === 0) return; // No elements found, exit
+  
+      wordElements.forEach(element => {
+        if (!element.textContent.trim()) return; // Skip empty elements
+        const wordSplit = new SplitText(element, { type: "words" });
+  
+        gsap.from(wordSplit.words, {
+          autoAlpha: 0,
+          translateY: "100%",
+          delay: 0.2,
+          duration: 1,
+          stagger: 0.05,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: element,
+            start: "top bottom",
+            end: "bottom top",
+            toggleActions: "play none none reset",
+          },
+        });
+      });
+  
+      lineElements.forEach(element => {
+        if (!element.textContent.trim()) return; // Skip empty elements
+        const linesSplit = new SplitText(element, { type: "lines" });
+  
+        gsap.from(linesSplit.lines, {
+          autoAlpha: 0,
+          translateY: "100%",
+          duration: 1,
+          delay: 0.2,
+          stagger: 0.1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: element,
+            start: "top bottom",
+            toggleActions: "play none none reset",
+          },
+        });
+      });
+    }, 200); // Reduce delay
+});
+
+// Subtitle Waymaker – Fade In
+gsap.utils.toArray(".icon-waymaker-subtitle").forEach((el) => {
+gsap.fromTo(el, 
+    { opacity: 0, y: '100%' }, 
+    { 
+    opacity: 1, 
+    y: '0%',
+    delay: 0.2,
+    duration: 1, 
+    ease: "power2.out",
+    scrollTrigger: {
+        trigger: el,
+        start: "top bottom",
+        toggleActions: "play none none reset"
+    }
+    }
+);
+});
+  
+  
 
 
   
