@@ -1925,9 +1925,8 @@ gsap.ticker.lagSmoothing(0)
 
 
 
-
+/*
 // Page refresh on resize
-// Define breakpoints
 const breakpoints = [479, 767, 991, 1239, 1439, 1919];
 
 // Store the initial window width
@@ -1951,6 +1950,7 @@ window.addEventListener('resize', function () {
     window.location.reload();
   }
 });
+*/
 
 // Footer back to top botton
 document.querySelector('.text-link.is-back_to_top').addEventListener('click', function () {
