@@ -60,7 +60,7 @@ $(".horizontal-rule").each(function (index, element) {
         // trigger element - viewport
         start: "top bottom",
         end: "bottom top", // Animation ends when the top of the element fully leaves the viewport
-        toggleActions: "play none none reset", // Reset animation when scrolling back up
+        toggleActions: "play none none none", // Reset animation when scrolling back up
       },
     });
     tl.from(targetElement, {
@@ -751,10 +751,30 @@ $(".scroller").hover(
   }
 );
 
-// ESG Video Cursor Fade In
+// Video Cursor Fade In
 $(".image_full-hero_secondary").each(function (index) {
     let triggerElement = $(this);
     let targetElement = $(".cursor-hover-video");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top 50%",
+        end: "top 25%",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      opacity: "100%",
+      duration: 1,
+    });
+});
+
+// Service Video Cursor Fade In
+$(".image_full-service_hero-video").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".cursor-hover-video.is-service_hero");
   
     let tl = gsap.timeline({
       scrollTrigger: {
@@ -838,6 +858,46 @@ $(".image_full-hero_secondary").each(function (index) {
     });
     tl.to(targetElement, {
       scale: "1",
+      duration: 1,
+    });
+});
+
+// Service hero video scale
+$(".image_full-service_hero-video").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".video-bg.is-service_hero");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      scale: "1",
+      duration: 1,
+    });
+});
+
+// Service hero video move
+$(".image_full-service_hero-video").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".video-bg.is-service_hero");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top top",
+        end: "bottom top",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      y: "-10%",
       duration: 1,
     });
 });
@@ -1019,6 +1079,26 @@ $(".image_full-services").each(function (index) {
     });
     tl.to(targetElement, {
       scale: "1",
+      duration: 1,
+    });
+});
+
+// Image move services – service page
+$(".image_full-services").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".image-full_screen-services");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top top",
+        end: "bottom top",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      y: "-10%",
       duration: 1,
     });
 });
@@ -1902,7 +1982,7 @@ document.addEventListener("DOMContentLoaded", () => {
             trigger: element,
             start: "top bottom",
             end: "bottom top",
-            toggleActions: "play none none reset",
+            toggleActions: "play none none none",
           },
         });
       });
@@ -1921,7 +2001,7 @@ document.addEventListener("DOMContentLoaded", () => {
           scrollTrigger: {
             trigger: element,
             start: "top bottom",
-            toggleActions: "play none none reset",
+            toggleActions: "play none none none",
           },
         });
       });
@@ -1941,11 +2021,125 @@ gsap.fromTo(el,
     scrollTrigger: {
         trigger: el,
         start: "top bottom",
-        toggleActions: "play none none reset"
+        toggleActions: "play none none none"
     }
     }
 );
 });
+
+// Plyr Videos
+$(document).ready(function () {
+    $(".plyr_component").each(function () {
+      let thisComponent = $(this);
+  
+      // Initialize Plyr for each component
+      let player = new Plyr(thisComponent.find(".plyr_video")[0], {
+        controls: ["play", "progress", "current-time", "mute", "fullscreen"],
+        resetOnEnd: true,
+      });
+  
+      // Custom video cover click
+      thisComponent.find(".plyr_cover").on("click", function () {
+        player.play();
+      });
+  
+      player.on("ended", () => {
+        thisComponent.removeClass("hide-cover");
+        if (player.fullscreen.active) {
+          player.fullscreen.exit();
+        }
+      });
+  
+      // Pause other playing videos when this one starts
+      player.on("play", () => {
+        $(".plyr_component").removeClass("hide-cover");
+        thisComponent.addClass("hide-cover");
+  
+        let prevPlayingComponent = $(".plyr--playing").closest(".plyr_component").not(thisComponent);
+        if (prevPlayingComponent.length > 0) {
+          prevPlayingComponent.find(".plyr_pause-trigger")[0].click();
+        }
+      });
+  
+      // Pause when clicking the custom pause trigger
+      thisComponent.find(".plyr_pause-trigger").on("click", function () {
+        player.pause();
+      });
+  
+      // Change video container mode when entering/exiting fullscreen
+      player.on("enterfullscreen", () => {
+        thisComponent.addClass("contain-video");
+      });
+      player.on("exitfullscreen", () => {
+        thisComponent.removeClass("contain-video");
+      });
+  
+      // Pause video when closing the modal
+      $(".text-link-alternate.is-video_modal-close").on("click", function () {
+        player.pause();
+      });
+  
+      // Store player instance inside the element for later use
+      thisComponent.data("player", player);
+    });
+  
+    // Handle video modal logic
+    $(".video-tabs_menu-item").each(function () {
+      const item = $(this);
+      const stage = item.find(".video-tabs_stage");
+      const modal = item.find(".video_modal");
+      const player = modal.find(".plyr_video").closest(".plyr_component").data("player"); // Get associated Plyr instance
+  
+      // Observe class changes to detect active state
+      new MutationObserver(() => {
+        stage.toggleClass("is-active", item.hasClass("is-active"));
+      }).observe(item[0], { attributes: true, attributeFilter: ["class"] });
+  
+      // Open modal and play video on click
+      stage.on("click", function () {
+        if (stage.hasClass("is-active")) {
+          gsap.set(modal, { display: "block" });
+          gsap.to(modal, { opacity: 1, duration: 0.3 });
+  
+          // Play the correct video inside the modal
+          if (player) {
+            player.play();
+          }
+        }
+      });
+    });
+});
+
+// .video-tabs_link-wrapper fade in on scroll
+
+
+// Select all elements with the class .video-tabs_link-wrapper
+const videoTabLinks = gsap.utils.toArray(".video-tabs_link-wrapper");
+
+videoTabLinks.forEach((link, index) => {
+  gsap.fromTo(
+    link,
+    { opacity: 0, y: '100%' },
+    {
+      opacity: 1,
+      y: '0%',
+      duration: 0.8,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: link,
+        start: "top 90%", // Adjust to control when each item animates
+        toggleActions: "play none none none",
+      },
+      delay: index * 0.05, // Stagger effect based on index
+    }
+  );
+});
+
+
+
+
+
+
   
   
 
