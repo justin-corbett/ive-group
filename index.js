@@ -771,6 +771,26 @@ $(".image_full-hero_secondary").each(function (index) {
     });
 });
 
+// Video Cursor Fade In
+$(".image_full-service_hero-video").each(function (index) {
+    let triggerElement = $(this);
+    let targetElement = $(".cursor-hover-video");
+  
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: triggerElement,
+        // trigger element - viewport
+        start: "top 50%",
+        end: "top 25%",
+        scrub: 1,
+      },
+    });
+    tl.to(targetElement, {
+      opacity: "100%",
+      duration: 1,
+    });
+});
+
 // Service Video Cursor Fade In
 $(".image_full-service_hero-video").each(function (index) {
     let triggerElement = $(this);
@@ -1142,35 +1162,6 @@ $(".section-footer").each(function (index) {
       duration: 1,
     });
 });
-
-/*
-// Force reload tablet and mobile
-$(document).ready(function() {
-    // Flag to track whether the page has been refreshed
-    var pageRefreshed = false;
-
-    // Function to check window width and reload if necessary
-    function checkWindowWidth() {
-        if ($(window).width() < 991 && !pageRefreshed) {
-            location.reload(); // Reload the page if window width is less than 991px and page hasn't been refreshed yet
-            pageRefreshed = true; // Set the flag to true to indicate that the page has been refreshed
-        }
-    }
-
-    // Call the function on page load if the initial width is below 991 pixels
-    if ($(window).width() < 991) {
-        pageRefreshed = true; // Set the flag to true to indicate that the page doesn't need to be refreshed
-    } else {
-        checkWindowWidth(); // Otherwise, check the window width
-    }
-
-    // Add an event listener to check window width on resize
-    $(window).resize(function() {
-        checkWindowWidth();
-    });
-});
-
-*/
 
 // Mobile Navigation Start
 $(document).ready(function() {
@@ -1925,7 +1916,7 @@ gsap.ticker.lagSmoothing(0)
 
 
 
-/*
+
 // Page refresh on resize
 const breakpoints = [479, 767, 991, 1239, 1439, 1919];
 
@@ -1950,7 +1941,7 @@ window.addEventListener('resize', function () {
     window.location.reload();
   }
 });
-*/
+
 
 // Footer back to top botton
 document.querySelector('.text-link.is-back_to_top').addEventListener('click', function () {
@@ -1961,17 +1952,27 @@ document.querySelector('.text-link.is-back_to_top').addEventListener('click', fu
 
 // GSAP Slplit Text – Animations
 document.addEventListener("DOMContentLoaded", () => {
-    setTimeout(() => {
+    const initSplitText = () => {
       const wordElements = document.querySelectorAll("[data-split-words]");
       const lineElements = document.querySelectorAll("[data-split-lines]");
   
-      if (wordElements.length === 0 && lineElements.length === 0) return; // No elements found, exit
+      if (wordElements.length === 0 && lineElements.length === 0) return;
   
+      // Clear any previous ScrollTriggers and animations
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+      gsap.killTweensOf("*");
+  
+      // Split Words
       wordElements.forEach(element => {
-        if (!element.textContent.trim()) return; // Skip empty elements
+        if (!element.textContent.trim()) return;
+        
+        // Clear previous split instances
         const wordSplit = new SplitText(element, { type: "words" });
+        wordSplit.revert(); // Reverts previous splits before splitting again
   
-        gsap.from(wordSplit.words, {
+        const newSplit = new SplitText(element, { type: "words" });
+  
+        gsap.from(newSplit.words, {
           autoAlpha: 0,
           translateY: "100%",
           delay: 0.2,
@@ -1987,11 +1988,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       });
   
+      // Split Lines
       lineElements.forEach(element => {
-        if (!element.textContent.trim()) return; // Skip empty elements
-        const linesSplit = new SplitText(element, { type: "lines" });
+        if (!element.textContent.trim()) return;
   
-        gsap.from(linesSplit.lines, {
+        // Clear previous split instances
+        const linesSplit = new SplitText(element, { type: "lines" });
+        linesSplit.revert(); // Reverts previous splits before splitting again
+  
+        const newSplit = new SplitText(element, { type: "lines" });
+  
+        gsap.from(newSplit.lines, {
           autoAlpha: 0,
           translateY: "100%",
           duration: 1,
@@ -2005,8 +2012,17 @@ document.addEventListener("DOMContentLoaded", () => {
           },
         });
       });
-    }, 200); // Reduce delay
-});
+    };
+  
+    // Initial Split Text Animation
+    setTimeout(initSplitText, 200);
+  
+    // Reinitialize on Window Resize
+    window.addEventListener("resize", () => {
+      setTimeout(initSplitText, 200);
+    });
+  });
+  
 
 // Subtitle Waymaker – Fade In
 gsap.utils.toArray(".icon-waymaker-subtitle").forEach((el) => {
