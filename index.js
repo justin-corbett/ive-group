@@ -1163,6 +1163,35 @@ $(".section-footer").each(function (index) {
     });
 });
 
+/*
+// Force reload tablet and mobile
+$(document).ready(function() {
+    // Flag to track whether the page has been refreshed
+    var pageRefreshed = false;
+
+    // Function to check window width and reload if necessary
+    function checkWindowWidth() {
+        if ($(window).width() < 991 && !pageRefreshed) {
+            location.reload(); // Reload the page if window width is less than 991px and page hasn't been refreshed yet
+            pageRefreshed = true; // Set the flag to true to indicate that the page has been refreshed
+        }
+    }
+
+    // Call the function on page load if the initial width is below 991 pixels
+    if ($(window).width() < 991) {
+        pageRefreshed = true; // Set the flag to true to indicate that the page doesn't need to be refreshed
+    } else {
+        checkWindowWidth(); // Otherwise, check the window width
+    }
+
+    // Add an event listener to check window width on resize
+    $(window).resize(function() {
+        checkWindowWidth();
+    });
+});
+
+*/
+
 // Mobile Navigation Start
 $(document).ready(function() {
     if ($(window).width() < 991) {
@@ -1914,9 +1943,6 @@ gsap.ticker.add((time) => {
 
 gsap.ticker.lagSmoothing(0)
 
-
-
-
 // Page refresh on resize
 const breakpoints = [479, 767, 991, 1239, 1439, 1919];
 
@@ -1952,27 +1978,17 @@ document.querySelector('.text-link.is-back_to_top').addEventListener('click', fu
 
 // GSAP Slplit Text – Animations
 document.addEventListener("DOMContentLoaded", () => {
-    const initSplitText = () => {
+    setTimeout(() => {
       const wordElements = document.querySelectorAll("[data-split-words]");
       const lineElements = document.querySelectorAll("[data-split-lines]");
   
-      if (wordElements.length === 0 && lineElements.length === 0) return;
+      if (wordElements.length === 0 && lineElements.length === 0) return; // No elements found, exit
   
-      // Clear any previous ScrollTriggers and animations
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-      gsap.killTweensOf("*");
-  
-      // Split Words
       wordElements.forEach(element => {
-        if (!element.textContent.trim()) return;
-        
-        // Clear previous split instances
+        if (!element.textContent.trim()) return; // Skip empty elements
         const wordSplit = new SplitText(element, { type: "words" });
-        wordSplit.revert(); // Reverts previous splits before splitting again
   
-        const newSplit = new SplitText(element, { type: "words" });
-  
-        gsap.from(newSplit.words, {
+        gsap.from(wordSplit.words, {
           autoAlpha: 0,
           translateY: "100%",
           delay: 0.2,
@@ -1988,17 +2004,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       });
   
-      // Split Lines
       lineElements.forEach(element => {
-        if (!element.textContent.trim()) return;
-  
-        // Clear previous split instances
+        if (!element.textContent.trim()) return; // Skip empty elements
         const linesSplit = new SplitText(element, { type: "lines" });
-        linesSplit.revert(); // Reverts previous splits before splitting again
   
-        const newSplit = new SplitText(element, { type: "lines" });
-  
-        gsap.from(newSplit.lines, {
+        gsap.from(linesSplit.lines, {
           autoAlpha: 0,
           translateY: "100%",
           duration: 1,
@@ -2012,17 +2022,8 @@ document.addEventListener("DOMContentLoaded", () => {
           },
         });
       });
-    };
-  
-    // Initial Split Text Animation
-    setTimeout(initSplitText, 200);
-  
-    // Reinitialize on Window Resize
-    window.addEventListener("resize", () => {
-      setTimeout(initSplitText, 200);
-    });
-  });
-  
+    }, 200); // Reduce delay
+});
 
 // Subtitle Waymaker – Fade In
 gsap.utils.toArray(".icon-waymaker-subtitle").forEach((el) => {
