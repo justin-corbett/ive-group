@@ -2127,9 +2127,93 @@ $(document).ready(function () {
     });
 });
 
+// Video tabs auto change timer
+$(function () {
+    if ($(window).width() > 319) {
+  
+      function autoplayTabs($tabsMenu) {
+        var $activeTab = $tabsMenu.find('.video-tabs_menu-item.is-active');
+        var $nextTab = $activeTab.next('.video-tabs_menu-item');
+        if ($nextTab.length === 0) {
+          $nextTab = $tabsMenu.find('.video-tabs_menu-item:first');
+        }
+        $nextTab.trigger('click');
+      }
+  
+      function startTimer($tabsMenu, timing) {
+        var interval = timing;
+        var timer = setInterval(function () {
+          autoplayTabs($tabsMenu);
+        }, interval);
+        $tabsMenu.data('timer', timer);
+        console.log("tabs timer started!");
+      }
+  
+      function resetTimer($tabsMenu, timing) {
+        var timer = $tabsMenu.data('timer');
+        clearInterval(timer);
+        startTimer($tabsMenu, timing);
+      }
+  
+      $('[tab-function="autoplay"]').each(function () {
+        var $tabsMenu = $(this);
+        var timing = parseInt($tabsMenu.attr('tab-timing'));
+  
+        // Autoplay tab change
+        $tabsMenu.find('.video-tabs_menu-item').on('click', function () {
+          $tabsMenu.find('.video-tabs_menu-item').removeClass('is-active');
+          $(this).addClass('is-active');
+          resetTimer($tabsMenu, timing);
+          $tabsMenu.find('.video-tabs_progress-bar').stop().css({ width: '0%' });
+          $(this).find('.video-tabs_progress-bar').css({ width: 0 })
+            .animate({ width: '100%' }, timing);
+        });
+  
+        var startType = $tabsMenu.attr('tab-function-start');
+        if (startType === 'scroll-into-view') {
+          // Check if tabs are in view and start autoplay
+          var options = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.5
+          };
+  
+          var observer = new IntersectionObserver(function (entries, observer) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                // Start timer and play active tab animation
+                startTimer($tabsMenu, timing);
+                $tabsMenu.find('.video-tabs_menu-item.is-active').find(
+                    '.video-tabs_progress-bar')
+                  .css({ width: 0 })
+                  .animate({ width: '100%' }, timing);
+  
+                observer.unobserve(entry.target);
+              }
+            });
+          }, options);
+  
+          observer.observe(this);
+        } else {
+          // Start autoplay on page load
+          startTimer($tabsMenu, timing);
+          $tabsMenu.find('.video-tabs_menu-item.is-active').find('.video-tabs_progress-bar')
+            .css({ width: 0 })
+            .animate({ width: '100%' }, timing);
+        }
+      });
+  
+      // Static tab change
+      $('[tab-function="static"] .video-tabs_menu-item').on('click', function () {
+        var $tabsMenu = $(this).closest('.video-tabs_menu');
+        $tabsMenu.find('.video-tabs_menu-item').removeClass('is-active');
+        $(this).addClass('is-active');
+      });
+    }
+});
+  
+
 // .video-tabs_link-wrapper fade in on scroll
-
-
 // Select all elements with the class .video-tabs_link-wrapper
 const videoTabLinks = gsap.utils.toArray(".video-tabs_link-wrapper");
 
@@ -2152,14 +2236,79 @@ videoTabLinks.forEach((link, index) => {
   );
 });
 
+// Cursor Video Play Text Infinite Carousel
+// Initially position text in a row
+gsap.utils.toArray(".cursor-video_play-wrapper").forEach((wrapper) => {
+    let texts = wrapper.querySelectorAll(".cursor-video_play-text");
+
+    // Initially position text in a row
+    gsap.set(texts, {
+        x: (i) => i * 140
+    });
+
+    // Animate text carousel
+    gsap.to(texts, {
+        duration: 5,
+        ease: "none",
+        x: "-=140", // Move left
+        modifiers: {
+            x: gsap.utils.unitize(x => parseFloat(x) % 540) 
+        },
+        repeat: -1
+    });
+});
+
+
+// Video Gallery – Show cursor on hover and follow mouse
+const cursor = document.querySelector(".cursor-video_play-wrapper");
+const videoStages = document.querySelectorAll(".video-tabs_stage");
+const cursorHoverVideos = document.querySelectorAll(".cursor-hover-video");
+
+// Make cursor follow the mouse
+document.addEventListener("mousemove", (e) => {
+  gsap.to(cursor, {
+    x: e.clientX,
+    y: e.clientY,
+    duration: 0.2,
+    ease: "power2.out",
+  });
+});
+
+// Loop through all .video-tabs_stage elements
+videoStages.forEach((stage) => {
+  stage.addEventListener("mouseenter", () => {
+    // Show cursor
+    gsap.to(cursor, {
+      autoAlpha: 1,
+      duration: 0.3,
+      ease: "power2.out",
+    });
+
+    // Hide all elements with .cursor-hover-video
+    gsap.to(cursorHoverVideos, {
+      autoAlpha: 0,
+      duration: 0.3,
+      ease: "power2.out",
+    });
+  });
+
+  stage.addEventListener("mouseleave", () => {
+    // Hide cursor
+    gsap.to(cursor, {
+      autoAlpha: 0,
+      duration: 0.3,
+      ease: "power2.out",
+    });
+
+    // Show all elements with .cursor-hover-video
+    gsap.to(cursorHoverVideos, {
+      autoAlpha: 1,
+      duration: 0.3,
+      ease: "power2.out",
+    });
+  });
+});
 
 
 
-
-
-  
-  
-
-
-  
 
