@@ -1163,35 +1163,6 @@ $(".section-footer").each(function (index) {
     });
 });
 
-/*
-// Force reload tablet and mobile
-$(document).ready(function() {
-    // Flag to track whether the page has been refreshed
-    var pageRefreshed = false;
-
-    // Function to check window width and reload if necessary
-    function checkWindowWidth() {
-        if ($(window).width() < 991 && !pageRefreshed) {
-            location.reload(); // Reload the page if window width is less than 991px and page hasn't been refreshed yet
-            pageRefreshed = true; // Set the flag to true to indicate that the page has been refreshed
-        }
-    }
-
-    // Call the function on page load if the initial width is below 991 pixels
-    if ($(window).width() < 991) {
-        pageRefreshed = true; // Set the flag to true to indicate that the page doesn't need to be refreshed
-    } else {
-        checkWindowWidth(); // Otherwise, check the window width
-    }
-
-    // Add an event listener to check window width on resize
-    $(window).resize(function() {
-        checkWindowWidth();
-    });
-});
-
-*/
-
 // Mobile Navigation Start
 $(document).ready(function() {
     if ($(window).width() < 991) {
@@ -2236,27 +2207,7 @@ videoTabLinks.forEach((link, index) => {
   );
 });
 
-// Cursor Video Play Text Infinite Carousel
-// Initially position text in a row
-gsap.utils.toArray(".cursor-video_play-wrapper").forEach((wrapper) => {
-    let texts = wrapper.querySelectorAll(".cursor-video_play-text");
 
-    // Initially position text in a row
-    gsap.set(texts, {
-        x: (i) => i * 140
-    });
-
-    // Animate text carousel
-    gsap.to(texts, {
-        duration: 5,
-        ease: "none",
-        x: "-=140", // Move left
-        modifiers: {
-            x: gsap.utils.unitize(x => parseFloat(x) % 540) 
-        },
-        repeat: -1
-    });
-});
 
 
 // Video Gallery – Show cursor on hover and follow mouse
