@@ -2100,89 +2100,122 @@ $(document).ready(function () {
 
 // Video tabs auto change timer
 $(function () {
-    if ($(window).width() > 319) {
-  
+  if ($(window).width() > 319) {
+
       function autoplayTabs($tabsMenu) {
-        var $activeTab = $tabsMenu.find('.video-tabs_menu-item.is-active');
-        var $nextTab = $activeTab.next('.video-tabs_menu-item');
-        if ($nextTab.length === 0) {
-          $nextTab = $tabsMenu.find('.video-tabs_menu-item:first');
-        }
-        $nextTab.trigger('click');
+          var $activeTab = $tabsMenu.find('.video-tabs_menu-item.is-active');
+          var $nextTab = $activeTab.next('.video-tabs_menu-item');
+          if ($nextTab.length === 0) {
+              $nextTab = $tabsMenu.find('.video-tabs_menu-item:first');
+          }
+          $nextTab.trigger('click');
       }
-  
+
       function startTimer($tabsMenu, timing) {
-        var interval = timing;
-        var timer = setInterval(function () {
-          autoplayTabs($tabsMenu);
-        }, interval);
-        $tabsMenu.data('timer', timer);
-        console.log("tabs timer started!");
+          var interval = timing;
+          var timer = setInterval(function () {
+              autoplayTabs($tabsMenu);
+          }, interval);
+          $tabsMenu.data('timer', timer);
+          console.log("tabs timer started!");
       }
-  
+
       function resetTimer($tabsMenu, timing) {
-        var timer = $tabsMenu.data('timer');
-        clearInterval(timer);
-        startTimer($tabsMenu, timing);
+          var timer = $tabsMenu.data('timer');
+          clearInterval(timer);
+          startTimer($tabsMenu, timing);
       }
-  
+
+      function updateAutostart($stage) {
+          var $video = $stage.find('.video-tabs-bg');
+          var videoElement = $video[0]; // Get the actual <video> element
+
+          if ($stage.hasClass('is-active')) {
+              $video.attr('autostart', '1');
+              if (videoElement) {
+                  videoElement.play().catch(error => console.log("Video play error:", error));
+              }
+          } else {
+              $video.attr('autostart', '0');
+              if (videoElement) {
+                  videoElement.pause();
+                  videoElement.currentTime = 0; // Reset to the beginning
+              }
+          }
+      }
+
+      function observeAutostart() {
+          $('.video-tabs_stage').each(function () {
+              var $stage = $(this);
+              var observer = new MutationObserver(function (mutationsList) {
+                  mutationsList.forEach(function (mutation) {
+                      if (mutation.attributeName === "class") {
+                          updateAutostart($stage);
+                      }
+                  });
+              });
+              observer.observe($stage[0], { attributes: true, attributeFilter: ['class'] });
+              updateAutostart($stage); // Ensure initial state is correct
+          });
+      }
+
       $('[tab-function="autoplay"]').each(function () {
-        var $tabsMenu = $(this);
-        var timing = parseInt($tabsMenu.attr('tab-timing'));
-  
-        // Autoplay tab change
-        $tabsMenu.find('.video-tabs_menu-item').on('click', function () {
-          $tabsMenu.find('.video-tabs_menu-item').removeClass('is-active');
-          $(this).addClass('is-active');
-          resetTimer($tabsMenu, timing);
-          $tabsMenu.find('.video-tabs_progress-bar').stop().css({ width: '0%' });
-          $(this).find('.video-tabs_progress-bar').css({ width: 0 })
-            .animate({ width: '100%' }, timing);
-        });
-  
-        var startType = $tabsMenu.attr('tab-function-start');
-        if (startType === 'scroll-into-view') {
-          // Check if tabs are in view and start autoplay
-          var options = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.5
-          };
-  
-          var observer = new IntersectionObserver(function (entries, observer) {
-            entries.forEach(function (entry) {
-              if (entry.isIntersecting) {
-                // Start timer and play active tab animation
-                startTimer($tabsMenu, timing);
-                $tabsMenu.find('.video-tabs_menu-item.is-active').find(
-                    '.video-tabs_progress-bar')
+          var $tabsMenu = $(this);
+          var timing = parseInt($tabsMenu.attr('tab-timing'));
+
+          $tabsMenu.find('.video-tabs_menu-item').on('click', function () {
+              $tabsMenu.find('.video-tabs_menu-item').removeClass('is-active');
+              $(this).addClass('is-active');
+              resetTimer($tabsMenu, timing);
+              $tabsMenu.find('.video-tabs_progress-bar').stop().css({ width: '0%' });
+              $(this).find('.video-tabs_progress-bar').css({ width: 0 })
+                  .animate({ width: '100%' }, timing);
+          });
+
+          var startType = $tabsMenu.attr('tab-function-start');
+          if (startType === 'scroll-into-view') {
+              var options = {
+                  root: null,
+                  rootMargin: '0px',
+                  threshold: 0.5
+              };
+
+              var observer = new IntersectionObserver(function (entries, observer) {
+                  entries.forEach(function (entry) {
+                      if (entry.isIntersecting) {
+                          startTimer($tabsMenu, timing);
+                          $tabsMenu.find('.video-tabs_menu-item.is-active')
+                              .find('.video-tabs_progress-bar')
+                              .css({ width: 0 })
+                              .animate({ width: '100%' }, timing);
+
+                          observer.unobserve(entry.target);
+                      }
+                  });
+              }, options);
+
+              observer.observe(this);
+          } else {
+              startTimer($tabsMenu, timing);
+              $tabsMenu.find('.video-tabs_menu-item.is-active')
+                  .find('.video-tabs_progress-bar')
                   .css({ width: 0 })
                   .animate({ width: '100%' }, timing);
-  
-                observer.unobserve(entry.target);
-              }
-            });
-          }, options);
-  
-          observer.observe(this);
-        } else {
-          // Start autoplay on page load
-          startTimer($tabsMenu, timing);
-          $tabsMenu.find('.video-tabs_menu-item.is-active').find('.video-tabs_progress-bar')
-            .css({ width: 0 })
-            .animate({ width: '100%' }, timing);
-        }
+          }
       });
-  
-      // Static tab change
+
       $('[tab-function="static"] .video-tabs_menu-item').on('click', function () {
-        var $tabsMenu = $(this).closest('.video-tabs_menu');
-        $tabsMenu.find('.video-tabs_menu-item').removeClass('is-active');
-        $(this).addClass('is-active');
+          var $tabsMenu = $(this).closest('.video-tabs_menu');
+          $tabsMenu.find('.video-tabs_menu-item').removeClass('is-active');
+          $(this).addClass('is-active');
       });
-    }
+
+      // Start observing changes for autostart
+      observeAutostart();
+  }
 });
-  
+
+
 
 // .video-tabs_link-wrapper fade in on scroll
 // Select all elements with the class .video-tabs_link-wrapper
@@ -2202,12 +2235,10 @@ videoTabLinks.forEach((link, index) => {
         start: "top 90%", // Adjust to control when each item animates
         toggleActions: "play none none none",
       },
-      delay: index * 0.05, // Stagger effect based on index
+      delay: index * 0.1, // Stagger effect based on index
     }
   );
 });
-
-
 
 
 // Video Gallery – Show cursor on hover and follow mouse
