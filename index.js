@@ -822,25 +822,36 @@ tl.set('.navigation-dropdown-bg-wrapper', { display: "block" })
 ;
 
 // Home hero title animation
-let typeSplit = new SplitType(".title-home-hero.is-animate", {
-    types: "words, chars",
-    tagName: "span"
-  });
-  
-  $(".home-hero-heading-wrapper").each(function (index) {
-    let headings = $(this).find(".title-home-hero.is-animate");
-    let tl = gsap.timeline({ repeat: -1, delay: 2.5 }); // Adding the delay here
-    tl.set($(this), { opacity: 1 });
-    headings.each(function (index) {
-      if (index > 0) {
-        tl.from($(this).find(".char"), { yPercent: 110, stagger: { amount: 0.4 }, duration: 0.4 }, "<0.1");
-      }
-      if (index < headings.length - 1) {
-        tl.to($(this).find(".char"), { delay: 1, yPercent: -110, stagger: { amount: 0.4 }, duration: 0.4 });
-      }
+const wrappers = document.querySelectorAll(".home-hero-heading-wrapper");
+
+if (wrappers.length > 0) {  // ✅ Prevents errors if the elements don’t exist
+    wrappers.forEach((wrapper) => {
+        let headings = wrapper.querySelectorAll(".title-home-hero.is-animate");
+
+        if (headings.length > 0) {  // ✅ Extra safety check
+            let splitTextInstances = [];
+
+            headings.forEach((heading) => {
+                splitTextInstances.push(new SplitText(heading, { type: "chars" }));
+            });
+
+            let tl = gsap.timeline({ repeat: -1, delay: 2.5 });
+
+            tl.set(wrapper, { opacity: 1 });
+
+            headings.forEach((heading, index) => {
+                let chars = splitTextInstances[index].chars;
+
+                if (index > 0) {
+                    tl.from(chars, { yPercent: 110, stagger: 0.04, duration: 0.4 }, "<0.1");
+                }
+                if (index < headings.length - 1) {
+                    tl.to(chars, { delay: 1, yPercent: -110, stagger: 0.04, duration: 0.4 });
+                }
+            });
+        }
     });
-  });
-  
+}
 
 // Image scale full projects
 $(".image_full-content-wrapper").each(function (index) {
@@ -2015,7 +2026,7 @@ gsap.fromTo(el,
 );
 });
 
-// Plyr Videos
+// Plyr Video Gallery 
 $(document).ready(function () {
     $(".plyr_component").each(function () {
       let thisComponent = $(this);
@@ -2097,6 +2108,71 @@ $(document).ready(function () {
       });
     });
 });
+
+// Plyr Video Page Hero
+$(".plyr_component.is-full-screen.is-page_hero").each(function (index) {
+  let thisComponent = $(this);
+
+  // create plyr settings
+  let player = new Plyr(thisComponent.find(".plyr_video")[0], {
+    controls: ["play", "progress", "current-time", "mute", "fullscreen"],
+    resetOnEnd: true
+  });
+  
+  // custom video cover
+  thisComponent.find(".plyr_cover").on("click", function () {
+    player.play();
+  });
+  
+  player.on("ended", () => {
+    thisComponent.removeClass("hide-cover");
+  });
+
+  // pause other playing videos when this one starts playing
+  player.on("play", () => {
+    $(".plyr_component.is-full-screen.is-page_hero").removeClass("hide-cover");
+    thisComponent.addClass("hide-cover");
+
+    let prevPlayingComponent = $(".plyr--playing")
+      .closest(".plyr_component.is-full-screen.is-page_hero")
+      .not(thisComponent);
+
+    if (prevPlayingComponent.length > 0) {
+      prevPlayingComponent.find(".plyr_pause-trigger")[0].click();
+    }
+  });
+
+  thisComponent.find(".plyr_pause-trigger").on("click", function () {
+    player.pause();
+  });
+
+  // exit full screen when video ends
+  player.on("ended", () => {
+    if (player.fullscreen.active) {
+      player.fullscreen.exit();
+    }
+  });
+
+  // set video to contain instead of cover when in full screen mode
+  player.on("enterfullscreen", () => {
+    thisComponent.addClass("contain-video");
+  });
+
+  player.on("exitfullscreen", () => {
+    thisComponent.removeClass("contain-video");
+  });
+
+  // Pause video when clicking on .text-link-alternate.is-video_modal-close
+  $(".text-link-alternate.is-video_modal-close").on("click", function() {
+    player.pause();
+  });
+
+  // Play video when clicking on .horizontal-spacer
+  $(".image_full-service_hero-video").on("click", function() {
+    player.play();
+  });
+});
+
 
 // Video tabs auto change timer
 $(function () {
