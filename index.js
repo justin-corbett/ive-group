@@ -2167,8 +2167,13 @@ $(".plyr_component.is-full-screen.is-page_hero").each(function (index) {
     player.pause();
   });
 
-  // Play video when clicking on .horizontal-spacer
+  // Play video service pages
   $(".image_full-service_hero-video").on("click", function() {
+    player.play();
+  });
+
+  // Play video home page
+  $(".home-hero_video").on("click", function() {
     player.play();
   });
 });
