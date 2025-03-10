@@ -674,6 +674,26 @@ $(".section-services_overview").each(function (index) {
     });
 });
 
+// Navigation BG Gradient Fade In – Case Studies
+$(".section-case_study-hero-content").each(function (index) {
+  let triggerElement = $(this);
+  let targetElement = $(".navigation-bg-gradient");
+
+  let tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: triggerElement,
+      // trigger element - viewport
+      start: "top bottom",
+      end: "top top",
+      scrub: 1,
+    },
+  });
+  tl.to(targetElement, {
+    opacity: "100%",
+    duration: 1,
+  });
+});
+
 // Navigation Home BG Gradient Fade In
 $(".scroll-track.is-home_hero").each(function (index) {
     let triggerElement = $(this);
@@ -1132,6 +1152,46 @@ $(".image_full-services").each(function (index) {
       y: "-10%",
       duration: 1,
     });
+});
+
+// Image scale – case studies
+$(".image-full-case_study").each(function (index) {
+  let triggerElement = $(this);
+  let targetElement = $(".image-full_screen-case_study");
+
+  let tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: triggerElement,
+      // trigger element - viewport
+      start: "top bottom",
+      end: "bottom top",
+      scrub: 1,
+    },
+  });
+  tl.to(targetElement, {
+    scale: "1",
+    duration: 1,
+  });
+});
+
+// Image move – case studies
+$(".image-full-case_study").each(function (index) {
+  let triggerElement = $(this);
+  let targetElement = $(".image-full_screen-case_study");
+
+  let tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: triggerElement,
+      // trigger element - viewport
+      start: "top top",
+      end: "bottom top",
+      scrub: 1,
+    },
+  });
+  tl.to(targetElement, {
+    y: "-10%",
+    duration: 1,
+  });
 });
 
 // Image scale case studies – service page
@@ -1812,8 +1872,62 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 
-// GSAP FLIP
-window.addEventListener("DOMContentLoaded", (event) => {
+// GSAP FLIP – Home page video
+if (window.location.pathname === "/" || window.location.pathname === "/index.html") {
+    window.addEventListener("DOMContentLoaded", (event) => {
+      
+      // SETUP ELEMENTS
+      let zoneEl = $("[js-scrollflip-element='zone']"),
+        targetEl = $("[js-scrollflip-element='target']").first();
+
+      // SETUP TIMELINE
+      let tl;
+      function createTimeline() {
+        if (tl) {
+          tl.kill();
+          gsap.set(targetEl, { clearProps: "all" });
+        }
+        tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: zoneEl.first(),
+            start: "top 25%",
+            endTrigger: zoneEl.last(),
+            end: "bottom bottom",
+            scrub: true
+          }
+        });
+        zoneEl.each(function (index) {
+          let nextZoneEl = zoneEl.eq(index + 1);
+          if (nextZoneEl.length) {
+            let nextZoneDistance =
+              nextZoneEl.offset().top + nextZoneEl.innerHeight() / 2;
+            let thisZoneDistance = $(this).offset().top + $(this).innerHeight() / 2;
+            let zoneDifference = nextZoneDistance - thisZoneDistance;
+            tl.add(
+              Flip.fit(targetEl[0], nextZoneEl[0], {
+                duration: zoneDifference,
+                ease: "power1.inOut"
+              })
+            );
+          }
+        });
+      }
+      createTimeline();
+
+      // SETUP RESIZE
+      let resizeTimer;
+      window.addEventListener("resize", function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+          createTimeline();
+        }, 250);
+      });
+  });
+}
+
+// GSAP FLIP – Case Studies
+if (window.location.pathname === "/australian-open") {
+  window.addEventListener("DOMContentLoaded", (event) => {
     
     // SETUP ELEMENTS
     let zoneEl = $("[js-scrollflip-element='zone']"),
@@ -1829,7 +1943,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
       tl = gsap.timeline({
         scrollTrigger: {
           trigger: zoneEl.first(),
-          start: "top 25%",
+          start: "top top",
           endTrigger: zoneEl.last(),
           end: "bottom bottom",
           scrub: true
@@ -1862,6 +1976,60 @@ window.addEventListener("DOMContentLoaded", (event) => {
       }, 250);
     });
 });
+}
+
+// GSAP FLIP – Case Studies
+if (window.location.pathname === "/reece") {
+  window.addEventListener("DOMContentLoaded", (event) => {
+    
+    // SETUP ELEMENTS
+    let zoneEl = $("[js-scrollflip-element='zone']"),
+      targetEl = $("[js-scrollflip-element='target']").first();
+
+    // SETUP TIMELINE
+    let tl;
+    function createTimeline() {
+      if (tl) {
+        tl.kill();
+        gsap.set(targetEl, { clearProps: "all" });
+      }
+      tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: zoneEl.first(),
+          start: "top top",
+          endTrigger: zoneEl.last(),
+          end: "bottom bottom",
+          scrub: true
+        }
+      });
+      zoneEl.each(function (index) {
+        let nextZoneEl = zoneEl.eq(index + 1);
+        if (nextZoneEl.length) {
+          let nextZoneDistance =
+            nextZoneEl.offset().top + nextZoneEl.innerHeight() / 2;
+          let thisZoneDistance = $(this).offset().top + $(this).innerHeight() / 2;
+          let zoneDifference = nextZoneDistance - thisZoneDistance;
+          tl.add(
+            Flip.fit(targetEl[0], nextZoneEl[0], {
+              duration: zoneDifference,
+              ease: "power1.inOut"
+            })
+          );
+        }
+      });
+    }
+    createTimeline();
+
+    // SETUP RESIZE
+    let resizeTimer;
+    window.addEventListener("resize", function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () {
+        createTimeline();
+      }, 250);
+    });
+});
+}
 
 
 // Function to animate all images title .image-array in a loop  
@@ -1963,6 +2131,11 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       const wordElements = document.querySelectorAll("[data-split-words]");
       const lineElements = document.querySelectorAll("[data-split-lines]");
+      const charsElements = document.querySelectorAll("[data-split-chars]");
+      const caseStudyTitleElements = document.querySelectorAll("[data-split-case_study-title]");
+      const caseStudyDescElements = document.querySelectorAll("[data-split-case_study-desc]");
+
+
   
       if (wordElements.length === 0 && lineElements.length === 0) return; // No elements found, exit
   
@@ -1973,14 +2146,13 @@ document.addEventListener("DOMContentLoaded", () => {
         gsap.from(wordSplit.words, {
           autoAlpha: 0,
           translateY: "100%",
-          delay: 0.2,
+          delay: 0.3,
           duration: 1,
           stagger: 0.05,
           ease: "power2.out",
           scrollTrigger: {
             trigger: element,
             start: "top bottom",
-            end: "bottom top",
             toggleActions: "play none none none",
           },
         });
@@ -1994,12 +2166,67 @@ document.addEventListener("DOMContentLoaded", () => {
           autoAlpha: 0,
           translateY: "100%",
           duration: 1,
-          delay: 0.2,
+          delay: 0.3,
           stagger: 0.1,
           ease: "power2.out",
           scrollTrigger: {
             trigger: element,
             start: "top bottom",
+            toggleActions: "play none none none",
+          },
+        });
+      });
+
+      charsElements.forEach(element => {
+        if (!element.textContent.trim()) return; // Skip empty elements
+        const charsSplit = new SplitText(element, { type: "chars, words" });
+  
+        gsap.from(charsSplit.chars, {
+          autoAlpha: 0,
+          translateY: "100%",
+          duration: 1,
+          delay: 0.3,
+          stagger: 0.05,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: element,
+            start: "top bottom",
+            toggleActions: "play none none none",
+          },
+        });
+      });
+
+      caseStudyTitleElements.forEach(element => {
+        if (!element.textContent.trim()) return; // Skip empty elements
+        const caseStudyTitleSplit = new SplitText(element, { type: "chars, words" });
+  
+        gsap.from(caseStudyTitleSplit.chars, {
+          autoAlpha: 0,
+          translateY: "50%",
+          duration: 1,
+          stagger: 0.05,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: element,
+            start: "top 50%",
+            toggleActions: "play none none none",
+          },
+        });
+      });
+
+      caseStudyDescElements.forEach(element => {
+        if (!element.textContent.trim()) return; // Skip empty elements
+        const caseStudyDescSplit = new SplitText(element, { type: "lines" });
+  
+        gsap.from(caseStudyDescSplit.lines, {
+          autoAlpha: 0,
+          translateY: "50%",
+          duration: 1,
+          stagger: 0.05,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: element,
+            start: "top 70%",
             toggleActions: "play none none none",
           },
         });
@@ -2172,11 +2399,17 @@ $(".plyr_component.is-full-screen.is-page_hero").each(function (index) {
     player.play();
   });
 
+    // Play video case study pages
+    $(".section-case_study-hero-video").on("click", function() {
+      player.play();
+    });
+
   // Play video home page
   $(".home-hero_video").on("click", function() {
     player.play();
   });
 });
+
 
 
 // Video tabs auto change timer
@@ -2324,7 +2557,7 @@ videoTabLinks.forEach((link, index) => {
 
 // Video Gallery – Show cursor on hover and follow mouse
 const cursor = document.querySelector(".cursor-video_play-wrapper");
-const videoStages = document.querySelectorAll(".video-tabs_stage");
+const videoStages = document.querySelectorAll(".video-tabs_stage, .section-case_study-hero-video");
 const cursorHoverVideos = document.querySelectorAll(".cursor-hover-video");
 
 // Make cursor follow the mouse
@@ -2371,6 +2604,104 @@ videoStages.forEach((stage) => {
     });
   });
 });
+
+// CTA Image Effect
+const root = document.querySelector('.section-case_study-cta')
+const images = []
+root.querySelectorAll('.case_study-cta_images-wrap img').forEach(image => {
+    images.push(image.getAttribute('src'))
+})
+
+let incr = 0, 
+    oldIncrX = 0, 
+    oldIncrY = 0, 
+    resetDist = window.innerWidth / 4, 
+    indexImg = 0
+
+window.addEventListener("DOMContentLoaded", () => {
+    root.addEventListener("mousemove", e => {
+        oldIncrX = e.clientX
+        oldIncrY = e.clientY
+    }, {once: true})
+
+    root.addEventListener("mousemove", e => {
+        const valX = e.clientX
+        const valY = e.clientY
+        
+        // Add the distance traveled on x + y
+        incr += Math.abs(valX - oldIncrX) + Math.abs(valY - oldIncrY)
+
+        if(incr > resetDist) {
+            incr = 0 // Reset the variable incr
+            createMedia(valX, valY - root.getBoundingClientRect().top, valX - oldIncrX, valY - oldIncrY)  
+        }
+  
+        // Reset after calculation to add the new delta on the next call
+        // Also reset after the createMedia() function
+        oldIncrX = valX
+        oldIncrY = valY
+    })
+})
+
+
+function createMedia(x, y, deltaX, deltaY) {
+
+    // We create an image and set its url with the current item of the images array
+    const image = document.createElement("img")
+    image.setAttribute('src', images[indexImg])
+
+    // We add this image to the DOM
+    root.appendChild(image)
+
+    const tl = gsap.timeline({
+        onComplete: () => {
+            // when our timeline is finished, we remove our image from the DOM
+            root.removeChild(image);
+            tl && tl.kill()
+        }
+    })
+
+    tl.fromTo(image, {
+        // Add some randomness
+        xPercent: -50 + (Math.random() - 0.5) * 80,
+        yPercent: -400 + (Math.random() - 0.5) * 10,
+        scaleX: 1.3,
+        scaleY: 1.3
+    }, {
+        scaleX:1,
+        scaleY:1,
+        ease:'elastic.out(2, 0.6)', // Easing property responsible of the rebound effect
+        duration:0.6
+    })
+
+    tl.fromTo(image, {
+        // The first and second parameters are x and y (cursor position)
+        // We set the image at the current cursor position
+        x,
+        y,
+        rotation:(Math.random() - 0.5) * 20,
+    }, {
+        // We add deltaX and deltaY (the third and fourth parameters of the function)
+        x: '+=' + deltaX * 4,
+        y: '+=' + deltaY * 4,
+        rotation:(Math.random() - 0.5) * 20,
+        ease:'power4.out',
+        duration: 1.5
+    }, '<') // Means that the animation starts at the start of the previous tween
+    
+    tl.to(image, {
+        duration: 0.3,
+        scale: 0.5, // Reduce the image later
+        delay: 0.1,
+        ease:'back.in(1.5)'
+    })
+
+    // Loop back to the first item when we're out of range in our images array
+    indexImg = (indexImg + 1) % images.length
+}
+
+
+
 
 
 
