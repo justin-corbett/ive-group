@@ -674,6 +674,26 @@ $(".section-services_overview").each(function (index) {
     });
 });
 
+// GSAP Navigation BG Gradient Fade In – Sustainability
+$(".section-about_sustainability-intro").each(function (index) {
+  let triggerElement = $(this);
+  let targetElement = $(".navigation-bg-gradient");
+
+  let tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: triggerElement,
+      // trigger element - viewport
+      start: "top bottom",
+      end: "top top",
+      scrub: 1,
+    },
+  });
+  tl.to(targetElement, {
+    opacity: "100%",
+    duration: 1,
+  });
+});
+
 // Navigation BG Gradient Fade In – Case Studies
 $(".section-case_study-hero-content").each(function (index) {
   let triggerElement = $(this);
