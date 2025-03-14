@@ -2420,7 +2420,7 @@ $(".plyr_component.is-full-screen.is-page_hero").each(function (index) {
   });
 
     // Play video case study pages
-    $(".section-case_study-hero-video").on("click", function() {
+    $(".case_study_hero-video-wrapper").on("click", function() {
       player.play();
     });
 
@@ -2577,7 +2577,7 @@ videoTabLinks.forEach((link, index) => {
 
 // Video Gallery – Show cursor on hover and follow mouse
 const cursor = document.querySelector(".cursor-video_play-wrapper");
-const videoStages = document.querySelectorAll(".video-tabs_stage, .section-case_study-hero-video");
+const videoStages = document.querySelectorAll(".video-tabs_stage, .case_study_hero-video-wrapper");
 const cursorHoverVideos = document.querySelectorAll(".cursor-hover-video");
 
 // Make cursor follow the mouse
