@@ -695,7 +695,7 @@ $(".section-about_sustainability-intro").each(function (index) {
 });
 
 // Navigation BG Gradient Fade In – Case Studies
-$(".section-case_study-hero-content").each(function (index) {
+$(".section-case_study-hero-video").each(function (index) {
   let triggerElement = $(this);
   let targetElement = $(".navigation-bg-gradient");
 
@@ -2171,7 +2171,7 @@ document.addEventListener("DOMContentLoaded", () => {
           autoAlpha: 0,
           translateY: "50%",
           duration: 1,
-          stagger: 0.05,
+          stagger: 0.02,
           ease: "power2.out",
           scrollTrigger: {
             trigger: element,
@@ -2189,7 +2189,7 @@ document.addEventListener("DOMContentLoaded", () => {
           autoAlpha: 0,
           translateY: "50%",
           duration: 1,
-          stagger: 0.05,
+          stagger: 0.1,
           ease: "power2.out",
           scrollTrigger: {
             trigger: element,
@@ -2572,100 +2572,120 @@ videoStages.forEach((stage) => {
   });
 });
 
-// CTA Image Effect
-const root = document.querySelector('.section-case_study-cta')
-const images = []
-root.querySelectorAll('.case_study-cta_images-wrap img').forEach(image => {
-    images.push(image.getAttribute('src'))
-})
+// Case Studies CTA Image Effect
+const root = document.querySelector('.section-case_study-cta');
 
-let incr = 0, 
-    oldIncrX = 0, 
-    oldIncrY = 0, 
-    resetDist = window.innerWidth / 4, 
-    indexImg = 0
+// Store image sources in an array
+const images = Array.from(root.querySelectorAll('.case_study-cta_images-wrap img')).map(img => img.getAttribute('src'));
 
-window.addEventListener("DOMContentLoaded", () => {
-    root.addEventListener("mousemove", e => {
-        oldIncrX = e.clientX
-        oldIncrY = e.clientY
-    }, {once: true})
+let incr = 0,               // Tracks the accumulated movement distance
+    oldIncrX = 0,           // Stores the previous mouse X position
+    oldIncrY = 0,           // Stores the previous mouse Y position
+    resetDist = window.innerWidth / 4, // Distance threshold before creating an image
+    indexImg = 0,           // Index to cycle through images
+    ticking = false;        // Used to throttle mousemove events
 
-    root.addEventListener("mousemove", e => {
-        const valX = e.clientX
-        const valY = e.clientY
-        
-        // Add the distance traveled on x + y
-        incr += Math.abs(valX - oldIncrX) + Math.abs(valY - oldIncrY)
+const MAX_VELOCITY = 40;    // Limit to prevent images from moving too fast
 
-        if(incr > resetDist) {
-            incr = 0 // Reset the variable incr
-            createMedia(valX, valY - root.getBoundingClientRect().top, valX - oldIncrX, valY - oldIncrY)  
-        }
-  
-        // Reset after calculation to add the new delta on the next call
-        // Also reset after the createMedia() function
-        oldIncrX = valX
-        oldIncrY = valY
-    })
-})
+// Update resetDist dynamically when window resizes
+window.addEventListener('resize', () => {
+    resetDist = window.innerWidth / 4;
+});
 
+// Use requestAnimationFrame for better performance
+root.addEventListener('mousemove', e => {
+    if (!ticking) {
+        requestAnimationFrame(() => {
+            handleMouseMove(e);
+            ticking = false;
+        });
+        ticking = true;
+    }
+});
+
+function handleMouseMove(e) {
+    const valX = e.clientX;
+    const valY = e.clientY;
+
+    // Initialize old coordinates on the first move
+    if (oldIncrX === 0 && oldIncrY === 0) {
+        oldIncrX = valX;
+        oldIncrY = valY;
+        return;
+    }
+
+    // Calculate movement distance
+    incr += Math.abs(valX - oldIncrX) + Math.abs(valY - oldIncrY);
+
+    // If movement exceeds threshold, create an image
+    if (incr > resetDist) {
+        incr = 0; // Reset movement counter
+
+        // Calculate deltas and cap the velocity
+        let deltaX = Math.min(Math.max(valX - oldIncrX, -MAX_VELOCITY), MAX_VELOCITY);
+        let deltaY = Math.min(Math.max(valY - oldIncrY, -MAX_VELOCITY), MAX_VELOCITY);
+
+        createMedia(valX, valY - root.getBoundingClientRect().top, deltaX, deltaY);
+    }
+
+    // Update old coordinates for the next event
+    oldIncrX = valX;
+    oldIncrY = valY;
+}
 
 function createMedia(x, y, deltaX, deltaY) {
-
-    // We create an image and set its url with the current item of the images array
-    const image = document.createElement("img")
-    image.setAttribute('src', images[indexImg])
-
-    // We add this image to the DOM
-    root.appendChild(image)
+    const image = document.createElement("img");
+    image.setAttribute('src', images[indexImg]);
+    image.style.position = 'absolute';
+    image.style.pointerEvents = 'none'; // Prevent interaction
+    root.appendChild(image);
 
     const tl = gsap.timeline({
         onComplete: () => {
-            // when our timeline is finished, we remove our image from the DOM
-            root.removeChild(image);
-            tl && tl.kill()
+            image.remove(); // Remove image from DOM after animation
+            tl.kill(); // Kill timeline to free up memory
         }
-    })
+    });
 
+    // Initial appearance with slight randomness
     tl.fromTo(image, {
-        // Add some randomness
         xPercent: -50 + (Math.random() - 0.5) * 80,
         yPercent: -400 + (Math.random() - 0.5) * 10,
         scaleX: 1.3,
         scaleY: 1.3
     }, {
-        scaleX:1,
-        scaleY:1,
-        ease:'elastic.out(2, 0.6)', // Easing property responsible of the rebound effect
-        duration:0.6
-    })
+        scaleX: 1,
+        scaleY: 1,
+        ease: 'elastic.out(2, 0.6)', // Rebound effect
+        duration: 0.6
+    });
 
+    // Movement animation with controlled velocity
     tl.fromTo(image, {
-        // The first and second parameters are x and y (cursor position)
-        // We set the image at the current cursor position
         x,
         y,
-        rotation:(Math.random() - 0.5) * 20,
+        rotation: (Math.random() - 0.5) * 20,
     }, {
-        // We add deltaX and deltaY (the third and fourth parameters of the function)
-        x: '+=' + deltaX * 4,
-        y: '+=' + deltaY * 4,
-        rotation:(Math.random() - 0.5) * 20,
-        ease:'power4.out',
+        x: `+=${deltaX * 4}`,
+        y: `+=${deltaY * 4}`,
+        rotation: (Math.random() - 0.5) * 20,
+        ease: 'power4.out',
         duration: 1.5
-    }, '<') // Means that the animation starts at the start of the previous tween
-    
+    }, '<'); // Start at the same time as previous animation
+
+    // Shrink and fade out effect
     tl.to(image, {
         duration: 0.3,
-        scale: 0.5, // Reduce the image later
+        scale: 0.5,
         delay: 0.1,
-        ease:'back.in(1.5)'
-    })
+        ease: 'back.in(1.5)'
+    });
 
-    // Loop back to the first item when we're out of range in our images array
-    indexImg = (indexImg + 1) % images.length
+    // Cycle through images
+    indexImg = (indexImg + 1) % images.length;
 }
+
+
 
 
 
