@@ -1946,60 +1946,7 @@ if (window.location.pathname === "/" || window.location.pathname === "/index.htm
 }
 
 // GSAP FLIP – Case Studies
-if (window.location.pathname === "/australian-open") {
-  window.addEventListener("DOMContentLoaded", (event) => {
-    
-    // SETUP ELEMENTS
-    let zoneEl = $("[js-scrollflip-element='zone']"),
-      targetEl = $("[js-scrollflip-element='target']").first();
-
-    // SETUP TIMELINE
-    let tl;
-    function createTimeline() {
-      if (tl) {
-        tl.kill();
-        gsap.set(targetEl, { clearProps: "all" });
-      }
-      tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: zoneEl.first(),
-          start: "top top",
-          endTrigger: zoneEl.last(),
-          end: "bottom bottom",
-          scrub: true
-        }
-      });
-      zoneEl.each(function (index) {
-        let nextZoneEl = zoneEl.eq(index + 1);
-        if (nextZoneEl.length) {
-          let nextZoneDistance =
-            nextZoneEl.offset().top + nextZoneEl.innerHeight() / 2;
-          let thisZoneDistance = $(this).offset().top + $(this).innerHeight() / 2;
-          let zoneDifference = nextZoneDistance - thisZoneDistance;
-          tl.add(
-            Flip.fit(targetEl[0], nextZoneEl[0], {
-              duration: zoneDifference,
-              ease: "power1.inOut"
-            })
-          );
-        }
-      });
-    }
-    createTimeline();
-
-    // SETUP RESIZE
-    let resizeTimer;
-    window.addEventListener("resize", function () {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(function () {
-        createTimeline();
-      }, 250);
-    });
-});
-}
-
-// GSAP FLIP – Case Studies
-if (window.location.pathname === "/reece") {
+if (window.location.pathname.includes("/case-studies")) {
   window.addEventListener("DOMContentLoaded", (event) => {
     
     // SETUP ELEMENTS
