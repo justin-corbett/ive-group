@@ -1,6 +1,5 @@
 // Initialize GSAP
-gsap.registerPlugin();
-gsap.registerPlugin(ScrollTrigger, Flip);
+gsap.registerPlugin(ScrollTrigger, Flip, Observer);
     
 // GSAP Scrolltrigger
 ScrollTrigger.defaults({
@@ -1712,6 +1711,150 @@ function iveCareHoverOut() {
     }, 100);
 }
 
+// Navigation – Case Studies – 1
+$(document).ready(function() {
+  if ($(window).width() >= 991) {
+      $('.nav-link-secondary.is-case_study-1').hover(function() {
+          caseStudy1HoverIn();
+      }, function() {
+        caseStudy1HoverOut();
+      });
+  }
+});
+
+// Case Studies – 1 – Hover In
+function caseStudy1HoverIn() {
+  ($('.nav-dropdown-img.is-case_study-1').addClass('is-active'))
+}
+
+// Case Studies – 1 – Hover Out
+function caseStudy1HoverOut() {
+  setTimeout(function() {
+      $('.nav-dropdown-img.is-case_study-1').removeClass('is-active');
+  }, 100);
+}
+
+// Navigation – Case Studies – 2
+$(document).ready(function() {
+  if ($(window).width() >= 991) {
+      $('.nav-link-secondary.is-case_study-2').hover(function() {
+          caseStudy2HoverIn();
+      }, function() {
+        caseStudy2HoverOut();
+      });
+  }
+});
+
+// Case Studies – 2 – Hover In
+function caseStudy2HoverIn() {
+  ($('.nav-dropdown-img.is-case_study-2').addClass('is-active'))
+}
+
+// Case Studies – 2 – Hover Out
+function caseStudy2HoverOut() {
+  setTimeout(function() {
+      $('.nav-dropdown-img.is-case_study-2').removeClass('is-active');
+  }, 100);
+}
+
+// Navigation – Case Studies – 3
+$(document).ready(function() {
+  if ($(window).width() >= 991) {
+      $('.nav-link-secondary.is-case_study-3').hover(function() {
+          caseStudy3HoverIn();
+      }, function() {
+        caseStudy3HoverOut();
+      });
+  }
+});
+
+// Case Studies – 3 – Hover In
+function caseStudy3HoverIn() {
+  ($('.nav-dropdown-img.is-case_study-3').addClass('is-active'))
+}
+
+// Case Studies – 3 – Hover Out
+function caseStudy3HoverOut() {
+  setTimeout(function() {
+      $('.nav-dropdown-img.is-case_study-3').removeClass('is-active');
+  }, 100);
+}
+
+// Navigation – Case Studies – 4
+$(document).ready(function() {
+  if ($(window).width() >= 991) {
+      $('.nav-link-secondary.is-case_study-4').hover(function() {
+          caseStudy4HoverIn();
+      }, function() {
+        caseStudy4HoverOut();
+      });
+  }
+});
+
+// Case Studies – 4 – Hover In
+function caseStudy4HoverIn() {
+  ($('.nav-dropdown-img.is-case_study-4').addClass('is-active'))
+}
+
+// Case Studies – 4 – Hover Out
+function caseStudy4HoverOut() {
+  setTimeout(function() {
+      $('.nav-dropdown-img.is-case_study-4').removeClass('is-active');
+  }, 100);
+}
+
+// Navigation – Case Studies – 5
+$(document).ready(function() {
+  if ($(window).width() >= 991) {
+      $('.nav-link-secondary.is-case_study-5').hover(function() {
+          caseStudy5HoverIn();
+      }, function() {
+        caseStudy5HoverOut();
+      });
+  }
+});
+
+// Case Studies – 5 – Hover In
+function caseStudy5HoverIn() {
+  ($('.nav-dropdown-img.is-case_study-5').addClass('is-active'))
+}
+
+// Case Studies – 5 – Hover Out
+function caseStudy5HoverOut() {
+  setTimeout(function() {
+      $('.nav-dropdown-img.is-case_study-5').removeClass('is-active');
+  }, 100);
+}
+
+// Navigation – Case Studies – 6
+$(document).ready(function() {
+  if ($(window).width() >= 991) {
+      $('.nav-link-secondary.is-case_study-6').hover(function() {
+          caseStudy6HoverIn();
+      }, function() {
+        caseStudy6HoverOut();
+      });
+  }
+});
+
+// Case Studies – 6 – Hover In
+function caseStudy6HoverIn() {
+  ($('.nav-dropdown-img.is-case_study-6').addClass('is-active'))
+}
+
+// Case Studies – 6 – Hover Out
+function caseStudy6HoverOut() {
+  setTimeout(function() {
+      $('.nav-dropdown-img.is-case_study-6').removeClass('is-active');
+  }, 100);
+}
+
+
+
+
+
+
+
 
 // Navigation secondary hover in/out
 $(document).ready(function() {
@@ -2687,7 +2830,73 @@ function createMedia(x, y, deltaX, deltaY) {
 
 
 
+// Image Gallery – Infinite Scroll + Drag
+let total = 0,
+    xTo,
+    itemValues = []
 
+window.addEventListener("DOMContentLoaded", () => {
+
+    const content = document.querySelector('.gallery-wrapper')
+    const cards = document.querySelectorAll('.gallery-item')
+    const cardsLength = cards.length / 2
+    const half = content.clientWidth / 2
+
+    const wrap = gsap.utils.wrap(-half, 0);
+
+    xTo = gsap.quickTo(content, "x", {
+        duration: 0.5, // Will transition over 0.5s
+        ease: 'power3', // Non-linear
+        modifiers: {
+            x: gsap.utils.unitize(wrap),
+        },
+    });
+
+    // Generate an array of random values between -10 and 10
+    for (let i = 0; i < cardsLength; i++) {
+        itemValues.push((Math.random() - 0.5) * 0);
+    }
+
+    // Create a GSAP timeline and keep it paused initially
+    const tl = gsap.timeline({ paused: true });
+    tl.to(cards, {
+        // Rotate each card using a precomputed random value
+        rotate: (index) => (itemValues[index % cardsLength]),
+        // Move each card horizontally based on the same random value
+        xPercent: (index) => (itemValues[index % cardsLength]),
+        // Move each card vertically based on the same random value
+        yPercent: (index) => (itemValues[index % cardsLength]),
+        // Slightly scale down the cards
+        scale: 0.95,
+        duration: 0.5,
+        ease: 'back.inOut(3)', // Non-linear
+    })
+
+    Observer.create({
+        target: content,
+        type: "pointer,touch", // Detect both pointer and touch events
+        onPress: () => tl.play(), // Play the timeline when pressing down
+        onDrag: (self) => { // Update the horizontal position while dragging
+            total += self.deltaX
+            xTo(total)
+        },
+        onRelease: () => { // Reverse the timeline when releasing the pointer
+            tl.reverse()
+        },
+        onStop: () => { // Reverse the timeline when the interaction stops
+            tl.reverse()
+        },
+    })
+
+    gsap.ticker.add(tick);
+
+    // TO GO FURTHER: You can add an offscreen check and kill Observer when necessary
+});
+
+function tick(time, deltaTime) {
+    total -= deltaTime / 10  // Adjust the speed of automatic scrolling    
+    xTo(total)
+}
 
 
 
