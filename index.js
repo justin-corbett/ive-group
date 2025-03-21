@@ -2830,73 +2830,168 @@ function createMedia(x, y, deltaX, deltaY) {
 
 
 
-// Image Gallery – Infinite Scroll + Drag
 let total = 0,
     xTo,
-    itemValues = []
+    itemValues = [],
+    observerInstance; // Store Observer instance
 
 window.addEventListener("DOMContentLoaded", () => {
+    const content = document.querySelector('.gallery-wrapper');
+    const cards = document.querySelectorAll('.gallery-item');
+    const cardsLength = cards.length / 2;
+    const half = content.clientWidth / 2;
 
-    const content = document.querySelector('.gallery-wrapper')
-    const cards = document.querySelectorAll('.gallery-item')
-    const cardsLength = cards.length / 2
-    const half = content.clientWidth / 2
-
-    const wrap = gsap.utils.wrap(-half, 0);
+    const wrap = gsap.utils.wrap(-content.scrollWidth / 2, 0);
 
     xTo = gsap.quickTo(content, "x", {
-        duration: 0.5, // Will transition over 0.5s
-        ease: 'power3', // Non-linear
+        duration: 0.5,
+        ease: 'power3',
         modifiers: {
             x: gsap.utils.unitize(wrap),
         },
     });
 
-    // Generate an array of random values between -10 and 10
     for (let i = 0; i < cardsLength; i++) {
-        itemValues.push((Math.random() - 0.5) * 0);
+        itemValues.push((Math.random() - 0.5) * 0); // Adjusted range – 0 is disabled
     }
 
-    // Create a GSAP timeline and keep it paused initially
     const tl = gsap.timeline({ paused: true });
     tl.to(cards, {
-        // Rotate each card using a precomputed random value
-        rotate: (index) => (itemValues[index % cardsLength]),
-        // Move each card horizontally based on the same random value
-        xPercent: (index) => (itemValues[index % cardsLength]),
-        // Move each card vertically based on the same random value
-        yPercent: (index) => (itemValues[index % cardsLength]),
-        // Slightly scale down the cards
-        scale: 0.95,
+        rotate: (index) => itemValues[index % cardsLength],
+        xPercent: (index) => itemValues[index % cardsLength],
+        yPercent: (index) => itemValues[index % cardsLength],
+        scale: 0.98,
         duration: 0.5,
-        ease: 'back.inOut(3)', // Non-linear
-    })
+        ease: 'back.inOut(3)',
+    });
 
-    Observer.create({
-        target: content,
-        type: "pointer,touch", // Detect both pointer and touch events
-        onPress: () => tl.play(), // Play the timeline when pressing down
-        onDrag: (self) => { // Update the horizontal position while dragging
-            total += self.deltaX
-            xTo(total)
-        },
-        onRelease: () => { // Reverse the timeline when releasing the pointer
-            tl.reverse()
-        },
-        onStop: () => { // Reverse the timeline when the interaction stops
-            tl.reverse()
-        },
-    })
+    function createObserver() {
+        observerInstance = Observer.create({
+            target: content,
+            type: "pointer,touch",
+            onPress: () => {
+                tl.play();
+                gsap.ticker.remove(tick); // Stop auto-scroll
+            },
+            onDrag: (self) => {
+                total += self.deltaX;
+                xTo(total);
+            },
+            onRelease: () => {
+                tl.reverse();
+                gsap.ticker.add(tick); // Resume auto-scroll
+            },
+            onStop: () => {
+                tl.reverse();
+                gsap.ticker.add(tick);
+            },
+        });
+    }
+
+    function destroyObserver() {
+        if (observerInstance) {
+            observerInstance.kill();
+            observerInstance = null;
+        }
+    }
 
     gsap.ticker.add(tick);
 
-    // TO GO FURTHER: You can add an offscreen check and kill Observer when necessary
+    function tick(time, deltaTime) {
+        total -= deltaTime / 10;
+        xTo(total);
+    }
+
+    // Stop auto-scrolling when off the screen
+    const visibilityObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                createObserver(); // Reinitialize GSAP Observer
+                gsap.ticker.add(tick); // Resume auto-scroll
+            } else {
+                destroyObserver(); // Kill GSAP Observer
+                gsap.ticker.remove(tick); // Stop auto-scroll
+            }
+        });
+    }, { threshold: 0 });
+
+    visibilityObserver.observe(content);
+
+    // Stop auto-scrolling when tab is not visible
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+            gsap.ticker.remove(tick); // Stop auto-scroll
+        } else {
+            gsap.ticker.add(tick); // Resume auto-scroll
+        }
+    });
 });
 
-function tick(time, deltaTime) {
-    total -= deltaTime / 10  // Adjust the speed of automatic scrolling    
-    xTo(total)
-}
+
+// Image Gallery – Cursor follow mouse and show/hide on hover
+document.addEventListener("DOMContentLoaded", () => {
+  const cursor = document.querySelector(".gallery-cursor-drag");
+  const galleryWrapper = document.querySelector(".gallery-wrapper");
+
+  if (!cursor || !galleryWrapper) return;
+
+  function updateCursorPosition(e) {
+      gsap.to(cursor, {
+          x: e.clientX,
+          y: e.clientY,
+          duration: 0.2,
+          ease: "power2.out"
+      });
+  }
+
+  function showCursor() {
+      if (window.innerWidth >= 992) {
+          gsap.to(cursor, { autoAlpha: 1, duration: 0.3, ease: "power2.out" });
+          window.addEventListener("mousemove", updateCursorPosition);
+      }
+  }
+
+  function hideCursor() {
+      gsap.to(cursor, { autoAlpha: 0, duration: 0.3, ease: "power2.out" });
+      window.removeEventListener("mousemove", updateCursorPosition);
+  }
+
+  galleryWrapper.addEventListener("mouseenter", showCursor);
+  galleryWrapper.addEventListener("mouseleave", hideCursor);
+});
+
+// Case Studies – View all case studies link
+
+// Scroll-triggered animation
+gsap.fromTo(".text-link_line.is-case_study-link", 
+  { opacity: 0, width: "0%" }, 
+  { 
+    opacity: 1,
+    width: "100%",
+    delay: 1,
+    duration: 1, 
+    ease: "power2.out",
+    scrollTrigger: {
+      trigger: ".text-link-case_study",
+      start: "top bottom",
+      toggleActions: "play none none none"
+    }
+  }
+);
+
+// Hover animation
+document.querySelector(".text-link-case_study").addEventListener("mouseenter", () => {
+  gsap.to(".text-link_line.is-case_study-link", { 
+    x: "100%", 
+    duration: 0.5, 
+    ease: "power2.out",
+    onComplete: () => {
+      gsap.set(".text-link_line.is-case_study-link", { x: "-101%" }); // Instantly set position
+      gsap.to(".text-link_line.is-case_study-link", { x: "0%", duration: 0.5, ease: "power2.out" }); // Animate back to normal
+    }
+  });
+});
+
 
 
 
