@@ -713,6 +713,26 @@ $(".section-case_study-hero-video").each(function (index) {
   });
 });
 
+// Navigation BG Gradient Fade In – Showcase
+$(".image_full-service_hero-video").each(function (index) {
+  let triggerElement = $(this);
+  let targetElement = $(".navigation-bg-gradient");
+
+  let tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: triggerElement,
+      // trigger element - viewport
+      start: "top bottom",
+      end: "top top",
+      scrub: 1,
+    },
+  });
+  tl.to(targetElement, {
+    opacity: "100%",
+    duration: 1,
+  });
+});
+
 // Navigation Home BG Gradient Fade In
 $(".scroll-track.is-home_hero").each(function (index) {
     let triggerElement = $(this);
@@ -863,15 +883,23 @@ tl.set('.navigation-dropdown-bg-wrapper', { display: "block" })
 // Home hero title animation
 const wrappers = document.querySelectorAll(".home-hero-heading-wrapper");
 
-if (wrappers.length > 0) {  // ✅ Prevents errors if the elements don’t exist
+if (wrappers.length > 0) {
     wrappers.forEach((wrapper) => {
         let headings = wrapper.querySelectorAll(".title-home-hero.is-animate");
 
-        if (headings.length > 0) {  // ✅ Extra safety check
+        if (headings.length > 0) {
             let splitTextInstances = [];
 
             headings.forEach((heading) => {
-                splitTextInstances.push(new SplitText(heading, { type: "chars" }));
+                // Wrap each word inside a span with overflow hidden
+                let split = new SplitText(heading, { type: "words, chars" });
+
+                // Apply overflow hidden to word containers
+                split.words.forEach((word) => {
+                    gsap.set(word, { overflow: "hidden", display: "inline-block", position: "relative" });
+                });
+
+                splitTextInstances.push(split);
             });
 
             let tl = gsap.timeline({ repeat: -1, delay: 2.5 });
@@ -882,15 +910,16 @@ if (wrappers.length > 0) {  // ✅ Prevents errors if the elements don’t exist
                 let chars = splitTextInstances[index].chars;
 
                 if (index > 0) {
-                    tl.from(chars, { yPercent: 110, stagger: 0.04, duration: 0.4 }, "<0.1");
+                    tl.from(chars, { yPercent: 110, opacity: 0, stagger: 0.04, duration: 0.4 }, "<0.1");
                 }
                 if (index < headings.length - 1) {
-                    tl.to(chars, { delay: 1, yPercent: -110, stagger: 0.04, duration: 0.4 });
+                    tl.to(chars, { delay: 1, yPercent: -110, opacity: 0, stagger: 0.04, duration: 0.4 });
                 }
             });
         }
     });
 }
+
 
 // Image scale full projects
 $(".image_full-content-wrapper").each(function (index) {
@@ -2089,7 +2118,7 @@ if (window.location.pathname === "/" || window.location.pathname === "/index.htm
 }
 
 // GSAP FLIP – Case Studies
-if (window.location.pathname.includes("/case-studies")) {
+if (window.location.pathname.includes("/showcase")) {
   window.addEventListener("DOMContentLoaded", (event) => {
     
     // SETUP ELEMENTS
@@ -2935,30 +2964,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!cursor || !galleryWrapper) return;
 
-  function updateCursorPosition(e) {
-      gsap.to(cursor, {
-          x: e.clientX,
-          y: e.clientY,
-          duration: 0.2,
-          ease: "power2.out"
-      });
-  }
+  // Make cursor always follow the mouse
+  document.addEventListener("mousemove", (e) => {
+    gsap.to(cursor, {
+      x: e.clientX,
+      y: e.clientY,
+      duration: 0.2,
+      ease: "power2.out"
+    });
+  });
 
   function showCursor() {
-      if (window.innerWidth >= 992) {
-          gsap.to(cursor, { autoAlpha: 1, duration: 0.3, ease: "power2.out" });
-          window.addEventListener("mousemove", updateCursorPosition);
-      }
+    if (window.innerWidth >= 992) {
+      gsap.to(cursor, { autoAlpha: 1, duration: 0.3, ease: "power2.out" });
+    }
   }
 
   function hideCursor() {
-      gsap.to(cursor, { autoAlpha: 0, duration: 0.3, ease: "power2.out" });
-      window.removeEventListener("mousemove", updateCursorPosition);
+    gsap.to(cursor, { autoAlpha: 0, duration: 0.3, ease: "power2.out" });
   }
 
   galleryWrapper.addEventListener("mouseenter", showCursor);
   galleryWrapper.addEventListener("mouseleave", hideCursor);
 });
+
 
 // Case Studies – View all case studies link
 
@@ -2991,9 +3020,3 @@ document.querySelector(".text-link-case_study").addEventListener("mouseenter", (
     }
   });
 });
-
-
-
-
-
-
