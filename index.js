@@ -2747,17 +2747,30 @@ videoStages.forEach((stage) => {
 // Case Studies CTA Image Effect
 const root = document.querySelector('.section-case_study-cta');
 
-// Store image sources in an array
-const images = Array.from(root.querySelectorAll('.case_study-cta_images-wrap img')).map(img => img.getAttribute('src'));
+if (!root) {
+    console.warn("Root element not found. Aborting script.");
+    return; // Exit early if root is missing
+}
 
-let incr = 0,               // Tracks the accumulated movement distance
-    oldIncrX = 0,           // Stores the previous mouse X position
-    oldIncrY = 0,           // Stores the previous mouse Y position
-    resetDist = window.innerWidth / 4, // Distance threshold before creating an image
-    indexImg = 0,           // Index to cycle through images
-    ticking = false;        // Used to throttle mousemove events
+// Store image sources in an array safely
+const imageElements = root.querySelectorAll('.case_study-cta_images-wrap img');
+const images = imageElements.length > 0 
+    ? Array.from(imageElements).map(img => img.getAttribute('src')) 
+    : [];
 
-const MAX_VELOCITY = 40;    // Limit to prevent images from moving too fast
+if (images.length === 0) {
+    console.warn("No images found. Aborting script.");
+    return; // Exit early if no images are found
+}
+
+let incr = 0,               
+    oldIncrX = 0,           
+    oldIncrY = 0,           
+    resetDist = window.innerWidth / 4, 
+    indexImg = 0,           
+    ticking = false;        
+
+const MAX_VELOCITY = 40;    
 
 // Update resetDist dynamically when window resizes
 window.addEventListener('resize', () => {
@@ -2779,47 +2792,43 @@ function handleMouseMove(e) {
     const valX = e.clientX;
     const valY = e.clientY;
 
-    // Initialize old coordinates on the first move
     if (oldIncrX === 0 && oldIncrY === 0) {
         oldIncrX = valX;
         oldIncrY = valY;
         return;
     }
 
-    // Calculate movement distance
     incr += Math.abs(valX - oldIncrX) + Math.abs(valY - oldIncrY);
 
-    // If movement exceeds threshold, create an image
     if (incr > resetDist) {
-        incr = 0; // Reset movement counter
+        incr = 0;
 
-        // Calculate deltas and cap the velocity
         let deltaX = Math.min(Math.max(valX - oldIncrX, -MAX_VELOCITY), MAX_VELOCITY);
         let deltaY = Math.min(Math.max(valY - oldIncrY, -MAX_VELOCITY), MAX_VELOCITY);
 
         createMedia(valX, valY - root.getBoundingClientRect().top, deltaX, deltaY);
     }
 
-    // Update old coordinates for the next event
     oldIncrX = valX;
     oldIncrY = valY;
 }
 
 function createMedia(x, y, deltaX, deltaY) {
+    if (images.length === 0) return; // Extra safety check
+
     const image = document.createElement("img");
     image.setAttribute('src', images[indexImg]);
     image.style.position = 'absolute';
-    image.style.pointerEvents = 'none'; // Prevent interaction
+    image.style.pointerEvents = 'none';
     root.appendChild(image);
 
     const tl = gsap.timeline({
         onComplete: () => {
-            image.remove(); // Remove image from DOM after animation
-            tl.kill(); // Kill timeline to free up memory
+            image.remove();
+            tl.kill();
         }
     });
 
-    // Initial appearance with slight randomness
     tl.fromTo(image, {
         xPercent: -50 + (Math.random() - 0.5) * 80,
         yPercent: -400 + (Math.random() - 0.5) * 10,
@@ -2828,11 +2837,10 @@ function createMedia(x, y, deltaX, deltaY) {
     }, {
         scaleX: 1,
         scaleY: 1,
-        ease: 'elastic.out(2, 0.6)', // Rebound effect
+        ease: 'elastic.out(2, 0.6)',
         duration: 0.6
     });
 
-    // Movement animation with controlled velocity
     tl.fromTo(image, {
         x,
         y,
@@ -2843,9 +2851,8 @@ function createMedia(x, y, deltaX, deltaY) {
         rotation: (Math.random() - 0.5) * 20,
         ease: 'power4.out',
         duration: 1.5
-    }, '<'); // Start at the same time as previous animation
+    }, '<');
 
-    // Shrink and fade out effect
     tl.to(image, {
         duration: 0.3,
         scale: 0.5,
@@ -2853,12 +2860,12 @@ function createMedia(x, y, deltaX, deltaY) {
         ease: 'back.in(1.5)'
     });
 
-    // Cycle through images
     indexImg = (indexImg + 1) % images.length;
 }
 
 
 
+// Image Gallery – Infinite + Drag
 let total = 0,
     xTo,
     itemValues = [],
