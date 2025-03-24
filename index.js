@@ -2742,6 +2742,7 @@ videoStages.forEach((stage) => {
   });
 });
 
+
 // Case Studies CTA Image Effect
 const root = document.querySelector('.section-case_study-cta');
 
@@ -2865,6 +2866,104 @@ function init() {
 }
 
 
+
+// Image Gallery – Infinite + Drag
+let total = 0,
+    xTo,
+    itemValues = [],
+    observerInstance; // Store Observer instance
+
+window.addEventListener("DOMContentLoaded", () => {
+    const content = document.querySelector('.gallery-wrapper');
+    const cards = document.querySelectorAll('.gallery-item');
+    const cardsLength = cards.length / 2;
+    const half = content.clientWidth / 2;
+
+    const wrap = gsap.utils.wrap(-content.scrollWidth / 2, 0);
+
+    xTo = gsap.quickTo(content, "x", {
+        duration: 0.5,
+        ease: 'power3',
+        modifiers: {
+            x: gsap.utils.unitize(wrap),
+        },
+    });
+
+    for (let i = 0; i < cardsLength; i++) {
+        itemValues.push((Math.random() - 0.5) * 0); // Adjusted range – 0 is disabled
+    }
+
+    const tl = gsap.timeline({ paused: true });
+    tl.to(cards, {
+        rotate: (index) => itemValues[index % cardsLength],
+        xPercent: (index) => itemValues[index % cardsLength],
+        yPercent: (index) => itemValues[index % cardsLength],
+        scale: 0.98,
+        duration: 0.5,
+        ease: 'back.inOut(3)',
+    });
+
+    function createObserver() {
+        observerInstance = Observer.create({
+            target: content,
+            type: "pointer,touch",
+            onPress: () => {
+                tl.play();
+                gsap.ticker.remove(tick); // Stop auto-scroll
+            },
+            onDrag: (self) => {
+                total += self.deltaX;
+                xTo(total);
+            },
+            onRelease: () => {
+                tl.reverse();
+                gsap.ticker.add(tick); // Resume auto-scroll
+            },
+            onStop: () => {
+                tl.reverse();
+                gsap.ticker.add(tick);
+            },
+        });
+    }
+
+    function destroyObserver() {
+        if (observerInstance) {
+            observerInstance.kill();
+            observerInstance = null;
+        }
+    }
+
+    gsap.ticker.add(tick);
+
+    function tick(time, deltaTime) {
+        total -= deltaTime / 10;
+        xTo(total);
+    }
+
+    // Stop auto-scrolling when off the screen
+    const visibilityObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                createObserver(); // Reinitialize GSAP Observer
+                gsap.ticker.add(tick); // Resume auto-scroll
+            } else {
+                destroyObserver(); // Kill GSAP Observer
+                gsap.ticker.remove(tick); // Stop auto-scroll
+            }
+        });
+    }, { threshold: 0 });
+
+    visibilityObserver.observe(content);
+
+    // Stop auto-scrolling when tab is not visible
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+            gsap.ticker.remove(tick); // Stop auto-scroll
+        } else {
+            gsap.ticker.add(tick); // Resume auto-scroll
+        }
+    });
+});
 
 // Image Gallery – Cursor follow mouse and show/hide on hover
 document.addEventListener("DOMContentLoaded", () => {
