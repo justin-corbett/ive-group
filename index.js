@@ -2749,219 +2749,123 @@ const root = document.querySelector('.section-case_study-cta');
 
 if (!root) {
     console.warn("Root element not found. Aborting script.");
-    return; // Exit early if root is missing
+} else {
+    init(); // Run script only if root exists
 }
 
-// Store image sources in an array safely
-const imageElements = root.querySelectorAll('.case_study-cta_images-wrap img');
-const images = imageElements.length > 0 
-    ? Array.from(imageElements).map(img => img.getAttribute('src')) 
-    : [];
+function init() {
+    // Store image sources in an array safely
+    const imageElements = root.querySelectorAll('.case_study-cta_images-wrap img');
+    const images = imageElements.length > 0 
+        ? Array.from(imageElements).map(img => img.getAttribute('src')) 
+        : [];
 
-if (images.length === 0) {
-    console.warn("No images found. Aborting script.");
-    return; // Exit early if no images are found
-}
-
-let incr = 0,               
-    oldIncrX = 0,           
-    oldIncrY = 0,           
-    resetDist = window.innerWidth / 4, 
-    indexImg = 0,           
-    ticking = false;        
-
-const MAX_VELOCITY = 40;    
-
-// Update resetDist dynamically when window resizes
-window.addEventListener('resize', () => {
-    resetDist = window.innerWidth / 4;
-});
-
-// Use requestAnimationFrame for better performance
-root.addEventListener('mousemove', e => {
-    if (!ticking) {
-        requestAnimationFrame(() => {
-            handleMouseMove(e);
-            ticking = false;
-        });
-        ticking = true;
+    if (images.length === 0) {
+        console.warn("No images found. Aborting script.");
+        return; // Exit early if no images exist
     }
-});
 
-function handleMouseMove(e) {
-    const valX = e.clientX;
-    const valY = e.clientY;
+    let incr = 0,               
+        oldIncrX = 0,           
+        oldIncrY = 0,           
+        resetDist = window.innerWidth / 4, 
+        indexImg = 0,           
+        ticking = false;        
 
-    if (oldIncrX === 0 && oldIncrY === 0) {
+    const MAX_VELOCITY = 40;    
+
+    // Update resetDist dynamically when window resizes
+    window.addEventListener('resize', () => {
+        resetDist = window.innerWidth / 4;
+    });
+
+    // Use requestAnimationFrame for better performance
+    root.addEventListener('mousemove', e => {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                handleMouseMove(e);
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+
+    function handleMouseMove(e) {
+        const valX = e.clientX;
+        const valY = e.clientY;
+
+        if (oldIncrX === 0 && oldIncrY === 0) {
+            oldIncrX = valX;
+            oldIncrY = valY;
+            return;
+        }
+
+        incr += Math.abs(valX - oldIncrX) + Math.abs(valY - oldIncrY);
+
+        if (incr > resetDist) {
+            incr = 0;
+
+            let deltaX = Math.min(Math.max(valX - oldIncrX, -MAX_VELOCITY), MAX_VELOCITY);
+            let deltaY = Math.min(Math.max(valY - oldIncrY, -MAX_VELOCITY), MAX_VELOCITY);
+
+            createMedia(valX, valY - root.getBoundingClientRect().top, deltaX, deltaY);
+        }
+
         oldIncrX = valX;
         oldIncrY = valY;
-        return;
     }
 
-    incr += Math.abs(valX - oldIncrX) + Math.abs(valY - oldIncrY);
+    function createMedia(x, y, deltaX, deltaY) {
+        if (images.length === 0) return; // Extra safety check
 
-    if (incr > resetDist) {
-        incr = 0;
+        const image = document.createElement("img");
+        image.setAttribute('src', images[indexImg]);
+        image.style.position = 'absolute';
+        image.style.pointerEvents = 'none';
+        root.appendChild(image);
 
-        let deltaX = Math.min(Math.max(valX - oldIncrX, -MAX_VELOCITY), MAX_VELOCITY);
-        let deltaY = Math.min(Math.max(valY - oldIncrY, -MAX_VELOCITY), MAX_VELOCITY);
-
-        createMedia(valX, valY - root.getBoundingClientRect().top, deltaX, deltaY);
-    }
-
-    oldIncrX = valX;
-    oldIncrY = valY;
-}
-
-function createMedia(x, y, deltaX, deltaY) {
-    if (images.length === 0) return; // Extra safety check
-
-    const image = document.createElement("img");
-    image.setAttribute('src', images[indexImg]);
-    image.style.position = 'absolute';
-    image.style.pointerEvents = 'none';
-    root.appendChild(image);
-
-    const tl = gsap.timeline({
-        onComplete: () => {
-            image.remove();
-            tl.kill();
-        }
-    });
-
-    tl.fromTo(image, {
-        xPercent: -50 + (Math.random() - 0.5) * 80,
-        yPercent: -400 + (Math.random() - 0.5) * 10,
-        scaleX: 1.3,
-        scaleY: 1.3
-    }, {
-        scaleX: 1,
-        scaleY: 1,
-        ease: 'elastic.out(2, 0.6)',
-        duration: 0.6
-    });
-
-    tl.fromTo(image, {
-        x,
-        y,
-        rotation: (Math.random() - 0.5) * 20,
-    }, {
-        x: `+=${deltaX * 4}`,
-        y: `+=${deltaY * 4}`,
-        rotation: (Math.random() - 0.5) * 20,
-        ease: 'power4.out',
-        duration: 1.5
-    }, '<');
-
-    tl.to(image, {
-        duration: 0.3,
-        scale: 0.5,
-        delay: 0.1,
-        ease: 'back.in(1.5)'
-    });
-
-    indexImg = (indexImg + 1) % images.length;
-}
-
-
-
-// Image Gallery – Infinite + Drag
-let total = 0,
-    xTo,
-    itemValues = [],
-    observerInstance; // Store Observer instance
-
-window.addEventListener("DOMContentLoaded", () => {
-    const content = document.querySelector('.gallery-wrapper');
-    const cards = document.querySelectorAll('.gallery-item');
-    const cardsLength = cards.length / 2;
-    const half = content.clientWidth / 2;
-
-    const wrap = gsap.utils.wrap(-content.scrollWidth / 2, 0);
-
-    xTo = gsap.quickTo(content, "x", {
-        duration: 0.5,
-        ease: 'power3',
-        modifiers: {
-            x: gsap.utils.unitize(wrap),
-        },
-    });
-
-    for (let i = 0; i < cardsLength; i++) {
-        itemValues.push((Math.random() - 0.5) * 0); // Adjusted range – 0 is disabled
-    }
-
-    const tl = gsap.timeline({ paused: true });
-    tl.to(cards, {
-        rotate: (index) => itemValues[index % cardsLength],
-        xPercent: (index) => itemValues[index % cardsLength],
-        yPercent: (index) => itemValues[index % cardsLength],
-        scale: 0.98,
-        duration: 0.5,
-        ease: 'back.inOut(3)',
-    });
-
-    function createObserver() {
-        observerInstance = Observer.create({
-            target: content,
-            type: "pointer,touch",
-            onPress: () => {
-                tl.play();
-                gsap.ticker.remove(tick); // Stop auto-scroll
-            },
-            onDrag: (self) => {
-                total += self.deltaX;
-                xTo(total);
-            },
-            onRelease: () => {
-                tl.reverse();
-                gsap.ticker.add(tick); // Resume auto-scroll
-            },
-            onStop: () => {
-                tl.reverse();
-                gsap.ticker.add(tick);
-            },
-        });
-    }
-
-    function destroyObserver() {
-        if (observerInstance) {
-            observerInstance.kill();
-            observerInstance = null;
-        }
-    }
-
-    gsap.ticker.add(tick);
-
-    function tick(time, deltaTime) {
-        total -= deltaTime / 10;
-        xTo(total);
-    }
-
-    // Stop auto-scrolling when off the screen
-    const visibilityObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                createObserver(); // Reinitialize GSAP Observer
-                gsap.ticker.add(tick); // Resume auto-scroll
-            } else {
-                destroyObserver(); // Kill GSAP Observer
-                gsap.ticker.remove(tick); // Stop auto-scroll
+        const tl = gsap.timeline({
+            onComplete: () => {
+                image.remove();
+                tl.kill();
             }
         });
-    }, { threshold: 0 });
 
-    visibilityObserver.observe(content);
+        tl.fromTo(image, {
+            xPercent: -50 + (Math.random() - 0.5) * 80,
+            yPercent: -400 + (Math.random() - 0.5) * 10,
+            scaleX: 1.3,
+            scaleY: 1.3
+        }, {
+            scaleX: 1,
+            scaleY: 1,
+            ease: 'elastic.out(2, 0.6)',
+            duration: 0.6
+        });
 
-    // Stop auto-scrolling when tab is not visible
-    document.addEventListener("visibilitychange", () => {
-        if (document.hidden) {
-            gsap.ticker.remove(tick); // Stop auto-scroll
-        } else {
-            gsap.ticker.add(tick); // Resume auto-scroll
-        }
-    });
-});
+        tl.fromTo(image, {
+            x,
+            y,
+            rotation: (Math.random() - 0.5) * 20,
+        }, {
+            x: `+=${deltaX * 4}`,
+            y: `+=${deltaY * 4}`,
+            rotation: (Math.random() - 0.5) * 20,
+            ease: 'power4.out',
+            duration: 1.5
+        }, '<');
+
+        tl.to(image, {
+            duration: 0.3,
+            scale: 0.5,
+            delay: 0.1,
+            ease: 'back.in(1.5)'
+        });
+
+        indexImg = (indexImg + 1) % images.length;
+    }
+}
+
 
 
 // Image Gallery – Cursor follow mouse and show/hide on hover
