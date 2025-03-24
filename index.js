@@ -2920,14 +2920,21 @@ gsap.fromTo(".text-link_line.is-case_study-link",
 );
 
 // Hover animation
-document.querySelector(".text-link-case_study").addEventListener("mouseenter", () => {
-  gsap.to(".text-link_line.is-case_study-link", { 
-    x: "100%", 
-    duration: 0.5, 
-    ease: "power2.out",
-    onComplete: () => {
-      gsap.set(".text-link_line.is-case_study-link", { x: "-101%" }); // Instantly set position
-      gsap.to(".text-link_line.is-case_study-link", { x: "0%", duration: 0.5, ease: "power2.out" }); // Animate back to normal
-    }
-  });
+document.addEventListener("DOMContentLoaded", () => {
+  const textLink = document.querySelector(".text-link-case_study");
+  
+  if (textLink) {
+    textLink.addEventListener("mouseenter", () => {
+      gsap.to(".text-link_line.is-case_study-link", { 
+        x: "100%", 
+        duration: 0.5, 
+        ease: "power2.out",
+        onComplete: () => {
+          gsap.set(".text-link_line.is-case_study-link", { x: "-101%" });
+          gsap.to(".text-link_line.is-case_study-link", { x: "0%", duration: 0.5, ease: "power2.out" });
+        }
+      });
+    });
+  }
 });
+
