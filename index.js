@@ -2887,8 +2887,6 @@ function init() {
     }
 }
 
-
-
 // Image Gallery – Infinite + Drag
 let total = 0,
     xTo,
@@ -2898,6 +2896,10 @@ let total = 0,
 window.addEventListener("DOMContentLoaded", () => {
     const content = document.querySelector('.gallery-wrapper');
     const cards = document.querySelectorAll('.gallery-item');
+
+    // Ensure content and cards exist before proceeding
+    if (!content || cards.length === 0) return;
+
     const cardsLength = cards.length / 2;
     const half = content.clientWidth / 2;
 
@@ -2986,6 +2988,7 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
 
 // Image Gallery – Cursor follow mouse and show/hide on hover
 document.addEventListener("DOMContentLoaded", () => {
