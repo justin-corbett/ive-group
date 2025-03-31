@@ -654,7 +654,7 @@ $(".scroll-track.is-home_hero").each(function (index) {
 
 
 // GSAP Navigation BG Gradient Fade In – Services
-$(".section-services_overview").each(function (index) {
+$(".section-hero-content").each(function (index) {
     let triggerElement = $(this);
     let targetElement = $(".navigation-bg-gradient");
   
@@ -662,8 +662,8 @@ $(".section-services_overview").each(function (index) {
       scrollTrigger: {
         trigger: triggerElement,
         // trigger element - viewport
-        start: "top bottom",
-        end: "top top",
+        start: "top top",
+        end: "top bottom",
         scrub: 1,
       },
     });
