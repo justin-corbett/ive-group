@@ -654,7 +654,7 @@ $(".scroll-track.is-home_hero").each(function (index) {
 
 
 // GSAP Navigation BG Gradient Fade In – Services
-$(".section-hero-content").each(function (index) {
+$(".animate-nav-bg").each(function (index) {
     let triggerElement = $(this);
     let targetElement = $(".navigation-bg-gradient");
   
@@ -662,8 +662,8 @@ $(".section-hero-content").each(function (index) {
       scrollTrigger: {
         trigger: triggerElement,
         // trigger element - viewport
-        start: "top top",
-        end: "top bottom",
+        start: "top bottom",
+        end: "top top",
         scrub: 1,
       },
     });
@@ -2997,7 +2997,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// Case Studies / Showcase – View all case studies text link
+// Case Studies / Showcase – View all case studies tetlink
 document.addEventListener("DOMContentLoaded", () => {
   // Select the main link and its underline element
   const textLink = document.querySelector(".text-link-case_study");
