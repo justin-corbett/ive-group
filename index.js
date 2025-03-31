@@ -701,8 +701,8 @@ $(".animate-nav-bg").each(function (index) {
     scrollTrigger: {
       trigger: triggerElement,
       // trigger element - viewport
-      start: "top top",
-      end: "top bottom",
+      start: "top bottom",
+      end: "top top",
       scrub: 1,
     },
   });
@@ -2532,7 +2532,7 @@ $(".plyr_component.is-full-screen.is-page_hero").each(function (index) {
 
 // Video tabs auto change timer
 $(function () {
-  if ($(window).width() > 991) {
+  if ($(window).width() > 319) {
 
       function autoplayTabs($tabsMenu) {
           var $activeTab = $tabsMenu.find('.video-tabs_menu-item.is-active');
