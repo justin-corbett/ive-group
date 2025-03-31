@@ -652,27 +652,6 @@ $(".scroll-track.is-home_hero").each(function (index) {
     });
 });
 
-
-// GSAP Navigation BG Gradient Fade In – Services
-$(".section-hero-content").each(function (index) {
-    let triggerElement = $(this);
-    let targetElement = $(".navigation-bg-gradient");
-  
-    let tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: triggerElement,
-        // trigger element - viewport
-        start: "top top",
-        end: "top bottom",
-        scrub: 1,
-      },
-    });
-    tl.to(targetElement, {
-      opacity: "100%",
-      duration: 1,
-    });
-});
-
 // GSAP Navigation BG Gradient Fade In – Sustainability
 $(".section-about_sustainability-intro").each(function (index) {
   let triggerElement = $(this);
@@ -693,7 +672,7 @@ $(".section-about_sustainability-intro").each(function (index) {
   });
 });
 
-// Navigation BG Gradient Fade In – Case Studies
+// Navigation BG Gradient Fade In – Case Studies - Is always active
 $(".section-case_study-hero-video").each(function (index) {
   let triggerElement = $(this);
   let targetElement = $(".navigation-bg-gradient");
@@ -713,8 +692,8 @@ $(".section-case_study-hero-video").each(function (index) {
   });
 });
 
-// Navigation BG Gradient Fade In – Showcase
-$(".section-showcase_hero").each(function (index) {
+// Navigation BG Gradient Fade In – Showcase, Services
+$(".animate-nav-bg").each(function (index) {
   let triggerElement = $(this);
   let targetElement = $(".navigation-bg-gradient");
 
