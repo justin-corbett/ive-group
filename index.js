@@ -673,26 +673,6 @@ $(".section-services_overview").each(function (index) {
     });
 });
 
-// GSAP Navigation BG Gradient Fade In – Services
-$(".section-showcase_hero").each(function (index) {
-  let triggerElement = $(this);
-  let targetElement = $(".navigation-bg-gradient");
-
-  let tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: triggerElement,
-      // trigger element - viewport
-      start: "top top",
-      end: "bottom top",
-      scrub: 1,
-    },
-  });
-  tl.to(targetElement, {
-    opacity: "100%",
-    duration: 1,
-  });
-});
-
 // GSAP Navigation BG Gradient Fade In – Sustainability
 $(".section-about_sustainability-intro").each(function (index) {
   let triggerElement = $(this);
@@ -2887,6 +2867,8 @@ function init() {
     }
 }
 
+
+
 // Image Gallery – Infinite + Drag
 let total = 0,
     xTo,
@@ -2896,10 +2878,6 @@ let total = 0,
 window.addEventListener("DOMContentLoaded", () => {
     const content = document.querySelector('.gallery-wrapper');
     const cards = document.querySelectorAll('.gallery-item');
-
-    // Ensure content and cards exist before proceeding
-    if (!content || cards.length === 0) return;
-
     const cardsLength = cards.length / 2;
     const half = content.clientWidth / 2;
 
@@ -2989,7 +2967,6 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-
 // Image Gallery – Cursor follow mouse and show/hide on hover
 document.addEventListener("DOMContentLoaded", () => {
   const cursor = document.querySelector(".gallery-cursor-drag");
@@ -3022,43 +2999,38 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// Case Studies – View all case studies tect link
-document.addEventListener("DOMContentLoaded", () => {
-  // Select the main link and its underline element
-  const textLink = document.querySelector(".text-link-case_study");
-  const textLine = document.querySelector(".text-link_line.is-case_study-link");
+// Case Studies – View all case studies link
 
-  // Scroll-triggered animation (only runs if textLine exists)
-  if (textLine) {
-    gsap.fromTo(textLine, 
-      { opacity: 0, width: "0%" }, // Start with hidden and zero width
-      { 
-        opacity: 1,
-        width: "100%", // Animate to full width and visible
-        delay: 1, 
-        duration: 1, 
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: textLink, // Element that triggers the animation
-          start: "top bottom", // Starts when the element enters the viewport
-          toggleActions: "play none none none" // Plays once and does not reset
-        }
-      }
-    );
+// Scroll-triggered animation
+gsap.fromTo(".text-link_line.is-case_study-link", 
+  { opacity: 0, width: "0%" }, 
+  { 
+    opacity: 1,
+    width: "100%",
+    delay: 1,
+    duration: 1, 
+    ease: "power2.out",
+    scrollTrigger: {
+      trigger: ".text-link-case_study",
+      start: "top bottom",
+      toggleActions: "play none none none"
+    }
   }
+);
 
-  // Hover animation (only runs if both elements exist)
-  if (textLink && textLine) {
+// Hover animation
+document.addEventListener("DOMContentLoaded", () => {
+  const textLink = document.querySelector(".text-link-case_study");
+  
+  if (textLink) {
     textLink.addEventListener("mouseenter", () => {
-      gsap.to(textLine, { 
-        x: "100%", // Moves the line to the right
+      gsap.to(".text-link_line.is-case_study-link", { 
+        x: "100%", 
         duration: 0.5, 
         ease: "power2.out",
         onComplete: () => {
-          // Instantly moves the line to the left outside view
-          gsap.set(textLine, { x: "-101%" }); 
-          // Animates the line back to its original position
-          gsap.to(textLine, { x: "0%", duration: 0.5, ease: "power2.out" });
+          gsap.set(".text-link_line.is-case_study-link", { x: "-101%" });
+          gsap.to(".text-link_line.is-case_study-link", { x: "0%", duration: 0.5, ease: "power2.out" });
         }
       });
     });
