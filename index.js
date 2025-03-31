@@ -2553,7 +2553,7 @@ $(".plyr_component.is-full-screen.is-page_hero").each(function (index) {
 
 // Video tabs auto change timer
 $(function () {
-  if ($(window).width() > 991) {
+  if ($(window).width() > 319) {
 
       function autoplayTabs($tabsMenu) {
           var $activeTab = $tabsMenu.find('.video-tabs_menu-item.is-active');
@@ -2997,41 +2997,47 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// Case Studies – View all case studies link
-
-// Scroll-triggered animation
-gsap.fromTo(".text-link_line.is-case_study-link", 
-  { opacity: 0, width: "0%" }, 
-  { 
-    opacity: 1,
-    width: "100%",
-    delay: 1,
-    duration: 1, 
-    ease: "power2.out",
-    scrollTrigger: {
-      trigger: ".text-link-case_study",
-      start: "top bottom",
-      toggleActions: "play none none none"
-    }
-  }
-);
-
-// Hover animation
+// Case Studies / Showcase – View all case studies text link
 document.addEventListener("DOMContentLoaded", () => {
+  // Select the main link and its underline element
   const textLink = document.querySelector(".text-link-case_study");
-  
-  if (textLink) {
+  const textLine = document.querySelector(".text-link_line.is-case_study-link");
+
+  // Scroll-triggered animation (only runs if textLine exists)
+  if (textLine) {
+    gsap.fromTo(textLine, 
+      { opacity: 0, width: "0%" }, // Start with hidden and zero width
+      { 
+        opacity: 1,
+        width: "100%", // Animate to full width and visible
+        delay: 1, 
+        duration: 1, 
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: textLink, // Element that triggers the animation
+          start: "top bottom", // Starts when the element enters the viewport
+          toggleActions: "play none none none" // Plays once and does not reset
+        }
+      }
+    );
+  }
+
+  // Hover animation (only runs if both elements exist)
+  if (textLink && textLine) {
     textLink.addEventListener("mouseenter", () => {
-      gsap.to(".text-link_line.is-case_study-link", { 
-        x: "100%", 
+      gsap.to(textLine, { 
+        x: "100%", // Moves the line to the right
         duration: 0.5, 
         ease: "power2.out",
         onComplete: () => {
-          gsap.set(".text-link_line.is-case_study-link", { x: "-101%" });
-          gsap.to(".text-link_line.is-case_study-link", { x: "0%", duration: 0.5, ease: "power2.out" });
+          // Instantly moves the line to the left outside view
+          gsap.set(textLine, { x: "-101%" }); 
+          // Animates the line back to its original position
+          gsap.to(textLine, { x: "0%", duration: 0.5, ease: "power2.out" });
         }
       });
     });
   }
 });
+
 
