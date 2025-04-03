@@ -6,6 +6,57 @@ ScrollTrigger.defaults({
   markers: false,
 });
 
+// Lenis smooth scroll
+// Initialize a new Lenis instance for smooth scrolling
+const lenis = new Lenis({
+  prevent: (node) => node.id === 'modal',
+})
+
+// Synchronize Lenis scrolling with GSAP's ScrollTrigger plugin
+lenis.on('scroll', ScrollTrigger.update);
+
+// Add Lenis's requestAnimationFrame (raf) method to GSAP's ticker
+// This ensures Lenis's smooth scroll animation updates on each GSAP tick
+gsap.ticker.add((time) => {
+  lenis.raf(time * 1000); // Convert time from seconds to milliseconds
+});
+
+// Disable lag smoothing in GSAP to prevent any delay in scroll animations
+gsap.ticker.lagSmoothing(0);
+
+// Page refresh on resize
+const breakpoints = [479, 767, 991, 1239, 1439, 1919];
+
+// Store the initial window width
+let initialWidth = window.innerWidth;
+
+// Function to check if the width crosses any breakpoints
+function shouldRefresh(newWidth) {
+  for (let breakpoint of breakpoints) {
+    if ((initialWidth <= breakpoint && newWidth > breakpoint) ||
+        (initialWidth > breakpoint && newWidth <= breakpoint)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// Add event listener for resize
+window.addEventListener('resize', function () {
+  let newWidth = window.innerWidth;
+  if (shouldRefresh(newWidth)) {
+    window.location.reload();
+  }
+});
+
+
+// Footer back to top botton
+document.querySelector('.text-link.is-back_to_top').addEventListener('click', function () {
+    lenis.scrollTo('#top', {
+      duration: 2.5, // Duration in seconds (e.g., 2 seconds for a slower animation)
+    });
+});
+
 // GSAP Horizontal Scroll – Desktop
 $(document).ready(function () {
     loaderOnPageLoad().then(() => {
@@ -37,11 +88,15 @@ function setTrackHeights() {
       let trackWidth = $(this).find(".track").outerWidth();
       $(this).height(trackWidth);
     });
+    ScrollTrigger.refresh(); // Ensure all triggers recalculate after height changes
+
   }
   
   window.addEventListener("resize", function () {
     if ($(window).width() > 991) {
         setTrackHeights();
+        ScrollTrigger.refresh(); // Ensure all triggers recalculate after height changes
+
     }
 });
 
@@ -652,47 +707,6 @@ $(".scroll-track.is-home_hero").each(function (index) {
     });
 });
 
-
-// GSAP Navigation BG Gradient Fade In – Services
-$(".section-services_overview").each(function (index) {
-    let triggerElement = $(this);
-    let targetElement = $(".navigation-bg-gradient");
-  
-    let tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: triggerElement,
-        // trigger element - viewport
-        start: "top bottom",
-        end: "top top",
-        scrub: 1,
-      },
-    });
-    tl.to(targetElement, {
-      opacity: "100%",
-      duration: 1,
-    });
-});
-
-// GSAP Navigation BG Gradient Fade In – Sustainability
-$(".section-about_sustainability-intro").each(function (index) {
-  let triggerElement = $(this);
-  let targetElement = $(".navigation-bg-gradient");
-
-  let tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: triggerElement,
-      // trigger element - viewport
-      start: "top bottom",
-      end: "top top",
-      scrub: 1,
-    },
-  });
-  tl.to(targetElement, {
-    opacity: "100%",
-    duration: 1,
-  });
-});
-
 // Navigation BG Gradient Fade In – Case Studies
 $(".section-case_study-hero-video").each(function (index) {
   let triggerElement = $(this);
@@ -713,8 +727,8 @@ $(".section-case_study-hero-video").each(function (index) {
   });
 });
 
-// Navigation BG Gradient Fade In – Showcase
-$(".image_full-service_hero-video").each(function (index) {
+// Navigation BG Gradient Fade In – .animate-nav-bg block
+$(".animate-nav-bg").each(function (index) {
   let triggerElement = $(this);
   let targetElement = $(".navigation-bg-gradient");
 
@@ -870,15 +884,20 @@ $(".image_full-service_hero-video").each(function (index) {
     });
 });
 
-// Navigation desktop
+// Navigation Open Desktop
 var tl = gsap.timeline();
 
 tl.set('.navigation-dropdown-bg-wrapper', { display: "block" })
   .to('.navigation-dropdown-slide', { duration: 0.5, opacity: 1, y: "0%", ease: "power2.out" })
   .to('.navigation-bg-main', { duration: 0.5, opacity: 1, ease: "power2.out" }, "-=0.5")
   .to('.hr-navigation', { duration: 0.5, y: "6rem", ease: "power2.out" }, "-=0.5")
-  .to('.navigation-bg-title', { duration: 0.5, y: "0%", ease: "power2.out" }, "-=0.5")
-;
+  .to('.navigation-bg-title', { 
+      duration: 0.5, 
+      y: "0%", 
+      ease: "power2.out",
+      onComplete: () => lenis.stop() // Stops Lenis smooth scrolling
+  }, "-=0.5");
+
 
 // Home hero title animation
 const wrappers = document.querySelectorAll(".home-hero-heading-wrapper");
@@ -902,7 +921,7 @@ if (wrappers.length > 0) {
                 splitTextInstances.push(split);
             });
 
-            let tl = gsap.timeline({ repeat: -1, delay: 2.5 });
+            let tl = gsap.timeline({ repeat: -1, delay: 4 });
 
             tl.set(wrapper, { opacity: 1 });
 
@@ -1332,6 +1351,7 @@ $(document).ready(function() {
                 tl.play();
             } else {
                 tl.reverse() && $('.nav-link').removeClass('is-inactive') && $('.navigation_dropdown-toggle').removeClass('is-inactive');
+                lenis.start();	
             }
         }
 
@@ -1878,13 +1898,6 @@ function caseStudy6HoverOut() {
   }, 100);
 }
 
-
-
-
-
-
-
-
 // Navigation secondary hover in/out
 $(document).ready(function() {
     if ($(window).width() >= 991) {
@@ -1919,12 +1932,6 @@ $(document).ready(function() {
 
 // Desktop Navigation End
 
-/*
-// Add a delay before stopping the scroll (adjust the delay time as needed)
-    setTimeout(function() {
-    window.SScroll.call.stop();
-    }, 1000); // 1000 milliseconds = 1 second
-*/
 
 
 
@@ -1936,29 +1943,23 @@ function loaderOnPageLoad() {
     // Create a GSAP timeline
     let tl = gsap.timeline();
 
-     // Stops flicker on homepage
-     gsap.set(".section-home-services", { display: "none" });
-
-  
     // Add animations to the timeline
-    tl.to(".logo-loader", {
+      tl.to(".logo-loader", {
         y: "0%",
         duration: 0.4,
         delay: 0.2,
         ease: 'power1.out',
         onComplete: () => {
-            lenis.scrollTo('#top', {
-                onComplete: () => {
-                  lenis.stop(); // Stops the scroll animation
-                }
-              });
+          lenis.scrollTo('#top', {
+            duration: 2,
+            lock: true,
+          });
         }
-    }, "<+0.3")
-      
+      })
       .to(".loader_background-gradient-1", {
         y: "-100%",
         duration: 1.5,
-        delay: 0.8,
+        delay: 0.4,
         ease: 'power2.out',
       })
       .to(".loader_background-gradient-2", {
@@ -1993,13 +1994,22 @@ function loaderOnPageLoad() {
         duration: 0.2,
         delay: 0,
         ease: 'power1.out',
-        onComplete: () => {
-            lenis.start()
-            gsap.set(".section-home-services", { display: "block" });
-            }
       }, "<")
+      .add(() => {
+        ScrollTrigger.refresh(true);
+        lenis.start();
+      }, "<+0.2")
+      .add(() => {
+        pageTitleSplitText.play(); // Play the SplitText animation
+      }, "<+0.5")
+      .add(() => {
+        pageSecondarySplitText.play();
+      }, "<+0.5")
+      .add(() => {
+        heroTertiaryAnimation.play();
+      }, "<+0.5")
+
       
-  
     // Return the timeline
     return tl;
 }
@@ -2218,51 +2228,38 @@ function animateImages() {
 });
 
 
-// Lenis smooth scroll
-const lenis = new Lenis()
+// GSAP Split Text
+// All Pages Loader Animation – Page Title
+const pageTitleSplitText = gsap.timeline({ paused: true });
+const pageTitleSplit = new SplitText("#page-title", { type: "chars, words, lines" });
 
-lenis.on('scroll', (e) => {
-  console.log(e)
-  ScrollTrigger.update()
-})
-
-gsap.ticker.add((time) => {
-  lenis.raf(time * 1000)
-})
-
-gsap.ticker.lagSmoothing(0)
-
-// Page refresh on resize
-const breakpoints = [479, 767, 991, 1239, 1439, 1919];
-
-// Store the initial window width
-let initialWidth = window.innerWidth;
-
-// Function to check if the width crosses any breakpoints
-function shouldRefresh(newWidth) {
-  for (let breakpoint of breakpoints) {
-    if ((initialWidth <= breakpoint && newWidth > breakpoint) ||
-        (initialWidth > breakpoint && newWidth <= breakpoint)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-// Add event listener for resize
-window.addEventListener('resize', function () {
-  let newWidth = window.innerWidth;
-  if (shouldRefresh(newWidth)) {
-    window.location.reload();
-  }
+pageTitleSplitText.from(pageTitleSplit.chars, {
+  duration: 0.5,
+  y: "3rem",
+  autoAlpha: 0,
+  stagger: 0.02,
+  ease: "power2.out"
 });
 
+// GSAP Split Text
+// All Pages Loader Animation – Text Secondary
+const pageSecondarySplitText = gsap.timeline({ paused: true });
+const pageSecondarySplit = new SplitText("#animate-secondary", { type: "words" });
 
-// Footer back to top botton
-document.querySelector('.text-link.is-back_to_top').addEventListener('click', function () {
-    lenis.scrollTo('#top', {
-      duration: 2.5, // Duration in seconds (e.g., 2 seconds for a slower animation)
-    });
+pageSecondarySplitText.from(pageSecondarySplit.words, {
+  duration: 0.5,
+  y: "1rem",
+  autoAlpha: 0,
+  stagger: 0.05,
+  ease: "power2.out"
+});
+
+// All Pages Loader Animation – Hero Tertiary
+const heroTertiaryAnimation = gsap.from("#hero-tertiary", {
+  autoAlpha: 0, // Equivalent to opacity: 1 and visibility: visible
+  duration: 0.5,  // Adjust duration as needed
+  ease: "power2.out",
+  paused: true  // Keeps the animation paused initially
 });
 
 // GSAP Slplit Text – Animations
@@ -2274,8 +2271,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const caseStudyTitleElements = document.querySelectorAll("[data-split-case_study-title]");
       const caseStudyDescElements = document.querySelectorAll("[data-split-case_study-desc]");
 
-
-  
       if (wordElements.length === 0 && lineElements.length === 0) return; // No elements found, exit
   
       wordElements.forEach(element => {
@@ -2696,7 +2691,7 @@ videoTabLinks.forEach((link, index) => {
 
 // Video Gallery – Show cursor on hover and follow mouse
 const cursor = document.querySelector(".cursor-video_play-wrapper");
-const videoStages = document.querySelectorAll(".video-tabs_stage, .case_study_hero-video-wrapper");
+const videoStages = document.querySelectorAll(".video-tabs_stage, .case_study_hero-video-wrapper, .hero-video-wrapper, .image_full-service_hero-video");
 const cursorHoverVideos = document.querySelectorAll(".cursor-hover-video");
 
 // Make cursor follow the mouse
@@ -3000,7 +2995,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // Case Studies – View all case studies link
-
 // Scroll-triggered animation
 gsap.fromTo(".text-link_line.is-case_study-link", 
   { opacity: 0, width: "0%" }, 
@@ -3036,3 +3030,42 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// Text Link Alternate – Hover Line animation
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".text-link-alternate").forEach((textLink) => {
+    const line = textLink.querySelector(".text-link_line.is-alternate");
+
+    if (line) {
+      // Scroll-triggered animation
+      gsap.fromTo(line, 
+        { width: "0%" }, 
+        { 
+          width: "100%",
+          delay: 0.5,
+          duration: 1, 
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: textLink, // Trigger on the closest parent
+            start: "top bottom",
+            toggleActions: "play none none reset"
+          }
+        }
+      );
+
+      // Hover animation
+      textLink.addEventListener("mouseenter", () => {
+        gsap.to(line, { 
+          x: "100%", 
+          duration: 0.5, 
+          ease: "power2.out",
+          onComplete: () => {
+            gsap.set(line, { x: "-101%" });
+            gsap.to(line, { x: "0%", duration: 0.5, ease: "power2.out" });
+          }
+        });
+      });
+    }
+  });
+});
+
