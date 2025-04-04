@@ -100,9 +100,6 @@ function setTrackHeights() {
     }
 });
 
-  
-
-
 // Horizontal rule 
 $(".horizontal-rule").each(function (index, element) {
     let triggerElement = $(this);
@@ -120,7 +117,7 @@ $(".horizontal-rule").each(function (index, element) {
     tl.from(targetElement, {
       width: "0%",
       duration: 1,
-      delay: 0.2,
+      delay: 0.3,
       ease: "power1.out",
     });
 });
@@ -3068,4 +3065,95 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+// Accordion Icon – Fade In 
+gsap.utils.toArray(".accordion_icon").forEach((icon) => {
+  gsap.fromTo(icon, 
+    { autoAlpha: 0 }, 
+    {
+      autoAlpha: 1,
+      delay: 0.75,
+      duration: 1,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: icon,
+        start: "top bottom", // adjust as needed
+        toggleActions: "play none none none"
+      }
+    }
+  );
+});
+
+// Footer Logo – Fade In 
+gsap.utils.toArray(".footer_logo-link").forEach((logo) => {
+  gsap.fromTo(logo, 
+    { autoAlpha: 0 }, 
+    {
+      autoAlpha: 1,
+      delay: 0.25,
+      duration: 1,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: logo,
+        start: "top bottom", // adjust as needed
+        toggleActions: "play none none none"
+      }
+    }
+  );
+});
+
+// Button White – Fade In 
+gsap.utils.toArray(".button-white").forEach((buttonWhite) => {
+  gsap.fromTo(buttonWhite, 
+    { autoAlpha: 0 }, 
+    {
+      autoAlpha: 1,
+      delay: 0.25,
+      duration: 1,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: buttonWhite,
+        start: "top bottom", // adjust as needed
+        toggleActions: "play none none none"
+      }
+    }
+  );
+});
+
+// Button Dark – Fade In 
+gsap.utils.toArray(".button-white").forEach((buttonDark) => {
+  gsap.fromTo(buttonDark, 
+    { autoAlpha: 0 }, 
+    {
+      autoAlpha: 1,
+      delay: 0.25,
+      duration: 1,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: buttonDark,
+        start: "top bottom", // adjust as needed
+        toggleActions: "play none none none"
+      }
+    }
+  );
+});
+
+// Social Link – Fade In 
+gsap.utils.toArray(".social-link").forEach((socialLink) => {
+  gsap.fromTo(socialLink, 
+    { autoAlpha: 0 }, 
+    {
+      autoAlpha: 1,
+      delay: 0.25,
+      duration: 1,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: socialLink,
+        start: "top bottom", // adjust as needed
+        toggleActions: "play none none none"
+      }
+    }
+  );
+});
+
 
