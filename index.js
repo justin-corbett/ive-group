@@ -2323,113 +2323,121 @@ const heroTertiaryAnimation = gsap.from(heroEls, {
   paused: true
 });
 
-/*
-// GSAP Slplit Text – Animations
+// GSAP Split Text – Animations
 document.addEventListener("DOMContentLoaded", () => {
-    setTimeout(() => {
-      const wordElements = document.querySelectorAll("[data-split-words]");
-      const lineElements = document.querySelectorAll("[data-split-lines]");
-      const charsElements = document.querySelectorAll("[data-split-chars]");
-      const caseStudyTitleElements = document.querySelectorAll("[data-split-case_study-title]");
-      const caseStudyDescElements = document.querySelectorAll("[data-split-case_study-desc]");
+  setTimeout(() => {
 
-      if (wordElements.length === 0 && lineElements.length === 0) return; // No elements found, exit
-  
-      wordElements.forEach(element => {
-        if (!element.textContent.trim()) return; // Skip empty elements
-        const wordSplit = new SplitText(element, { type: "words" });
-  
-        gsap.from(wordSplit.words, {
-          autoAlpha: 0,
-          translateY: "100%",
-          delay: 0.3,
-          duration: 1,
-          stagger: 0.05,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: element,
-            start: "top bottom",
-            toggleActions: "play none none none",
-          },
-        });
+    // 1) Words
+    document.querySelectorAll("[data-split-words]").forEach(element => {
+      if (!element.textContent.trim()) return;
+      const split = SplitText.create(element, {
+        type: "words",
+        autoSplit: true
       });
-  
-      lineElements.forEach(element => {
-        if (!element.textContent.trim()) return; // Skip empty elements
-        const linesSplit = new SplitText(element, { type: "lines" });
-  
-        gsap.from(linesSplit.lines, {
-          autoAlpha: 0,
-          translateY: "100%",
-          duration: 1,
-          delay: 0.3,
-          stagger: 0.1,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: element,
-            start: "top bottom",
-            toggleActions: "play none none none",
-          },
-        });
+      gsap.from(split.words, {
+        autoAlpha: 0,
+        yPercent: 100,
+        delay: 0.3,
+        duration: 1,
+        stagger: 0.05,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: element,
+          start: "top bottom",
+          toggleActions: "play none none none"
+        }
       });
+    });
 
-      charsElements.forEach(element => {
-        if (!element.textContent.trim()) return; // Skip empty elements
-        const charsSplit = new SplitText(element, { type: "chars, words" });
-  
-        gsap.from(charsSplit.chars, {
-          autoAlpha: 0,
-          translateY: "100%",
-          duration: 1,
-          delay: 0.3,
-          stagger: 0.05,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: element,
-            start: "top bottom",
-            toggleActions: "play none none none",
-          },
-        });
+    // 2) Lines
+    document.querySelectorAll("[data-split-lines]").forEach(element => {
+      if (!element.textContent.trim()) return;
+      const split = SplitText.create(element, {
+        type: "lines",
+        autoSplit: true
       });
+      gsap.from(split.lines, {
+        autoAlpha: 0,
+        yPercent: 100,
+        duration: 1,
+        delay: 0.3,
+        stagger: 0.1,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: element,
+          start: "top bottom",
+          toggleActions: "play none none none"
+        }
+      });
+    });
 
-      caseStudyTitleElements.forEach(element => {
-        if (!element.textContent.trim()) return; // Skip empty elements
-        const caseStudyTitleSplit = new SplitText(element, { type: "chars, words" });
-  
-        gsap.from(caseStudyTitleSplit.chars, {
-          autoAlpha: 0,
-          translateY: "50%",
-          duration: 1,
-          stagger: 0.02,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: element,
-            start: "top 50%",
-            toggleActions: "play none none none",
-          },
-        });
+    // 3) Chars
+    document.querySelectorAll("[data-split-chars]").forEach(element => {
+      if (!element.textContent.trim()) return;
+      const split = SplitText.create(element, {
+        type: "chars,words",
+        autoSplit: true
       });
+      gsap.from(split.chars, {
+        autoAlpha: 0,
+        yPercent: 100,
+        duration: 1,
+        delay: 0.3,
+        stagger: 0.05,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: element,
+          start: "top bottom",
+          toggleActions: "play none none none"
+        }
+      });
+    });
 
-      caseStudyDescElements.forEach(element => {
-        if (!element.textContent.trim()) return; // Skip empty elements
-        const caseStudyDescSplit = new SplitText(element, { type: "lines" });
-  
-        gsap.from(caseStudyDescSplit.lines, {
-          autoAlpha: 0,
-          translateY: "50%",
-          duration: 1,
-          stagger: 0.1,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: element,
-            start: "top 70%",
-            toggleActions: "play none none none",
-          },
-        });
+    // 4) Case Study Title
+    document.querySelectorAll("[data-split-case_study-title]").forEach(element => {
+      if (!element.textContent.trim()) return;
+      const split = SplitText.create(element, {
+        type: "chars,words",
+        autoSplit: true
       });
-    }, 200); // Reduce delay
+      gsap.from(split.chars, {
+        autoAlpha: 0,
+        yPercent: 50,
+        duration: 1,
+        stagger: 0.02,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: element,
+          start: "top 50%",
+          toggleActions: "play none none none"
+        }
+      });
+    });
+
+    // 5) Case Study Description
+    document.querySelectorAll("[data-split-case_study-desc]").forEach(element => {
+      if (!element.textContent.trim()) return;
+      const split = SplitText.create(element, {
+        type: "lines",
+        autoSplit: true
+      });
+      gsap.from(split.lines, {
+        autoAlpha: 0,
+        yPercent: 50,
+        duration: 1,
+        stagger: 0.1,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: element,
+          start: "top 70%",
+          toggleActions: "play none none none"
+        }
+      });
+    });
+
+  }, 200);
 });
-*/
+
 
 // Sub-title Waymaker – Fade In
 gsap.utils.toArray(".icon-waymaker-subtitle").forEach((el) => {
