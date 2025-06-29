@@ -2025,6 +2025,7 @@ function loaderOnPageLoad() {
       }, "<+0.2")
       .add(() => {
         pageSecondarySplitText.play();
+        pageLinesSplitText.play();
       }, "<+0.2")
       .add(() => {
         heroTertiaryAnimation.play();
@@ -2129,7 +2130,8 @@ if (window.location.pathname === "/" || window.location.pathname === "/index.htm
             tl.add(
               Flip.fit(targetEl[0], nextZoneEl[0], {
                 duration: zoneDifference,
-                ease: "power1.inOut"
+                ease: "power1.inOut",
+                props: ["borderRadius"],
               })
             );
           }
@@ -2277,6 +2279,23 @@ pageTitleSecondarySplitText.from(pageTitleSecondarySplit.words, {
   autoAlpha: 0,
   stagger: 0.02,
   ease: "power2.out"
+});
+
+// GSAP Split Text
+// All Pages Loader Animation – Split Lines
+const pageLinesSplitText = gsap.timeline({ paused: true });
+const pageLinesSplit = new SplitText("#page-loader-lines", { 
+  type: "lines", 
+  mask: "lines",
+  lineClass: "line",
+});
+
+pageLinesSplitText.from(pageLinesSplit.lines, {
+  duration: 0.5,
+  y: "110%",
+  autoAlpha: 0,
+  stagger: 0.1,
+  ease: "power4.out"
 });
 
 // GSAP Split Text
