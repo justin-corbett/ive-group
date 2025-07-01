@@ -2151,46 +2151,47 @@ if (window.location.pathname === "/" || window.location.pathname === "/index.htm
 }
 
 // GSAP FLIP – Case Studies
-if (window.location.pathname.includes("/showcase")) {
+if (window.location.pathname.includes("/case-studies")) {
   window.addEventListener("DOMContentLoaded", (event) => {
     
     // SETUP ELEMENTS
     let zoneEl = $("[js-scrollflip-element='zone']"),
-      targetEl = $("[js-scrollflip-element='target']").first();
+    targetEl = $("[js-scrollflip-element='target']").first();
 
-    // SETUP TIMELINE
-    let tl;
-    function createTimeline() {
-      if (tl) {
-        tl.kill();
-        gsap.set(targetEl, { clearProps: "all" });
-      }
-      tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: zoneEl.first(),
-          start: "top top",
-          endTrigger: zoneEl.last(),
-          end: "bottom bottom",
-          scrub: true
-        }
-      });
-      zoneEl.each(function (index) {
-        let nextZoneEl = zoneEl.eq(index + 1);
-        if (nextZoneEl.length) {
-          let nextZoneDistance =
-            nextZoneEl.offset().top + nextZoneEl.innerHeight() / 2;
-          let thisZoneDistance = $(this).offset().top + $(this).innerHeight() / 2;
-          let zoneDifference = nextZoneDistance - thisZoneDistance;
-          tl.add(
-            Flip.fit(targetEl[0], nextZoneEl[0], {
-              duration: zoneDifference,
-              ease: "power1.inOut"
-            })
-          );
-        }
-      });
+  // SETUP TIMELINE
+  let tl;
+  function createTimeline() {
+    if (tl) {
+      tl.kill();
+      gsap.set(targetEl, { clearProps: "all" });
     }
-    createTimeline();
+    tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: zoneEl.first(),
+        start: "top top",
+        endTrigger: zoneEl.last(),
+        end: "bottom bottom",
+        scrub: true
+      }
+    });
+    zoneEl.each(function (index) {
+      let nextZoneEl = zoneEl.eq(index + 1);
+      if (nextZoneEl.length) {
+        let nextZoneDistance =
+          nextZoneEl.offset().top + nextZoneEl.innerHeight() / 2;
+        let thisZoneDistance = $(this).offset().top + $(this).innerHeight() / 2;
+        let zoneDifference = nextZoneDistance - thisZoneDistance;
+        tl.add(
+          Flip.fit(targetEl[0], nextZoneEl[0], {
+            duration: zoneDifference,
+            ease: "power1.inOut",
+            props: ["borderRadius"],
+          })
+        );
+      }
+    });
+  }
+  createTimeline();
 
     // SETUP RESIZE
     let resizeTimer;
@@ -2323,119 +2324,111 @@ const heroTertiaryAnimation = gsap.from(heroEls, {
   paused: true
 });
 
-// GSAP Split Text – Animations
+
+// GSAP Slplit Text – Animations
 document.addEventListener("DOMContentLoaded", () => {
-  setTimeout(() => {
+    setTimeout(() => {
+      const wordElements = document.querySelectorAll("[data-split-words]");
+      const lineElements = document.querySelectorAll("[data-split-lines]");
+      const charsElements = document.querySelectorAll("[data-split-chars]");
+      const caseStudyTitleElements = document.querySelectorAll("[data-split-case_study-title]");
+      const caseStudyDescElements = document.querySelectorAll("[data-split-case_study-desc]");
 
-    // 1) Words
-    document.querySelectorAll("[data-split-words]").forEach(element => {
-      if (!element.textContent.trim()) return;
-      const split = SplitText.create(element, {
-        type: "words",
-        autoSplit: true
+      if (wordElements.length === 0 && lineElements.length === 0) return; // No elements found, exit
+  
+      wordElements.forEach(element => {
+        if (!element.textContent.trim()) return; // Skip empty elements
+        const wordSplit = new SplitText(element, { type: "words" });
+  
+        gsap.from(wordSplit.words, {
+          autoAlpha: 0,
+          translateY: "100%",
+          delay: 0.3,
+          duration: 1,
+          stagger: 0.05,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: element,
+            start: "top bottom",
+            toggleActions: "play none none none",
+          },
+        });
       });
-      gsap.from(split.words, {
-        autoAlpha: 0,
-        yPercent: 100,
-        delay: 0.3,
-        duration: 1,
-        stagger: 0.05,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: element,
-          start: "top bottom",
-          toggleActions: "play none none none"
-        }
+  
+      lineElements.forEach(element => {
+        if (!element.textContent.trim()) return; // Skip empty elements
+        const linesSplit = new SplitText(element, { type: "lines" });
+  
+        gsap.from(linesSplit.lines, {
+          autoAlpha: 0,
+          translateY: "100%",
+          duration: 1,
+          delay: 0.3,
+          stagger: 0.1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: element,
+            start: "top bottom",
+            toggleActions: "play none none none",
+          },
+        });
       });
-    });
 
-    // 2) Lines
-    document.querySelectorAll("[data-split-lines]").forEach(element => {
-      if (!element.textContent.trim()) return;
-      const split = SplitText.create(element, {
-        type: "lines",
-        autoSplit: true
+      charsElements.forEach(element => {
+        if (!element.textContent.trim()) return; // Skip empty elements
+        const charsSplit = new SplitText(element, { type: "chars, words" });
+  
+        gsap.from(charsSplit.chars, {
+          autoAlpha: 0,
+          translateY: "100%",
+          duration: 1,
+          delay: 0.3,
+          stagger: 0.05,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: element,
+            start: "top bottom",
+            toggleActions: "play none none none",
+          },
+        });
       });
-      gsap.from(split.lines, {
-        autoAlpha: 0,
-        yPercent: 100,
-        duration: 1,
-        delay: 0.3,
-        stagger: 0.1,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: element,
-          start: "top bottom",
-          toggleActions: "play none none none"
-        }
-      });
-    });
 
-    // 3) Chars
-    document.querySelectorAll("[data-split-chars]").forEach(element => {
-      if (!element.textContent.trim()) return;
-      const split = SplitText.create(element, {
-        type: "chars,words",
-        autoSplit: true
+      caseStudyTitleElements.forEach(element => {
+        if (!element.textContent.trim()) return; // Skip empty elements
+        const caseStudyTitleSplit = new SplitText(element, { type: "chars, words" });
+  
+        gsap.from(caseStudyTitleSplit.chars, {
+          autoAlpha: 0,
+          translateY: "50%",
+          duration: 1,
+          stagger: 0.02,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: element,
+            start: "top 50%",
+            toggleActions: "play none none none",
+          },
+        });
       });
-      gsap.from(split.chars, {
-        autoAlpha: 0,
-        yPercent: 100,
-        duration: 1,
-        delay: 0.3,
-        stagger: 0.05,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: element,
-          start: "top bottom",
-          toggleActions: "play none none none"
-        }
-      });
-    });
 
-    // 4) Case Study Title
-    document.querySelectorAll("[data-split-case_study-title]").forEach(element => {
-      if (!element.textContent.trim()) return;
-      const split = SplitText.create(element, {
-        type: "chars,words",
-        autoSplit: true
+      caseStudyDescElements.forEach(element => {
+        if (!element.textContent.trim()) return; // Skip empty elements
+        const caseStudyDescSplit = new SplitText(element, { type: "lines" });
+  
+        gsap.from(caseStudyDescSplit.lines, {
+          autoAlpha: 0,
+          translateY: "50%",
+          duration: 1,
+          stagger: 0.1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: element,
+            start: "top 70%",
+            toggleActions: "play none none none",
+          },
+        });
       });
-      gsap.from(split.chars, {
-        autoAlpha: 0,
-        yPercent: 50,
-        duration: 1,
-        stagger: 0.02,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: element,
-          start: "top 50%",
-          toggleActions: "play none none none"
-        }
-      });
-    });
-
-    // 5) Case Study Description
-    document.querySelectorAll("[data-split-case_study-desc]").forEach(element => {
-      if (!element.textContent.trim()) return;
-      const split = SplitText.create(element, {
-        type: "lines",
-        autoSplit: true
-      });
-      gsap.from(split.lines, {
-        autoAlpha: 0,
-        yPercent: 50,
-        duration: 1,
-        stagger: 0.1,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: element,
-          start: "top 70%",
-          toggleActions: "play none none none"
-        }
-      });
-    });
-
-  }, 200);
+    }, 200); // Reduce delay
 });
 
 
@@ -2819,7 +2812,7 @@ videoStages.forEach((stage) => {
 const root = document.querySelector('.section-case_study-cta');
 
 if (!root) {
-    console.warn("Root element not found. Aborting script.");
+    // console.warn("Root element not found. Aborting script.");
 } else {
     init(); // Run script only if root exists
 }
@@ -3237,78 +3230,60 @@ gsap.utils.toArray(".social-link").forEach((socialLink) => {
 
 // Gallery Filter Modal – Open
 document.addEventListener('DOMContentLoaded', () => {
-  // GSAP Timelines
-  var filterModalOpen = gsap.timeline({ paused: true });
-  filterModalOpen
-    .set('.filter-modal-wrap', { display: "block" })
-    .from('.filter-modal_background-overlay', {
-      duration: 0.5,
-      opacity: 0,
-      ease: "power3.inOut"
-    })
-    .from('.filter-modal_content-wrapper', {
-      duration: 0.5,
-      translateX: "100%",
-      ease: "power3.inOut"
-    }, "<");
+  // Grab the core modal elements
+  const modalWrap       = document.querySelector('.filter-modal-wrap');
+  const modalOverlay    = document.querySelector('.filter-modal_background-overlay');
+  const modalContent    = document.querySelector('.filter-modal_content-wrapper');
+  const closeButton     = document.querySelector('.filter-modal_close-button');
+  const openButtons     = document.querySelectorAll('.text-link-alternate.is-filters_open');
+  const hasLenis        = typeof lenis !== 'undefined' && lenis !== null;
 
-  var filterModalClose = gsap.timeline({ paused: true });
-  filterModalClose
-    .to('.filter-modal_background-overlay', {
-      duration: 0.5,
-      opacity: 0,
-      ease: "power3.inOut"
-    })
-    .to('.filter-modal_content-wrapper', {
-      duration: 0.5,
-      translateX: "100%",
-      ease: "power3.inOut"
-    }, "<")
-    .add(() => {
-      gsap.set('.filter-modal-wrap', { display: "none" });
+  // If any of the required modal pieces are missing, bail out
+  if (!modalWrap || !modalOverlay || !modalContent) return;
+
+  // Build GSAP timelines targeting the actual elements
+  const filterModalOpen = gsap.timeline({ paused: true })
+    .set(modalWrap,    { display: 'block' })
+    .from(modalOverlay, { duration: 0.5, opacity: 0, ease: 'power3.inOut' })
+    .from(modalContent, { duration: 0.5, x: '100%',   ease: 'power3.inOut' }, '<');
+
+  const filterModalClose = gsap.timeline({ paused: true })
+    .to(modalOverlay, { duration: 0.5, opacity: 0, ease: 'power3.inOut' })
+    .to(modalContent, { duration: 0.5, x: '100%',   ease: 'power3.inOut' }, '<')
+    .add(() => gsap.set(modalWrap, { display: 'none' }));
+
+  // Attach open handlers
+  openButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      filterModalOpen.restart();
+      if (hasLenis) lenis.stop();
     });
+  });
 
-  // Modal Elements
-  const filterModalCloseButton = document.querySelector('.filter-modal_close-button');
-  const filterModalBackdrop = document.querySelector('.filter-modal_background-overlay');
-  const filterModalOpenButtons = document.querySelectorAll('.text-link-alternate.is-filters_open');
-
-  // Open Button Event Listeners
-  if (filterModalOpenButtons.length > 0) {
-    filterModalOpenButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        filterModalOpen.restart();
-        lenis.stop();
-      });
-    });
-  }
-
-  // Close Button Event Listener
-  if (filterModalCloseButton) {
-    filterModalCloseButton.addEventListener('click', () => {
+  // Attach close handlers
+  if (closeButton) {
+    closeButton.addEventListener('click', () => {
       filterModalClose.restart();
-      lenis.start();
+      if (hasLenis) lenis.start();
     });
   }
-
-  // Backdrop Click Event Listener
-  if (filterModalBackdrop) {
-    filterModalBackdrop.addEventListener('click', () => {
-      filterModalClose.restart();
-      lenis.start();
-    });
-  }
+  modalOverlay.addEventListener('click', () => {
+    filterModalClose.restart();
+    if (hasLenis) lenis.start();
+  });
 });
 
+
+
+// SplitText 
 document.fonts.ready.then(() => {
-  document.querySelectorAll("[data-split-rich_text]").forEach((text) => {
+  document.querySelectorAll("[data-word-reveal='true']").forEach((text) => {
 
     const split = SplitText.create(text.children, {
       type: "lines",
       mask: "lines",
-      lineClass: "line",
+      linesClass: "line",
       autoSplit: true,
-      
     });
 
     const tl = gsap.timeline({
@@ -3323,13 +3298,13 @@ document.fonts.ready.then(() => {
       yPercent: 110,
       delay: 0.2,
       duration: 0.8,
-      stagger: { amount: 0.1 },
-      ease:"expo.out",
+      stagger: { amount: 0.5 },
     });
 
     gsap.set(text, { visibility: "visible" });
   });
 });
+
 
 
 
