@@ -2324,7 +2324,7 @@ const heroTertiaryAnimation = gsap.from(heroEls, {
   paused: true
 });
 
-/*
+
 // GSAP Slplit Text – Animations
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
@@ -2410,7 +2410,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }, 200); // Reduce delay
 });
-*/
+
 
 // Sub-title Waymaker – Fade In
 gsap.utils.toArray(".icon-waymaker-subtitle").forEach((el) => {
@@ -3281,7 +3281,7 @@ document.fonts.ready.then(() => {
   });
 });
 
-
+/*
 // Split Text – Lines
 document.fonts.ready.then(() => {
   // ensure targets are visible (but still masked)
@@ -3314,6 +3314,7 @@ document.fonts.ready.then(() => {
     });
   });
 });
+*/
 
 
 
