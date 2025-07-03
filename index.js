@@ -2328,6 +2328,7 @@ const heroTertiaryAnimation = gsap.from(heroEls, {
 // GSAP Slplit Text – Animations
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
+      const lineElements = document.querySelectorAll("[data-split-lines]");
       const wordElements = document.querySelectorAll("[data-split-words]");
       const charsElements = document.querySelectorAll("[data-split-chars]");
       const caseStudyTitleElements = document.querySelectorAll("[data-split-case_study-title]");
@@ -2335,6 +2336,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (wordElements.length === 0 && lineElements.length === 0) return; // No elements found, exit
   
+      lineElements.forEach(element => {
+        if (!element.textContent.trim()) return; // Skip empty elements
+        const lineSplit = new SplitText(element, { type: "lines" });
+  
+        gsap.from(lineSplit.lines, {
+          autoAlpha: 0,
+          translateY: "100%",
+          delay: 0.3,
+          duration: 1,
+          stagger: 0.05,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: element,
+            start: "top bottom",
+            toggleActions: "play none none none",
+          },
+        });
+      });
+
       wordElements.forEach(element => {
         if (!element.textContent.trim()) return; // Skip empty elements
         const wordSplit = new SplitText(element, { type: "words" });
