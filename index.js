@@ -2324,12 +2324,11 @@ const heroTertiaryAnimation = gsap.from(heroEls, {
   paused: true
 });
 
-
+/*
 // GSAP Slplit Text – Animations
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       const wordElements = document.querySelectorAll("[data-split-words]");
-      const lineElements = document.querySelectorAll("[data-split-lines]");
       const charsElements = document.querySelectorAll("[data-split-chars]");
       const caseStudyTitleElements = document.querySelectorAll("[data-split-case_study-title]");
       const caseStudyDescElements = document.querySelectorAll("[data-split-case_study-desc]");
@@ -2346,25 +2345,6 @@ document.addEventListener("DOMContentLoaded", () => {
           delay: 0.3,
           duration: 1,
           stagger: 0.05,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: element,
-            start: "top bottom",
-            toggleActions: "play none none none",
-          },
-        });
-      });
-  
-      lineElements.forEach(element => {
-        if (!element.textContent.trim()) return; // Skip empty elements
-        const linesSplit = new SplitText(element, { type: "lines" });
-  
-        gsap.from(linesSplit.lines, {
-          autoAlpha: 0,
-          translateY: "100%",
-          duration: 1,
-          delay: 0.3,
-          stagger: 0.1,
           ease: "power2.out",
           scrollTrigger: {
             trigger: element,
@@ -2430,7 +2410,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }, 200); // Reduce delay
 });
-
+*/
 
 // Sub-title Waymaker – Fade In
 gsap.utils.toArray(".icon-waymaker-subtitle").forEach((el) => {
@@ -2727,10 +2707,6 @@ $(function () {
     observeAutostart();
   }
 });
-
-
-
-
 
 
 // .video-tabs_link-wrapper fade in on scroll
@@ -3306,8 +3282,678 @@ document.fonts.ready.then(() => {
 });
 
 
+// Split Text – Lines
+document.fonts.ready.then(() => {
+  // ensure targets are visible (but still masked)
+  gsap.set("[data-split-lines]", { opacity: 1 });
+
+  document.querySelectorAll("[data-split-lines]").forEach(el => {
+    // 1. Split into lines, mask them, and get the SplitText instance
+    const split = SplitText.create(el, {
+      type: "lines",
+      linesClass: "line",
+      autoSplit: true,
+      mask: "lines"
+    });
+
+    // 2. Animate with ScrollTrigger, then clean up on leave
+    gsap.from(split.lines, {
+      duration: 1,
+      yPercent: 100,
+      autoAlpha: 0,
+      stagger: 0.1,
+      ease: "power4.out",
+      delay: 0.3,
+      scrollTrigger: {
+        trigger: el,
+        start: "top bottom",              // when el.top hits viewport bottom
+        toggleActions: "play none none none",
+        onLeave:    () => split.revert(), // clean up when scrolling past
+        onLeaveBack:() => split.revert()  // clean up if scrolling back up
+      }
+    });
+  });
+});
 
 
 
 
 
+/*
+gsap.defaults({
+  ease: "power4.inOut",
+  duration: 0.8,
+});
+
+function createLightbox(container, {
+  onStart,
+  onOpen,
+  onClose,
+  onCloseComplete
+} = {}) {
+  
+    // Get only visible triggers (not hidden by filters)
+    const allTriggers = container.querySelectorAll('[data-lightbox="trigger"]');
+    const allItems = container.querySelectorAll('[data-lightbox="item"]');
+    
+    const visibleTriggers = Array.from(allTriggers).filter(trigger => {
+      const galleryItem = trigger.closest('.gallery-grid__item');
+      if (!galleryItem) return true; // If no gallery item wrapper, assume visible
+      
+      const style = window.getComputedStyle(galleryItem);
+      return style.display !== 'none';
+    });
+    
+    // Get corresponding lightbox items for visible triggers only
+    const visibleItems = visibleTriggers.map((trigger, index) => {
+      // Find the original index of this trigger in the full list
+      const originalIndex = Array.from(allTriggers).indexOf(trigger);
+      return allItems[originalIndex];
+    }).filter(item => item); // Remove any undefined items
+
+    const elements = {
+      wrapper: container.querySelector('[data-lightbox="wrapper"]'),
+      triggers: visibleTriggers,
+      triggerParents: container.querySelectorAll('[data-lightbox="trigger-parent"]'),
+      items: visibleItems,
+      nav: container.querySelectorAll('[data-lightbox="nav"]'),
+      counter: {
+        current: container.querySelector('[data-lightbox="counter-current"]'),
+        total: container.querySelector('[data-lightbox="counter-total"]')
+      },
+      buttons: {
+        prev: container.querySelector('[data-lightbox="prev"]'),
+        next: container.querySelector('[data-lightbox="next"]'),
+        close: container.querySelector('[data-lightbox="close"]')
+      }
+    };
+
+    // Create our main timeline that will coordinate all animations
+    const mainTimeline = gsap.timeline();
+
+    // Store event listeners so we can remove them later
+    const eventListeners = [];
+    
+    // Flag to prevent conflicts during opening/closing
+    let isAnimating = false;
+    
+    // Failsafe to reset animation flag if it gets stuck
+    let animationTimeout;
+    function resetAnimationFlag() {
+      clearTimeout(animationTimeout);
+      animationTimeout = setTimeout(() => {
+                if (isAnimating) {
+        // console.log('⚠️ Animation flag stuck, resetting...');
+        isAnimating = false;
+      }
+      }, 5000); // 5 second failsafe
+    }
+
+    // ————————— COUNTER ————————— //
+    // console.log(`✅ COUNTER: ${elements.triggers.length} triggers, ${elements.items.length} items`);
+    
+    if (elements.counter.total) {
+      elements.counter.total.textContent = elements.items.length;
+    }
+    
+    
+    // ————————— CLOSE FUNCTION ————————— //
+    function closeLightbox() {
+      if (isAnimating) {
+        console.log('⚠️ Already animating, skipping close');
+        return;
+      }
+      
+      isAnimating = true;
+      // console.log('🔒 Starting close animation...');
+      resetAnimationFlag(); // Start failsafe timer
+      
+      // Remove outside click listener immediately
+      container.removeEventListener('click', handleOutsideClick);
+      // console.log('🔇 Outside click listener disabled');
+      
+      // on close callback
+      onClose?.();
+      
+      // First, we clear any running animations to prevent conflicts
+      mainTimeline.clear();
+      gsap.killTweensOf([
+        elements.wrapper, 
+        elements.nav, 
+        elements.triggerParents, 
+        elements.items,
+        container.querySelector('[data-lightbox="original"]')
+      ]);
+      
+      const tl = gsap.timeline({
+        defaults: { ease: "power2.inOut" },
+        onComplete: () => {
+          elements.wrapper.classList.remove('is-active');
+          
+          // Show all hidden images in lightbox items
+          elements.items.forEach(item => {
+            item.classList.remove('is-active');
+            const lightboxImage = item.querySelector('img');
+            if (lightboxImage) {
+              lightboxImage.style.display = '';
+            }
+          });
+          
+          // Clear any lingering transform properties on the original image
+          const originalImg = container.querySelector('[data-lightbox="original"]');
+          if (originalImg) { gsap.set(originalImg, { clearProps: "all" });}
+          
+          // Remove the fixed height from the trigger parent
+          const originalParent = container.querySelector('[data-lightbox="original-parent"]');
+          if (originalParent) { originalParent.parentElement.style.removeProperty('height'); }
+          
+          // on close complete callback
+          onCloseComplete?.();
+          
+                        // Reset animation flag
+            clearTimeout(animationTimeout); // Clear failsafe timer
+            isAnimating = false;
+            // console.log('🔓 Close animation complete');
+        }
+      });
+  
+      // First, find and move back the original item
+      const originalItem = container.querySelector('[data-lightbox="original"]');
+      const originalParent = container.querySelector('[data-lightbox="original-parent"]');
+      
+      if (originalItem && originalParent) {
+        // Before moving the item back, clear its transforms
+        gsap.set(originalItem, { clearProps: "all" });
+        
+        // Find the button inside the parent to put the image back correctly
+        const originalButton = originalParent.querySelector('[data-lightbox="trigger"]');
+        if (originalButton) {
+          // Move the image back into the button, not just the parent
+          originalButton.appendChild(originalItem);
+          // console.log('✅ Image restored to button correctly');
+        } else {
+          // Fallback: move to parent if button not found
+          originalParent.appendChild(originalItem);
+          // console.log('⚠️ Button not found, using parent fallback');
+        }
+        
+        // Restore the original data-lightbox attribute instead of removing it completely
+        originalParent.setAttribute('data-lightbox', 'trigger-parent');
+        originalItem.removeAttribute('data-lightbox');
+        // console.log('🔄 Restored trigger-parent attribute on:', originalParent);
+      }
+      
+      // Find active slide
+      let activeLightboxSlide = container.querySelector('[data-lightbox="item"].is-active')
+
+      // Return animation
+      tl.to(elements.triggerParents, {
+        autoAlpha: 1,
+        duration: 0.5,
+        stagger: 0.03,
+        overwrite: true
+      })
+      .to(elements.nav, {
+        autoAlpha: 0,
+        y: "1rem",
+        duration: 0.4,
+        stagger: 0
+      },"<")
+      .to(elements.wrapper, {
+        backgroundColor: "rgba(0,0,0,0)",
+        duration: 0.4
+      }, "<")
+      .to(activeLightboxSlide,{
+        autoAlpha:0,
+        duration: 0.4,
+      },"<")
+      .set([elements.items, activeLightboxSlide, elements.triggerParents],  { clearProps: "all" })
+    
+      // Add this timeline to our main timeline
+      mainTimeline.add(tl);
+      
+    }
+
+
+    // ————————— CLICK-OUTSIDE FUNCTIONALITY ————————— //
+    function handleOutsideClick(event) {
+      if (event.detail === 0) {
+        return;
+      }
+      
+      // Don't allow outside clicks while animating
+      if (isAnimating) {
+        // console.log('⚠️ Ignoring outside click during animation');
+        return;
+      }
+    
+      const clickedElement = event.target;
+      const isOutside = !clickedElement.closest('[data-lightbox="item"].is-active img, [data-lightbox="nav"], [data-lightbox="close"], [data-lightbox="trigger"]');
+        
+      if (isOutside) {
+        // console.log('👆 Outside click detected, closing lightbox');
+        closeLightbox();
+      }
+    }
+
+
+    // ————————— TOGGLE ACTIVE ITEM IN LIGHTBOX ————————— //
+    function updateActiveItem(index) {
+      elements.items.forEach(item => item.classList.remove('is-active'));
+      elements.items[index].classList.add('is-active');
+        
+      if (elements.counter.current) {
+        elements.counter.current.textContent = index + 1;
+      }
+      
+      // Always update total counter to reflect current visible items
+      if (elements.counter.total) {
+        elements.counter.total.textContent = elements.items.length;
+      }
+      
+      // Force update counters directly as backup
+      const currentCounterDirect = container.querySelector('[data-lightbox="counter-current"]');
+      const totalCounterDirect = container.querySelector('[data-lightbox="counter-total"]');
+      
+      if (currentCounterDirect) {
+        currentCounterDirect.textContent = index + 1;
+      }
+      if (totalCounterDirect) {
+        totalCounterDirect.textContent = elements.items.length;
+      }
+    }
+
+
+    // ————————— CLICK TO OPEN ————————— //
+    // console.log(`📎 Setting up ${elements.triggers.length} click handlers`);
+    elements.triggers.forEach((trigger, index) => {
+      const clickHandler = () => {
+        // console.log(`🖱️ Trigger ${index} clicked`);
+        
+        if (isAnimating) {
+          // console.log('⚠️ Already animating, skipping open');
+          return;
+        }
+        
+        isAnimating = true;
+        // console.log('🔒 Starting open animation...');
+        resetAnimationFlag(); // Start failsafe timer
+        
+        // On start of open callback
+        onStart?.();
+        
+        // Clear any running animations before starting new ones
+        mainTimeline.clear();
+        gsap.killTweensOf([
+          elements.wrapper, 
+          elements.nav, 
+          elements.triggerParents
+        ]);
+        
+        const img = trigger.querySelector("img")
+        const state = Flip.getState(img);
+        
+        // Store the trigger's current height before the FLIP animation
+        // So the grid does not collapse
+        const triggerParentEl = trigger.closest('[data-lightbox="trigger-parent"]');
+        if (!triggerParentEl) {
+          // console.error('❌ trigger-parent not found for trigger:', trigger);
+          // console.log('🔍 Available parents:', trigger.parentElement, trigger.closest('.gallery-grid__item'));
+          // console.log('🔍 All trigger-parents in container:', container.querySelectorAll('[data-lightbox="trigger-parent"]'));
+          isAnimating = false; // Reset flag to prevent getting stuck
+          return;
+        }
+        // console.log('✅ Found trigger-parent:', triggerParentEl);
+        const triggerRect = triggerParentEl.getBoundingClientRect();
+        triggerParentEl.style.height = `${triggerRect.height}px`;
+        
+      
+        // Save element and parent that was clicked
+        triggerParentEl.setAttribute('data-lightbox', 'original-parent');
+        img.setAttribute('data-lightbox', 'original');
+        
+        
+        // Set correct lightbox item to visible (using filtered index)
+        updateActiveItem(index);
+        
+        
+        // Start listening for clicks outside of lightbox after a delay
+        // This prevents immediate closing from the same click that opened it
+        setTimeout(() => {
+          if (elements.wrapper.classList.contains('is-active')) {
+            container.addEventListener('click', handleOutsideClick);
+            // console.log('👂 Outside click listener enabled');
+          }
+        }, 100);
+        
+        const tl = gsap.timeline({
+          onComplete: () => {
+            // On open callback
+            onOpen?.();
+            
+            // Reset animation flag after open completes
+            clearTimeout(animationTimeout); // Clear failsafe timer
+            isAnimating = false;
+            // console.log('🔓 Open animation complete');
+          }
+        });
+        elements.wrapper.classList.add('is-active');
+        const targetItem = elements.items[index];
+        
+        // Hide the original image in the lightbox item
+        const lightboxImage = targetItem.querySelector('img');
+        if (lightboxImage) {
+          lightboxImage.style.display = 'none';
+        }
+  
+        // Fade out other grid items
+        elements.triggerParents.forEach(otherTriggerParent => {
+          if (otherTriggerParent !== triggerParentEl) {
+            gsap.to(otherTriggerParent, {
+              autoAlpha: 0,
+              duration: 0.4,
+              stagger:0.02,
+              overwrite: true
+            });
+          }
+        });
+  
+        // Flip clicked image into lightbox
+        if (!targetItem.contains(img)) {
+          // Store reference to original button for safety
+          const originalButton = img.parentElement;
+          targetItem.appendChild(img);
+          
+          tl.add(
+            Flip.from(state, {
+              targets: img,
+              absolute: true,
+              duration: 0.6,
+              ease: "power2.inOut",
+              // Ensure image doesn't get orphaned during animation
+              onComplete: () => {
+                // console.log('📸 FLIP animation complete');
+              }
+            }), 0
+          );
+        }
+        
+        // Animate in our navigation and background
+        tl.to(elements.wrapper, {
+          backgroundColor: "rgba(14,5,102,0.95)",
+          duration: 0.6
+        }, 0)
+        .fromTo(elements.nav, {
+          autoAlpha: 0,
+          y: "1rem"
+        }, {
+          autoAlpha: 1,
+          y: "0rem",
+          duration: 0.6,
+          stagger: { each: 0.05, from: "center" }
+        }, 0.2);
+        
+        // Add this timeline to our main timeline
+        mainTimeline.add(tl);
+        
+      };
+
+      trigger.addEventListener('click', clickHandler);
+      eventListeners.push({ element: trigger, type: 'click', handler: clickHandler });
+    });
+
+
+    // ————————— NAV BUTTONS ————————— //
+    if (elements.buttons.next) {
+      const nextHandler = () => {
+        const currentIndex = Array.from(elements.items).findIndex(item => 
+          item.classList.contains('is-active')
+        );
+        const nextIndex = (currentIndex + 1) % elements.items.length;
+        updateActiveItem(nextIndex);
+      };
+      elements.buttons.next.addEventListener('click', nextHandler);
+      eventListeners.push({ element: elements.buttons.next, type: 'click', handler: nextHandler });
+    }
+
+    if (elements.buttons.prev) {
+      const prevHandler = () => {
+        const currentIndex = Array.from(elements.items).findIndex(item => 
+          item.classList.contains('is-active')
+        );
+        const prevIndex = (currentIndex - 1 + elements.items.length) % elements.items.length;
+        updateActiveItem(prevIndex);
+      };
+      elements.buttons.prev.addEventListener('click', prevHandler);
+      eventListeners.push({ element: elements.buttons.prev, type: 'click', handler: prevHandler });
+    }
+
+    if (elements.buttons.close) {
+      elements.buttons.close.addEventListener('click', closeLightbox);
+      eventListeners.push({ element: elements.buttons.close, type: 'click', handler: closeLightbox });
+    }
+
+
+    // ————————— KEYBOARD NAV ————————— //
+    const keyboardHandler = (event) => {
+      if (!elements.wrapper.classList.contains('is-active')) return;
+      switch (event.key) {
+        case 'Escape':
+          closeLightbox();
+          break;
+        case 'ArrowRight':
+          elements.buttons.next?.click();
+          break;
+        case 'ArrowLeft':
+          elements.buttons.prev?.click();
+          break;
+      }
+    };
+    document.addEventListener('keydown', keyboardHandler);
+    eventListeners.push({ element: document, type: 'keydown', handler: keyboardHandler });
+
+    // Return cleanup function
+    return {
+      destroy: () => {
+        // Close lightbox if open
+        if (elements.wrapper.classList.contains('is-active')) {
+          closeLightbox();
+        }
+        
+        // Remove all event listeners
+        eventListeners.forEach(({ element, type, handler }) => {
+          element.removeEventListener(type, handler);
+        });
+        
+        // Clear animations
+        mainTimeline.clear();
+        gsap.killTweensOf([
+          elements.wrapper, 
+          elements.nav, 
+          elements.triggerParents, 
+          elements.items
+        ]);
+      }
+    };
+}
+
+  document.addEventListener("DOMContentLoaded", () => {
+  let lightboxInstances = new Map();
+  
+  // Initialize lightboxes - now only for visible items
+  function initializeLightboxes() {
+    // console.log('=== INITIALIZING LIGHTBOXES ===');
+    let wrappers = document.querySelectorAll("[data-gallery]");
+    // console.log(`Found ${wrappers.length} gallery wrappers`);
+    
+    wrappers.forEach((wrapper, index) => {
+      // console.log(`Processing wrapper ${index + 1}:`);
+      
+      // Count visible triggers in this wrapper
+      const allTriggers = wrapper.querySelectorAll('[data-lightbox="trigger"]');
+      const visibleTriggers = Array.from(allTriggers).filter(trigger => {
+        const galleryItem = trigger.closest('.gallery-grid__item');
+        if (!galleryItem) return true;
+        const style = window.getComputedStyle(galleryItem);
+        const isVisible = style.display !== 'none';
+        // console.log(`  - Trigger ${Array.from(allTriggers).indexOf(trigger)}: ${isVisible ? 'VISIBLE' : 'HIDDEN'}`);
+        return isVisible;
+      });
+      
+      // console.log(`  📊 Total: ${allTriggers.length}, Visible: ${visibleTriggers.length}`);
+      
+      // If we already have an instance for this wrapper, destroy it first
+      if (lightboxInstances.has(wrapper)) {
+        // console.log(`  - Destroying existing instance`);
+        lightboxInstances.get(wrapper).destroy();
+      }
+      
+      // Create new lightbox instance
+      const instance = createLightbox(wrapper, {
+        onStart: () => {
+          if (typeof lenis !== 'undefined') lenis.stop();
+          // console.log("Starting");
+        },
+        onOpen: () => {
+          if (typeof lenis !== 'undefined') lenis.stop();
+          // console.log("Open");
+        },
+        onClose: () => {
+          if (typeof lenis !== 'undefined') lenis.start();
+          // console.log("Closing");
+        },
+        onCloseComplete: () => {
+          if (typeof lenis !== 'undefined') lenis.start();
+          // console.log("Done");
+        }
+      });
+      
+      lightboxInstances.set(wrapper, instance);
+      // console.log(`  - Created new lightbox instance`);
+    });
+    
+    // console.log(`=== LIGHTBOX INIT COMPLETE: ${lightboxInstances.size} instances ===`);
+  }
+  
+  // Function to get visible gallery items count
+  function getVisibleGalleryCount() {
+    const galleryContainer = document.querySelector('.gallery-grid.w-dyn-items');
+    if (!galleryContainer) return 0;
+    
+    // Count only visible items (not hidden by Finsweet filter)
+    const allItems = galleryContainer.querySelectorAll('.gallery-grid__item');
+    const visibleItems = Array.from(allItems).filter(item => {
+      const style = window.getComputedStyle(item);
+      return style.display !== 'none';
+    });
+    
+    return visibleItems.length;
+  }
+  
+  // Initial setup
+  initializeLightboxes();
+
+      // Simple function to reinitialize lightboxes
+  function reinitLightboxes() {
+    // console.log('🔄 REINITIALIZING LIGHTBOXES...');
+    
+    // Check for and fix any broken button structures before reinit
+    const brokenButtons = document.querySelectorAll('[data-lightbox="trigger"]:not(:has(img))');
+    brokenButtons.forEach(button => {
+      const parentItem = button.closest('.gallery-grid__item');
+      const orphanedImg = parentItem?.querySelector('img:not([data-lightbox="trigger"] img)');
+      if (orphanedImg) {
+        // console.log('🔧 Fixing orphaned image');
+        button.appendChild(orphanedImg);
+      }
+    });
+    
+    // Destroy all existing lightbox instances
+    // console.log(`Destroying ${lightboxInstances.size} existing instances`);
+    lightboxInstances.forEach((instance, wrapper) => {
+      instance.destroy();
+    });
+    lightboxInstances.clear();
+    
+    // Small delay to ensure DOM is stable
+    setTimeout(() => {
+      // console.log('🔧 Creating new lightbox instances...');
+      initializeLightboxes();
+    }, 50);
+  }
+
+  // Hook into Finsweet List API (simpler approach)
+  window.FinsweetAttributes = window.FinsweetAttributes || [];
+  window.FinsweetAttributes.push([
+    'list',
+    (listInstances) => {
+      // console.log('Finsweet List API loaded');
+      
+      // Get the first list instance (assuming one gallery)
+      const [listInstance] = listInstances;
+      
+      if (listInstance) {
+        // console.log('List instance found, setting up hooks');
+        
+        let isFirstRender = true;
+        
+        // Hook into the afterRender phase - this runs after items are filtered/shown
+        listInstance.addHook('afterRender', (items) => {
+          // console.log(`🎯 FINSWEET AFTER RENDER: ${items.length} items visible`);
+          
+          // Skip the first render (initial page load) to avoid double initialization
+          if (isFirstRender) {
+            // console.log('⏭️ Skipping first render (already initialized)');
+            isFirstRender = false;
+            return items;
+          }
+          
+          // Small delay to ensure DOM is updated
+          setTimeout(() => {
+            // console.log(`⏰ Triggering reinit after filter...`);
+            reinitLightboxes();
+          }, 100);
+          
+          return items; // Always return the items
+        });
+      }
+    },
+  ]);
+});
+*/
+
+/*
+$(document).ready( function () {
+  setTimeout(function() {
+      function resizeGridItem(item){
+        grid = document.getElementsByClassName("gallery-grid")[0];
+        rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
+        rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-row-gap'));
+        rowSpan = Math.ceil((item.querySelector('.gallery-item__button').getBoundingClientRect().height+rowGap)/(rowHeight+rowGap));
+          item.style.gridRowEnd = "span "+rowSpan;
+      }
+  
+      function resizeAllGridItems(){
+        allItems = document.getElementsByClassName("gallery-grid__item");
+        for(x=0;x<allItems.length;x++){
+          resizeGridItem(allItems[x]);
+        }
+      }
+  
+      function resizeInstance(instance){
+          item = instance.elements[0];
+        resizeGridItem(item);
+      }
+  
+      window.onload = resizeAllGridItems();
+      window.addEventListener("resize", resizeAllGridItems);
+  
+      allItems = document.getElementsByClassName("gallery-grid__item");
+      for(x=0;x<allItems.length;x++){
+        imagesLoaded( allItems[x], resizeInstance);
+      }
+      
+      setTimeout(function(){ resizeInstance() }, 100);
+    }, 800);
+})
+*/
