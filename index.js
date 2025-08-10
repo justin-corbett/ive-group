@@ -3336,11 +3336,102 @@ document.fonts.ready.then(() => {
 });
 */
 
+// Masonry Grid
+function initMasonryGrid() {
+  document.querySelectorAll('[data-masonry-list]').forEach(container => {
+    const shuffle = container.dataset.masonryShuffle !== 'false';
+    let cols, gapPx, colHeights;
+
+    // Take columns and gaps from CSS
+    const getVars = () => {
+      const cs = getComputedStyle(container);
+      cols = parseInt(cs.getPropertyValue('--masonry-col'));
+      const rawGap = cs.getPropertyValue('--masonry-gap').trim();
+      if (rawGap.endsWith('px')) {
+        gapPx = parseFloat(rawGap);
+      } else if (rawGap.endsWith('em')) {
+        gapPx = parseFloat(rawGap) * parseFloat(cs.fontSize);
+      } else if (rawGap.endsWith('rem')) {
+        gapPx = parseFloat(rawGap) * parseFloat(getComputedStyle(document.documentElement).fontSize);
+      } else {
+        gapPx = parseFloat(rawGap);
+      }
+    };
+    
+    // Set the layout
+    const layout = () => {
+      getVars();
+      const wCalc = `(100% - ${(cols - 1)}*var(--masonry-gap)) / ${cols}`;
+      colHeights = Array(cols).fill(0);
+      container.style.position = 'relative';
+      const items = Array.from(container.children);
+
+      items.forEach(el => {
+        el.style.position = 'absolute';
+        el.style.width = `calc(${wCalc})`;
+      });
+
+      items.forEach((el, i) => {
+        const h = el.offsetHeight;
+        const idx = shuffle
+          ? colHeights.indexOf(Math.min(...colHeights))
+          : (i % cols);
+        el.style.top  = `${colHeights[idx]}px`;
+        el.style.left = `calc(${wCalc}*${idx} + var(--masonry-gap)*${idx})`;
+        colHeights[idx] += h + gapPx;
+      });
+
+      container.style.height = `${Math.max(...colHeights)}px`;
+    };
+
+    // Debounce function to use on resize
+    const debounce = (fn, delay) => {
+      let t;
+      return () => {
+        clearTimeout(t);
+        t = setTimeout(fn, delay);
+      };
+    };
+
+    const onResize = debounce(layout, 100);
+    window.addEventListener('resize', onResize);
+
+    // Return promise if images are loaded
+    const imgLoad = () => {
+      const imgs = container.querySelectorAll('img');
+      return Promise.all(Array.from(imgs).map(img =>
+        img.complete ? Promise.resolve() : new Promise(r => img.addEventListener('load', r))
+      ));
+    };
+
+    // When images are ready, set the layout
+    imgLoad().then(layout);
+
+    // Constructor with destroy and recalc function
+    container._masonry = {
+      recalc: () => imgLoad().then(layout),
+      destroy: () => {
+        window.removeEventListener('resize', onResize);
+        const items = Array.from(container.children);
+        items.forEach(el => {
+          el.style.position =
+          el.style.width =
+          el.style.top =
+          el.style.left = '';
+        });
+        container.style.position =
+        container.style.height = '';
+      }
+    };
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initMasonryGrid();
+});
 
 
-
-
-/*
+// Lightbox
 gsap.defaults({
   ease: "power4.inOut",
   duration: 0.8,
@@ -3467,6 +3558,10 @@ function createLightbox(container, {
           // Remove the fixed height from the trigger parent
           const originalParent = container.querySelector('[data-lightbox="original-parent"]');
           if (originalParent) { originalParent.parentElement.style.removeProperty('height'); }
+
+          // Find the grid, and then re-init the layout
+          const masonryGrid = document.querySelector('[data-masonry-list]');
+          masonryGrid._masonry.recalc();
           
           // on close complete callback
           onCloseComplete?.();
@@ -3511,7 +3606,6 @@ function createLightbox(container, {
       tl.to(elements.triggerParents, {
         autoAlpha: 1,
         duration: 0.5,
-        stagger: 0.03,
         overwrite: true
       })
       .to(elements.nav, {
@@ -3888,6 +3982,10 @@ function createLightbox(container, {
         button.appendChild(orphanedImg);
       }
     });
+
+    // Find the grid, and then re-init the layout
+    const masonryGrid = document.querySelector('[data-masonry-list]');
+    masonryGrid._masonry.recalc();
     
     // Destroy all existing lightbox instances
     // console.log(`Destroying ${lightboxInstances.size} existing instances`);
@@ -3932,7 +4030,7 @@ function createLightbox(container, {
           // Small delay to ensure DOM is updated
           setTimeout(() => {
             // console.log(`⏰ Triggering reinit after filter...`);
-            reinitLightboxes();
+            reinitLightboxes();   
           }, 100);
           
           return items; // Always return the items
@@ -3941,7 +4039,7 @@ function createLightbox(container, {
     },
   ]);
 });
-*/
+
 
 /*
 $(document).ready( function () {
@@ -3977,4 +4075,383 @@ $(document).ready( function () {
       setTimeout(function(){ resizeInstance() }, 100);
     }, 800);
 })
+
+
+/*
+// ————————————————————————————————————————————————————————————————
+// 1) MasonryHelper: measures full item height, uses Math.ceil
+// ————————————————————————————————————————————————————————————————
+window.MasonryHelper = (() => {
+  const grid = document.querySelector(".gallery-grid");
+  let rowHeight, rowGap;
+
+  function recalcMetrics() {
+    const style = window.getComputedStyle(grid);
+    rowHeight = parseInt(style.getPropertyValue("grid-auto-rows"), 10);
+    rowGap    = parseInt(style.getPropertyValue("grid-row-gap"), 10);
+  }
+
+  function resizeGridItem(item) {
+    // measure the *entire* item
+    const h = item.getBoundingClientRect().height;
+    // how many rows (plus gaps) we need
+    const span = Math.ceil((h + rowGap) / (rowHeight + rowGap));
+    item.style.gridRowEnd = `span ${span}`;
+  }
+
+  function resizeAllGridItems() {
+    recalcMetrics();
+    document.querySelectorAll(".gallery-grid__item")
+      .forEach(resizeGridItem);
+  }
+
+  return { resizeAllGridItems, resizeGridItem };
+})();
+
+
+// ————————————————————————————————————————————————————————————————
+// 2) Initial layout & image‐load hooks
+// ————————————————————————————————————————————————————————————————
+$(document).ready(() => {
+  // initial layout (delay for any dynamic items)
+  setTimeout(() => {
+    window.MasonryHelper.resizeAllGridItems();
+  }, 800);
+
+  // recalc on viewport resize
+  window.addEventListener("resize", window.MasonryHelper.resizeAllGridItems);
+
+  // per‐item: when its images load, resize just that cell
+  document.querySelectorAll(".gallery-grid__item").forEach(item => {
+    imagesLoaded(item, () => {
+      window.MasonryHelper.resizeGridItem(item);
+    });
+  });
+
+  // once *all* grid images load, do a full recalc
+  const gridEl = document.querySelector(".gallery-grid");
+  if (gridEl) {
+    imagesLoaded(gridEl, () => {
+      window.MasonryHelper.resizeAllGridItems();
+    });
+  }
+});
+
+
+// ————————————————————————————————————————————————————————————————
+// 3) GSAP lightbox factory (full implementation, reflow on close)
+// ————————————————————————————————————————————————————————————————
+gsap.defaults({ ease: "power4.inOut", duration: 0.8 });
+
+function createLightbox(container, { onStart, onOpen, onClose, onCloseComplete } = {}) {
+  const allTriggers = container.querySelectorAll('[data-lightbox="trigger"]');
+  const allItems    = container.querySelectorAll('[data-lightbox="item"]');
+
+  // only those not hidden by filters
+  const visibleTriggers = Array.from(allTriggers).filter(trigger => {
+    const item = trigger.closest(".gallery-grid__item");
+    return !item || getComputedStyle(item).display !== "none";
+  });
+  const visibleItems = visibleTriggers
+    .map(t => allItems[ Array.from(allTriggers).indexOf(t) ])
+    .filter(Boolean);
+
+  const elements = {
+    wrapper:        container.querySelector('[data-lightbox="wrapper"]'),
+    triggers:       visibleTriggers,
+    triggerParents: container.querySelectorAll('[data-lightbox="trigger-parent"]'),
+    items:          visibleItems,
+    nav:            container.querySelectorAll('[data-lightbox="nav"]'),
+    counter: {
+      current: container.querySelector('[data-lightbox="counter-current"]'),
+      total:   container.querySelector('[data-lightbox="counter-total"]')
+    },
+    buttons: {
+      prev:  container.querySelector('[data-lightbox="prev"]'),
+      next:  container.querySelector('[data-lightbox="next"]'),
+      close: container.querySelector('[data-lightbox="close"]')
+    }
+  };
+
+  const mainTimeline   = gsap.timeline();
+  const eventListeners = [];
+  let isAnimating      = false;
+  let animationTimeout;
+
+  function resetAnimationFlag() {
+    clearTimeout(animationTimeout);
+    animationTimeout = setTimeout(() => { isAnimating = false; }, 5000);
+  }
+
+  if (elements.counter.total) {
+    elements.counter.total.textContent = elements.items.length;
+  }
+
+  // ————————— CLOSE ————————— //
+  function closeLightbox() {
+    if (isAnimating) return;
+    isAnimating = true;
+    resetAnimationFlag();
+    container.removeEventListener("click", handleOutsideClick);
+    onClose?.();
+    mainTimeline.clear();
+    gsap.killTweensOf([
+      elements.wrapper, elements.nav,
+      elements.triggerParents, elements.items,
+      container.querySelector('[data-lightbox="original"]')
+    ]);
+
+    const tl = gsap.timeline({
+      defaults: { ease: "power2.inOut" },
+      onComplete: () => {
+        elements.wrapper.classList.remove("is-active");
+        elements.items.forEach(it => {
+          it.classList.remove("is-active");
+          const img = it.querySelector("img");
+          if (img) img.style.display = "";
+        });
+        const origImg = container.querySelector('[data-lightbox="original"]');
+        if (origImg) gsap.set(origImg, { clearProps: "all" });
+        const origParent = container.querySelector('[data-lightbox="original-parent"]');
+        if (origParent) origParent.parentElement.style.removeProperty("height");
+        onCloseComplete?.();
+        // ←— reflow masonry after close
+        window.MasonryHelper.resizeAllGridItems();
+        clearTimeout(animationTimeout);
+        isAnimating = false;
+      }
+    });
+
+    const origItem   = container.querySelector('[data-lightbox="original"]');
+    const origParent = container.querySelector('[data-lightbox="original-parent"]');
+    if (origItem && origParent) {
+      gsap.set(origItem, { clearProps: "all" });
+      const btn = origParent.querySelector('[data-lightbox="trigger"]');
+      (btn || origParent).appendChild(origItem);
+      origParent.setAttribute("data-lightbox", "trigger-parent");
+      origItem.removeAttribute("data-lightbox");
+    }
+
+    const active = container.querySelector('[data-lightbox="item"].is-active');
+    tl.to(elements.triggerParents, { autoAlpha: 1, duration: 0.5 })
+      .to(elements.nav, { autoAlpha: 0, y: "1rem", duration: 0.4 }, "<")
+      .to(elements.wrapper, { backgroundColor: "rgba(0,0,0,0)", duration: 0.4 }, "<")
+      .to(active, { autoAlpha: 0, duration: 0.4 }, "<")
+      .set([elements.items, active, elements.triggerParents], { clearProps: "all" });
+
+    mainTimeline.add(tl);
+  }
+
+  // ————————— OUTSIDE‐CLICK ————————— //
+  function handleOutsideClick(e) {
+    if (e.detail === 0 || isAnimating) return;
+    const outside = !e.target.closest(
+      '[data-lightbox="item"].is-active img, [data-lightbox="nav"], [data-lightbox="close"], [data-lightbox="trigger"]'
+    );
+    if (outside) closeLightbox();
+  }
+
+  // ————————— UPDATE ACTIVE ————————— //
+  function updateActiveItem(i) {
+    elements.items.forEach(it => it.classList.remove("is-active"));
+    elements.items[i].classList.add("is-active");
+    if (elements.counter.current) elements.counter.current.textContent = i+1;
+    if (elements.counter.total)   elements.counter.total.textContent   = elements.items.length;
+  }
+
+  // ————————— OPEN TRIGGERS ————————— //
+  elements.triggers.forEach((trigger, idx) => {
+    const handler = () => {
+      if (isAnimating) return;
+      isAnimating = true;
+      resetAnimationFlag();
+      onStart?.();
+      mainTimeline.clear();
+      gsap.killTweensOf([elements.wrapper, elements.nav, elements.triggerParents]);
+
+      const img    = trigger.querySelector("img");
+      const state  = Flip.getState(img, {props: "borderRadius"});
+      const parent = trigger.closest('[data-lightbox="trigger-parent"]');
+      const rect   = parent.getBoundingClientRect();
+      parent.style.height = `${rect.height}px`;
+      parent.setAttribute("data-lightbox", "original-parent");
+      img.setAttribute("data-lightbox", "original");
+
+      updateActiveItem(idx);
+
+      setTimeout(() => {
+        if (elements.wrapper.classList.contains("is-active")) {
+          container.addEventListener("click", handleOutsideClick);
+        }
+      }, 100);
+
+      const tl = gsap.timeline({ onComplete: () => {
+        onOpen?.();
+        clearTimeout(animationTimeout);
+        isAnimating = false;
+      }});
+      elements.wrapper.classList.add("is-active");
+
+      const target = elements.items[idx];
+      const lbImg  = target.querySelector("img");
+      if (lbImg) lbImg.style.display = "none";
+
+      elements.triggerParents.forEach(tp => {
+        if (tp !== parent) gsap.to(tp, { autoAlpha: 0, duration: 0.4, stagger: 0.02 });
+      });
+
+      if (!target.contains(img)) {
+        target.appendChild(img);
+        tl.add(Flip.from(state, {
+          targets: img,
+          absolute: true,
+          duration: 0.6,
+          ease: "power2.inOut"
+        }), 0);
+      }
+
+      tl.to(elements.wrapper, { backgroundColor: "rgba(14,5,102,0.95)", duration: 0.6 }, 0)
+        .fromTo(elements.nav, { autoAlpha: 0, y: "1rem" }, {
+          autoAlpha: 1, y: "0rem", duration: 0.6,
+          stagger: { each: 0.05, from: "center" }
+        }, 0.2);
+
+      mainTimeline.add(tl);
+    };
+
+    trigger.addEventListener("click", handler);
+    eventListeners.push({ element: trigger, type: "click", handler });
+  });
+
+  // ————————— NAV BUTTONS ————————— //
+  if (elements.buttons.next) {
+    const nextH = () => {
+      const i = elements.items.findIndex(it => it.classList.contains("is-active"));
+      updateActiveItem((i+1) % elements.items.length);
+    };
+    elements.buttons.next.addEventListener("click", nextH);
+    eventListeners.push({ element: elements.buttons.next, type: "click", handler: nextH });
+  }
+  if (elements.buttons.prev) {
+    const prevH = () => {
+      const i = elements.items.findIndex(it => it.classList.contains("is-active"));
+      updateActiveItem((i-1 + elements.items.length) % elements.items.length);
+    };
+    elements.buttons.prev.addEventListener("click", prevH);
+    eventListeners.push({ element: elements.buttons.prev, type: "click", handler: prevH });
+  }
+  if (elements.buttons.close) {
+    elements.buttons.close.addEventListener("click", closeLightbox);
+    eventListeners.push({ element: elements.buttons.close, type: "click", handler: closeLightbox });
+  }
+
+  // ————————— KEYBOARD ————————— //
+  const keyH = e => {
+    if (!elements.wrapper.classList.contains("is-active")) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowRight") elements.buttons.next?.click();
+    if (e.key === "ArrowLeft")  elements.buttons.prev?.click();
+  };
+  document.addEventListener("keydown", keyH);
+  eventListeners.push({ element: document, type: "keydown", handler: keyH });
+
+  return {
+    destroy() {
+      if (elements.wrapper.classList.contains("is-active")) closeLightbox();
+      eventListeners.forEach(({ element, type, handler }) => {
+        element.removeEventListener(type, handler);
+      });
+      mainTimeline.clear();
+      gsap.killTweensOf([elements.wrapper, elements.nav, elements.triggerParents, elements.items]);
+    }
+  };
+}
+
+
+// ————————————————————————————————————————————————————————————————
+// 4) Initialize & re-init lightboxes + Finsweet hook
+// ————————————————————————————————————————————————————————————————
+document.addEventListener("DOMContentLoaded", () => {
+  let lightboxInstances = new Map();
+
+  function initializeLightboxes() {
+    document.querySelectorAll("[data-gallery]").forEach(wrapper => {
+      if (lightboxInstances.has(wrapper)) {
+        lightboxInstances.get(wrapper).destroy();
+      }
+      const instance = createLightbox(wrapper, {
+        onStart:         () => { if (window.lenis) lenis.stop(); },
+        onOpen:          () => { if (window.lenis) lenis.stop(); },
+        onClose:         () => { if (window.lenis) lenis.start(); },
+        onCloseComplete: () => {
+          if (window.lenis) lenis.start();
+          window.MasonryHelper.resizeAllGridItems();
+        }
+      });
+      lightboxInstances.set(wrapper, instance);
+    });
+  }
+
+  initializeLightboxes();
+
+  function reinitLightboxes() {
+    lightboxInstances.forEach(inst => inst.destroy());
+    lightboxInstances.clear();
+    setTimeout(initializeLightboxes, 50);
+  }
+
+  window.FinsweetAttributes = window.FinsweetAttributes || [];
+  window.FinsweetAttributes.push([
+    "list",
+    listInstances => {
+      const [listInstance] = listInstances;
+      if (!listInstance) return;
+      let first = true;
+      listInstance.addHook("afterRender", items => {
+        if (first) { first = false; return items; }
+        setTimeout(() => {
+          window.MasonryHelper.resizeAllGridItems();
+          reinitLightboxes();
+        }, 100);
+        return items;
+      });
+    }
+  ]);
+});
+</script>
+<script>
+// Show/Hide 'clear all' button when filter is selected
+window.FinsweetAttributes ||= [];
+window.FinsweetAttributes.push([
+  'list',
+  (listInstances) => {
+    const [listInstance] = listInstances;
+
+    const clearBtn = document.querySelector('[fs-list-element="clear"]');
+    const filtersForm = document.querySelector('[fs-list-element="filters"]');
+
+    const isFilterActive = () =>
+      Array.from(filtersForm.querySelectorAll('input, select, textarea'))
+        .some(ctrl =>
+          (ctrl.type === 'checkbox' || ctrl.type === 'radio')
+            ? ctrl.checked
+            : ctrl.value.trim() !== ''
+        );
+
+    const toggleClear = () => {
+      if (clearBtn) {
+        clearBtn.style.display = isFilterActive() ? 'block' : 'none';
+      }
+    };
+
+    toggleClear();
+    filtersForm.addEventListener('change', toggleClear);
+
+    listInstance.addHook('afterRender', items => {
+      toggleClear();
+      return items;
+    });
+  },
+]);
+
 */
