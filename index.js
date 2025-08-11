@@ -2150,6 +2150,60 @@ if (window.location.pathname === "/" || window.location.pathname === "/index.htm
   });
 }
 
+// GSAP FLIP – Built To Connect
+if (window.location.pathname.includes("/marketing/built-to-connect"))  {
+    window.addEventListener("DOMContentLoaded", (event) => {
+      
+      // SETUP ELEMENTS
+      let zoneEl = $("[js-scrollflip-element='zone']"),
+        targetEl = $("[js-scrollflip-element='target']").first();
+
+      // SETUP TIMELINE
+      let tl;
+      function createTimeline() {
+        if (tl) {
+          tl.kill();
+          gsap.set(targetEl, { clearProps: "all" });
+        }
+        tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: zoneEl.first(),
+            start: "top 25%",
+            endTrigger: zoneEl.last(),
+            end: "bottom bottom",
+            scrub: true
+          }
+        });
+        zoneEl.each(function (index) {
+          let nextZoneEl = zoneEl.eq(index + 1);
+          if (nextZoneEl.length) {
+            let nextZoneDistance =
+              nextZoneEl.offset().top + nextZoneEl.innerHeight() / 2;
+            let thisZoneDistance = $(this).offset().top + $(this).innerHeight() / 2;
+            let zoneDifference = nextZoneDistance - thisZoneDistance;
+            tl.add(
+              Flip.fit(targetEl[0], nextZoneEl[0], {
+                duration: zoneDifference,
+                ease: "power1.inOut",
+                props: ["borderRadius"],
+              })
+            );
+          }
+        });
+      }
+      createTimeline();
+
+      // SETUP RESIZE
+      let resizeTimer;
+      window.addEventListener("resize", function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+          createTimeline();
+        }, 250);
+      });
+  });
+}
+
 // GSAP FLIP – Case Studies
 if (window.location.pathname.includes("/case-studies")) {
   window.addEventListener("DOMContentLoaded", (event) => {
@@ -4455,3 +4509,72 @@ window.FinsweetAttributes.push([
 ]);
 
 */
+
+// Button Stagger Animation
+function initButtonCharacterStagger() {
+  const offsetIncrement = 0.01; // Transition offset increment in seconds
+  const buttons = document.querySelectorAll('[data-button-animate-chars]');
+
+  buttons.forEach(button => {
+    const text = button.textContent; // Get the button's text content
+    button.innerHTML = ''; // Clear the original content
+
+    [...text].forEach((char, index) => {
+      const span = document.createElement('span');
+      span.textContent = char;
+      span.style.transitionDelay = `${index * offsetIncrement}s`;
+
+      // Handle spaces explicitly
+      if (char === ' ') {
+        span.style.whiteSpace = 'pre'; // Preserve space width
+      }
+
+      button.appendChild(span);
+    });
+  });
+}
+
+// Initialize Button Character Stagger Animation
+document.addEventListener('DOMContentLoaded', () => {
+  initButtonCharacterStagger();
+});
+
+
+// CSS Marquee
+// Note: The Javascript is optional. Read the documentation below how to use the CSS Only version.
+
+function initCSSMarquee() {
+  const pixelsPerSecond = 100; // Set the marquee speed (pixels per second)
+  const marquees = document.querySelectorAll('[data-css-marquee]');
+  
+  // Duplicate each [data-css-marquee-list] element inside its container
+  marquees.forEach(marquee => {
+    marquee.querySelectorAll('[data-css-marquee-list]').forEach(list => {
+      const duplicate = list.cloneNode(true);
+      marquee.appendChild(duplicate);
+    });
+  });
+
+  // Create an IntersectionObserver to check if the marquee container is in view
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      entry.target.querySelectorAll('[data-css-marquee-list]').forEach(list => 
+        list.style.animationPlayState = entry.isIntersecting ? 'running' : 'paused'
+      );
+    });
+  }, { threshold: 0 });
+  
+  // Calculate the width and set the animation duration accordingly
+  marquees.forEach(marquee => {
+    marquee.querySelectorAll('[data-css-marquee-list]').forEach(list => {
+      list.style.animationDuration = (list.offsetWidth / pixelsPerSecond) + 's';
+      list.style.animationPlayState = 'paused';
+    });
+    observer.observe(marquee);
+  });
+}
+
+// Initialize CSS Marquee
+document.addEventListener('DOMContentLoaded', function() {
+  initCSSMarquee();
+});
