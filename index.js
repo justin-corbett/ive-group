@@ -2168,9 +2168,9 @@ if (window.location.pathname.includes("/marketing/built-to-connect"))  {
         tl = gsap.timeline({
           scrollTrigger: {
             trigger: zoneEl.first(),
-            start: "top 25%",
+            start: "center center",
             endTrigger: zoneEl.last(),
-            end: "bottom bottom",
+            end: "center center",
             scrub: true
           }
         });
