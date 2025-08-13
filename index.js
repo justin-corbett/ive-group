@@ -1969,12 +1969,6 @@ function loaderOnPageLoad() {
         duration: 0.4,
         delay: 0.2,
         ease: 'power1.out',
-        onComplete: () => {
-          lenis.scrollTo('#top', {
-            duration: 2,
-            lock: true,
-          });
-        }
       })
       .to(".loader_background-gradient-1", {
         y: "-100%",
@@ -2168,7 +2162,7 @@ if (window.location.pathname.includes("/marketing/built-to-connect"))  {
         tl = gsap.timeline({
           scrollTrigger: {
             trigger: zoneEl.first(),
-            start: "center center",
+            start: "bottom bottom",
             endTrigger: zoneEl.last(),
             end: "center center",
             scrub: true
@@ -2184,7 +2178,7 @@ if (window.location.pathname.includes("/marketing/built-to-connect"))  {
             tl.add(
               Flip.fit(targetEl[0], nextZoneEl[0], {
                 duration: zoneDifference,
-                ease: "power1.inOut",
+                ease: "power4.Out",
                 props: ["borderRadius"],
               })
             );
