@@ -3384,6 +3384,8 @@ document.fonts.ready.then(() => {
 });
 */
 
+
+/*
 // Masonry Grid
 function initMasonryGrid() {
   document.querySelectorAll('[data-masonry-list]').forEach(container => {
@@ -4123,7 +4125,7 @@ $(document).ready( function () {
       setTimeout(function(){ resizeInstance() }, 100);
     }, 800);
 })
-
+*/
 
 /*
 // ————————————————————————————————————————————————————————————————
