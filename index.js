@@ -1369,6 +1369,7 @@ $(document).ready(function() {
         function updateClasses() {
             if ($('.navigation_dropdown-toggle').hasClass('w--open')) {
                 tl.play();
+                lenis.stop();	
             } else {
                 tl.reverse() && $('.nav-link').removeClass('is-inactive') && $('.navigation_dropdown-toggle').removeClass('is-inactive');
                 lenis.start();	
@@ -2025,57 +2026,63 @@ function loaderOnPageLoad() {
         heroTertiaryAnimation.play();
       }, "<+0.2")
 
-      
     // Return the timeline
     return tl;
 }
 
 // GSAP timeline function for click event
-  function loaderOnLinkClick(destination) {
-    gsap.set(".loader", { display: "block" });
-    gsap.fromTo(
-      ".loader_background", {
-        y: "100%"
-      }, {
-        y: "0%",
-        duration: 0.5,
-        ease: 'power2.out',
-        onComplete: () => {
-          window.location = destination;
-        }
+function loaderOnLinkClick(destination) {
+  gsap.set(".loader", { display: "block" });
+  gsap.fromTo(
+    ".loader_background", {
+      y: "100%"
+    }, {
+      y: "0%",
+      duration: 0.5,
+      ease: 'power2.out',
+      onComplete: () => {
+        window.location = destination;
       }
-    );
-  }
+    }
+  );
+}
   
 // Call loaderOnPageLoad when the page loads
-  $(document).ready(function () {
-    loaderOnPageLoad();
-  
-// Code for click event
-    $(document).on("click", "a", function (e) {
-      if (
-        $(this).prop("hostname") === window.location.host &&
-        $(this).attr("href").indexOf("#") === -1 &&
-        $(this).attr("target") !== "_blank"
-      ) {
-        e.preventDefault();
-        let destination = $(this).attr("href");
-        gsap.set(".loader", { display: "block" });
-  
-        // Call loaderOnLinkClick when a link is clicked
-        loaderOnLinkClick(destination);
-      }
-    });
-  
-// On click of the back button
-    window.onpageshow = function (event) {
-      if (event.persisted) {
-        window.location.reload();
-      }
+$(document).ready(function () {
+  loaderOnPageLoad();
+
+  // Code for click event
+  $(document).on("click", "a", function (e) {
+    const $a = $(this);
+    const href = $a.attr("href") || "";
+
+    // Skip loader if data-no-loader is present
+    if ($a.is("[data-no-loader]")) return;
+
+    if (
+      $a.prop("hostname") === window.location.host &&
+      href.indexOf("#") === -1 &&
+      $a.attr("target") !== "_blank"
+    ) {
+      e.preventDefault();
+      let destination = href;
+      gsap.set(".loader", { display: "block" });
+
+      // Call loaderOnLinkClick when a link is clicked
+      loaderOnLinkClick(destination);
     }
   });
 
+  // On click of the back button
+  window.onpageshow = function (event) {
+    if (event.persisted) {
+      window.location.reload();
+    }
+  }
+});
+
 // Loader And Page Transition End
+
 
 // Scroll to top on page refresh
 document.addEventListener("DOMContentLoaded", function() {
