@@ -1960,83 +1960,82 @@ $(document).ready(function() {
 
 // GSAP timeline function for pageload
 function loaderOnPageLoad() {
- 
-    // Create a GSAP timeline
-    let tl = gsap.timeline();
+  // Create a GSAP timeline
+  let tl = gsap.timeline();
 
-    // Add animations to the timeline
-      tl.to(".logo-loader", {
-        y: "0%",
-        duration: 0.4,
-        delay: 0.2,
-        ease: 'power1.out',
-      })
-      .to(".loader_background-gradient-1", {
-        y: "-100%",
-        duration: 1.5,
-        delay: 0.4,
-        ease: 'power2.out',
-      })
-      .to(".loader_background-gradient-2", {
-        y: "-100%",
-        duration: 1.5,
-        delay: 0,
-        ease: 'power2.out',
-      }, "<+0.2")
-      .to(".loader_background-gradient-3", {
-        y: "-100%",
-        duration: 1.5,
-        delay: 0,
-        ease: 'power2.out',
-      }, "<+0.2")
-      .to(".loader_background-gradient-4", {
-        y: "-100%",
-        duration: 1.5,
-        delay: 0,
-        ease: 'power2.out',
-      }, "<+0.2")
-      .to(".loader_background", {
-        y: "-100%",
-        duration: 1.5,
-        delay: 0,
-        ease: 'power2.out',
-        onComplete: () => {
-            gsap.set(".loader", { display: "none" });
-            }
-      }, "<+0.3")
-      .to(".logo-loader", {
-        y: "-100%",
-        duration: 0.2,
-        delay: 0,
-        ease: 'power1.out',
-      }, "<")
-      .add(() => {
-        ScrollTrigger.refresh(true);
-        lenis.start();
-      }, "<+0.2")
-      .add(() => {
-        pageTitleSplitText.play(); // Play the SplitText animation
-        pageTitleSecondarySplitText.play();
-      }, "<+0.2")
-      .add(() => {
-        pageSecondarySplitText.play();
-        pageLinesSplitText.play();
-      }, "<+0.2")
-      .add(() => {
-        heroTertiaryAnimation.play();
-      }, "<+0.2")
+  // Add animations to the timeline
+  tl.to(".logo-loader", {
+      y: "0%",
+      duration: 0.4,
+      delay: 0.2,
+      ease: 'power1.out',
+    })
+    .to(".loader_background-gradient-1", {
+      y: "-100%",
+      duration: 1.5,
+      delay: 0.4,
+      ease: 'power2.out',
+    })
+    .to(".loader_background-gradient-2", {
+      y: "-100%",
+      duration: 1.5,
+      delay: 0,
+      ease: 'power2.out',
+    }, "<+0.2")
+    .to(".loader_background-gradient-3", {
+      y: "-100%",
+      duration: 1.5,
+      delay: 0,
+      ease: 'power2.out',
+    }, "<+0.2")
+    .to(".loader_background-gradient-4", {
+      y: "-100%",
+      duration: 1.5,
+      delay: 0,
+      ease: 'power2.out',
+    }, "<+0.2")
+    .to(".loader_background", {
+      y: "-100%",
+      duration: 1.5,
+      delay: 0,
+      ease: 'power2.out',
+      onComplete: () => {
+        gsap.set(".loader", { display: "none" });
+      }
+    }, "<+0.3")
+    .to(".logo-loader", {
+      y: "-100%",
+      duration: 0.2,
+      delay: 0,
+      ease: 'power1.out',
+    }, "<")
+    .add(() => {
+      ScrollTrigger.refresh(true);
+      lenis.start();
+    }, "<+0.2")
+    .add(() => {
+      pageTitleSplitText.play(); // Play the SplitText animation
+      pageTitleSecondarySplitText.play();
+    }, "<+0.2")
+    .add(() => {
+      pageSecondarySplitText.play();
+      pageLinesSplitText.play();
+    }, "<+0.2")
+    .add(() => {
+      heroTertiaryAnimation.play();
+    }, "<+0.2");
 
-    // Return the timeline
-    return tl;
+  // Return the timeline
+  return tl;
 }
 
 // GSAP timeline function for click event
 function loaderOnLinkClick(destination) {
   gsap.set(".loader", { display: "block" });
   gsap.fromTo(
-    ".loader_background", {
-      y: "100%"
-    }, {
+    ".loader_background",
+    { y: "100%" },
+    {
       y: "0%",
       duration: 0.5,
       ease: 'power2.out',
@@ -2046,42 +2045,46 @@ function loaderOnLinkClick(destination) {
     }
   );
 }
-  
+
 // Call loaderOnPageLoad when the page loads
 $(document).ready(function () {
   loaderOnPageLoad();
 
-  // Code for click event
+  // Click -> page transition (with data-no-loader bypass)
   $(document).on("click", "a", function (e) {
     const $a = $(this);
     const href = $a.attr("href") || "";
 
-    // Skip loader if data-no-loader is present
-    if ($a.is("[data-no-loader]")) return;
+    // --- BYPASS RULE: if the link OR ANY ANCESTOR has data-no-loader, skip the loader
+    if ($a.closest("[data-no-loader]").length) {
+      return; // let the browser handle the navigation normally
+    }
 
-    if (
-      $a.prop("hostname") === window.location.host &&
-      href.indexOf("#") === -1 &&
-      $a.attr("target") !== "_blank"
-    ) {
+    // Respect user intent / non-left clicks
+    const isNewTabIntent = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0;
+    if (isNewTabIntent) return;
+
+    // Only intercept same-origin navigations without hash, not targeting _blank
+    const isSameHost = $a.prop("hostname") === window.location.host;
+    const hasHash = href.indexOf("#") !== -1;
+    const targetsBlank = $a.attr("target") === "_blank";
+
+    if (isSameHost && !hasHash && !targetsBlank) {
       e.preventDefault();
-      let destination = href;
-      gsap.set(".loader", { display: "block" });
-
-      // Call loaderOnLinkClick when a link is clicked
-      loaderOnLinkClick(destination);
+      loaderOnLinkClick(href);
     }
   });
 
-  // On click of the back button
+  // Handle bfcache back/forward restores
   window.onpageshow = function (event) {
     if (event.persisted) {
       window.location.reload();
     }
-  }
+  };
 });
 
 // Loader And Page Transition End
+
 
 
 // Scroll to top on page refresh
@@ -4638,3 +4641,20 @@ function initModalBasic() {
 document.addEventListener('DOMContentLoaded', () => {
   initModalBasic();
 });
+
+
+// Gallery Scroll Top On Pagination Click
+// Simulate click on #back-to-top when any element with data-scroll_link-top is clicked
+document.addEventListener("click", function(e) {
+  const target = e.target.closest("[data-scroll_link-top]");
+  if (target) {
+    e.preventDefault(); // optional: stop the default link behavior
+    const backToTop = document.querySelector("#back-to-top");
+    if (backToTop) {
+      setTimeout(() => {
+        backToTop.click();
+      }, 1); // delay in ms (change 500 to whatever you need)
+    }
+  }
+});
+
