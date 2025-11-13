@@ -4658,3 +4658,34 @@ document.addEventListener("click", function(e) {
   }
 });
 
+// Scrolling image gallery add class to portrait images
+document.addEventListener("DOMContentLoaded", () => {
+  const galleryImages = document.querySelectorAll(".gallery-list .gallery-img");
+
+  galleryImages.forEach(img => {
+    // Ensure we know dimensions (in case image not yet loaded)
+    if (img.complete) {
+      checkOrientation(img);
+    } else {
+      img.addEventListener("load", () => checkOrientation(img));
+    }
+  });
+
+  function checkOrientation(image) {
+    const parent = image.closest(".gallery-item");
+
+    if (!parent) return;
+
+    const { naturalWidth: w, naturalHeight: h } = image;
+
+    if (h > w) {
+      // Portrait
+      parent.classList.add("is-portrait");
+    } else {
+      // Landscape (optional)
+      parent.classList.remove("is-portrait");
+    }
+  }
+});
+
+
