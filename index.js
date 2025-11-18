@@ -1020,25 +1020,7 @@ $(".image_full-service_hero-video").each(function (index) {
     });
 });
 
-// Service hero video move
-$(".image_full-service_hero-video").each(function (index) {
-    let triggerElement = $(this);
-    let targetElement = $(".video-bg.is-service_hero");
-  
-    let tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: triggerElement,
-        // trigger element - viewport
-        start: "top top",
-        end: "bottom top",
-        scrub: 1,
-      },
-    });
-    tl.to(targetElement, {
-      y: "-10%",
-      duration: 1,
-    });
-});
+
 
 
 // Image scale CTA team member
@@ -2592,79 +2574,159 @@ $(document).ready(function () {
     });
 });
 
-// Plyr Video Page Hero
-$(".plyr_component.is-full-screen.is-page_hero").each(function (index) {
-  let thisComponent = $(this);
+// Plyr Video Page Hero + Secondary
+$(function () {
+  let heroPlayer = null;
+  let secondaryPlayer = null;
+  let $heroComp = $(".plyr_component.is-full-screen.is-page_hero").first();
+  let $secondaryComp = $(".plyr_component.is-full-screen.is-page_secondary").first();
 
-  // create plyr settings
-  let player = new Plyr(thisComponent.find(".plyr_video")[0], {
-    controls: ["play", "progress", "current-time", "mute", "fullscreen"],
-    resetOnEnd: true
-  });
-  
-  // custom video cover
-  thisComponent.find(".plyr_cover").on("click", function () {
-    player.play();
-  });
-  
-  player.on("ended", () => {
-    thisComponent.removeClass("hide-cover");
-  });
-
-  // pause other playing videos when this one starts playing
-  player.on("play", () => {
-    $(".plyr_component.is-full-screen.is-page_hero").removeClass("hide-cover");
-    thisComponent.addClass("hide-cover");
-
-    let prevPlayingComponent = $(".plyr--playing")
-      .closest(".plyr_component.is-full-screen.is-page_hero")
-      .not(thisComponent);
-
-    if (prevPlayingComponent.length > 0) {
-      prevPlayingComponent.find(".plyr_pause-trigger")[0].click();
+  // Helper functions
+  function showHeroHideSecondary() {
+    if ($secondaryComp && $secondaryComp.length) {
+      $secondaryComp.addClass("is-hidden-video");
+      if (secondaryPlayer) secondaryPlayer.pause();
     }
-  });
-
-  thisComponent.find(".plyr_pause-trigger").on("click", function () {
-    player.pause();
-  });
-
-  // exit full screen when video ends
-  player.on("ended", () => {
-    if (player.fullscreen.active) {
-      player.fullscreen.exit();
+    if ($heroComp && $heroComp.length) {
+      $heroComp.removeClass("is-hidden-video");
     }
-  });
+  }
 
-  // set video to contain instead of cover when in full screen mode
-  player.on("enterfullscreen", () => {
-    thisComponent.addClass("contain-video");
-  });
+  function showSecondaryHideHero() {
+    if ($heroComp && $heroComp.length) {
+      $heroComp.addClass("is-hidden-video");
+      if (heroPlayer) heroPlayer.pause();
+    }
+    if ($secondaryComp && $secondaryComp.length) {
+      $secondaryComp.removeClass("is-hidden-video");
+    }
+  }
 
-  player.on("exitfullscreen", () => {
-    thisComponent.removeClass("contain-video");
-  });
+  // ---- HERO INIT ----
+  if ($heroComp.length) {
+    const heroVideoEl = $heroComp.find(".plyr_video")[0];
+    if (heroVideoEl) {
+      heroPlayer = new Plyr(heroVideoEl, {
+        controls: ["play", "progress", "current-time", "mute", "fullscreen"],
+        resetOnEnd: true
+      });
 
-  // Pause video when clicking on .text-link-alternate.is-video_modal-close
-  $(".text-link-alternate.is-video_modal-close").on("click", function() {
-    player.pause();
-  });
+      // Cover click → play hero
+      $heroComp.find(".plyr_cover").on("click", function () {
+        showHeroHideSecondary();
+        heroPlayer.play();
+      });
 
-  // Play video service pages
-  $(".image_full-service_hero-video").on("click", function() {
-    player.play();
-  });
+      // Pause trigger
+      $heroComp.find(".plyr_pause-trigger").on("click", function () {
+        heroPlayer.pause();
+      });
 
-    // Play video case study pages
-    $(".case_study_hero-video-wrapper").on("click", function() {
-      player.play();
+      // When hero ends
+      heroPlayer.on("ended", () => {
+        $heroComp.removeClass("hide-cover");
+        if (heroPlayer.fullscreen && heroPlayer.fullscreen.active) {
+          heroPlayer.fullscreen.exit();
+        }
+      });
+
+      heroPlayer.on("enterfullscreen", () => $heroComp.addClass("contain-video"));
+      heroPlayer.on("exitfullscreen", () => $heroComp.removeClass("contain-video"));
+
+      // Pause hero when closing modal
+      $(".text-link-alternate.is-video_modal-close").on("click", function () {
+        heroPlayer.pause();
+      });
+
+      // If hero starts playing via Plyr controls:
+      heroPlayer.on("play", () => {
+        showHeroHideSecondary();
+        $heroComp.addClass("hide-cover");
+      });
+    }
+  }
+
+  // ---- SECONDARY INIT ----
+  if ($secondaryComp.length) {
+    const secondaryVideoEl = $secondaryComp.find(".plyr_video")[0];
+    if (secondaryVideoEl) {
+      secondaryPlayer = new Plyr(secondaryVideoEl, {
+        controls: ["play", "progress", "current-time", "mute", "fullscreen"],
+        resetOnEnd: true
+      });
+
+      // Cover click → play secondary
+      $secondaryComp.find(".plyr_cover").on("click", function () {
+        showSecondaryHideHero();
+        secondaryPlayer.play();
+      });
+
+      // Pause trigger
+      $secondaryComp.find(".plyr_pause-trigger").on("click", function () {
+        secondaryPlayer.pause();
+      });
+
+      secondaryPlayer.on("ended", () => {
+        $secondaryComp.removeClass("hide-cover");
+        if (secondaryPlayer.fullscreen && secondaryPlayer.fullscreen.active) {
+          secondaryPlayer.fullscreen.exit();
+        }
+      });
+
+      secondaryPlayer.on("enterfullscreen", () => $secondaryComp.addClass("contain-video"));
+      secondaryPlayer.on("exitfullscreen", () => $secondaryComp.removeClass("contain-video"));
+
+      // Pause secondary when closing modal
+      $(".text-link-alternate.is-video_modal-close").on("click", function () {
+        secondaryPlayer.pause();
+      });
+
+      // If secondary starts playing via Plyr controls:
+      secondaryPlayer.on("play", () => {
+        showSecondaryHideHero();
+        $secondaryComp.addClass("hide-cover");
+      });
+    }
+  }
+
+  // ---- TRIGGERS ----
+
+  // Primary hero trigger(s) (not secondary)
+  $(".image_full-service_hero-video")
+    .not(".cursor-video.is-secondary")
+    .on("click", function (e) {
+      e.preventDefault();
+      if (heroPlayer && $heroComp.length) {
+        showHeroHideSecondary();
+        $heroComp.addClass("hide-cover");
+        heroPlayer.play();
+      }
     });
 
-  // Play video home page
-  $(".home-hero_video").on("click", function() {
-    player.play();
+  // Secondary trigger
+  $(".image_full-service_hero-video.cursor-video.is-secondary").on("click", function (e) {
+    e.preventDefault();
+    if (secondaryPlayer && $secondaryComp.length) {
+      showSecondaryHideHero();
+      $secondaryComp.addClass("hide-cover");
+      secondaryPlayer.play();
+    }
+  });
+
+  // Optional: case study + home hero triggers point to hero
+  $(".case_study_hero-video-wrapper, .home-hero_video").on("click", function (e) {
+    e.preventDefault();
+    if (heroPlayer && $heroComp.length) {
+      showHeroHideSecondary();
+      $heroComp.addClass("hide-cover");
+      heroPlayer.play();
+    }
   });
 });
+
+
+
+
 
 
 // Autoplay video tabs
