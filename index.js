@@ -1349,11 +1349,11 @@ $(document).ready(function() {
     if ($(window).width() > 991) {
         // Function to add or remove class based on the state of .navigation_dropdown-toggle
         function updateClasses() {
-            if ($('.navigation_dropdown-toggle').hasClass('w--open')) {
+            if ($('.navigation_dropdown-toggle').hasClass('w--open') || $('.nav-search-wrap').hasClass('is-active')) {
                 tl.play();
                 lenis.stop();	
             } else {
-                tl.reverse() && $('.nav-link').removeClass('is-inactive') && $('.navigation_dropdown-toggle').removeClass('is-inactive');
+                tl.reverse() && $('.nav-link').removeClass('is-inactive') && $('.navigation_dropdown-toggle').removeClass('is-inactive') && $('.c_search_component').removeClass('is-active') && $('.nav-search-wrap').removeClass('is-active') && $('.nav-link-icon-wrap.is-search').removeClass('is-inactive') && $('.c_search_results').removeClass('is-active');
                 lenis.start();	
             }
         }
@@ -1375,6 +1375,103 @@ $(document).ready(function() {
         // Start observing changes to attributes of elements with class 'navigation_dropdown-toggle'
         observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['class'] });
     }
+});
+
+// When clicking search dropdown also click search input
+$(document).ready(function () {
+    if ($(window).width() > 991) {
+
+        // When the search toggle is clicked
+        $('.nav-search-wrap').on('click', function () {
+            $(this).addClass('is-active'); // add the active class
+            // Give Webflow a tiny delay to register the dropdown open
+            setTimeout(() => {
+                $('.c_search_input').focus();
+            }, 10); // 10ms is enough
+        });
+
+        // Optional: prevent clicks inside search from closing dropdown
+        $(document).on('pointerdown', '.c_search_component, .c_search_input', function (e) {
+            e.stopPropagation();
+        });
+
+        $(document).on('click', '.c_search_component, .c_search_input', function (e) {
+            e.stopImmediatePropagation();
+        });
+
+    }
+});
+
+// Close search nav when clicking nav background
+$(document).ready(function() {
+    if ($(window).width() > 991) {
+
+        $('.navigation-dropdown-bg-wrapper').on('click', function () {
+            $('.nav-search-wrap').removeClass('is-active');
+        });
+
+    }
+});
+
+// Hide search nav item when search bar is typed
+$(document).ready(function () {
+    if ($(window).width() > 991) {
+
+        $(document).on('input', '.c_search_input', function () {
+            const hasText = $(this).val().trim().length > 0;
+
+            if (hasText) {
+                $('.nav-link.is-search').addClass('is-hidden');
+            } else {
+                $('.nav-link.is-search').removeClass('is-hidden');
+            }
+        });
+
+    }
+});
+
+// Clear search input when nav closes
+$(document).ready(function () {
+  if ($(window).width() > 991) {
+
+    const target = document.querySelector('.nav-search-wrap');
+    if (!target) return;
+
+    let wasActive = target.classList.contains('is-active');
+
+    const observer = new MutationObserver(function (mutationsList) {
+      mutationsList.forEach(mutation => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+          
+          const isActiveNow = target.classList.contains('is-active');
+
+          // ✅ Detect when is-active is REMOVED
+          if (wasActive && !isActiveNow) {
+            $('.c_search_input').val('').trigger('input');
+          }
+
+          wasActive = isActiveNow;
+        }
+      });
+    });
+
+    observer.observe(target, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+  }
+});
+
+//Change nav search title to 'showing results' when search input is typed in
+$(document).on('input', '.c_search_input', function () {
+  const hasText = this.value.trim().length > 0;
+  const $title = $('.text-link_p.is-nav-search_title');
+
+  const newText = hasText ? 'Showing results' : 'Popular searches';
+  if ($title.text() !== newText) {
+    $title.text(newText);
+  }
 });
 
 
@@ -1406,19 +1503,33 @@ $(document).ready(function() {
                 updateInvestors();
             }, 110);
         });
+        $('.nav-search-wrap').click(function() {
+            // Adding a delay to prevent no open class found
+            setTimeout(function() {
+                updateSearch();
+            }, 110);
+        });
          // Navigation about open
          function updateAbout() {
             if ($('.navigation_dropdown-toggle.is-about').hasClass('w--open')) {
                 $('.navigation_dropdown-toggle.is-about').removeClass('is-inactive');
+                $('.nav-search-wrap').removeClass('is-active');
+                $('.c_search_component').removeClass('is-active');
+                $('.c_search_results').removeClass('is-active');
                 $('.navigation_dropdown-toggle.is-services').addClass('is-inactive');
                 $('.navigation_dropdown-toggle.is-case_studies').addClass('is-inactive');
                 $('.navigation_dropdown-toggle.is-investors').addClass('is-inactive');
+                $('.nav-link-icon-wrap.is-search').addClass('is-inactive');
                 $('.nav-link.is-news').addClass('is-inactive');
                 $('.nav-link.is-contact').addClass('is-inactive');
             } else {
                 $('.navigation_dropdown-toggle.is-services').removeClass('is-inactive');
                 $('.navigation_dropdown-toggle.is-case_studies').removeClass('is-inactive');
                 $('.navigation_dropdown-toggle.is-investors').removeClass('is-inactive');
+                $('.nav-link-icon-wrap.is-search').removeClass('is-inactive');
+                $('.nav-search-wrap').removeClass('is-active');
+                $('.c_search_component').removeClass('is-active');
+                $('.c_search_results').removeClass('is-active');
                 $('.nav-link.is-news').removeClass('is-inactive');
                 $('.nav-link.is-contact').removeClass('is-inactive');
             }
@@ -1428,15 +1539,23 @@ $(document).ready(function() {
         function updateServices() {
             if ($('.navigation_dropdown-toggle.is-services').hasClass('w--open')) {
                 $('.navigation_dropdown-toggle.is-services').removeClass('is-inactive');
+                $('.nav-search-wrap').removeClass('is-active');
+                $('.c_search_component').removeClass('is-active');
+                $('.c_search_results').removeClass('is-active');
                 $('.navigation_dropdown-toggle.is-about').addClass('is-inactive');
                 $('.navigation_dropdown-toggle.is-case_studies').addClass('is-inactive');
                 $('.navigation_dropdown-toggle.is-investors').addClass('is-inactive');
+                $('.nav-link-icon-wrap.is-search').addClass('is-inactive');
                 $('.nav-link.is-news').addClass('is-inactive');
                 $('.nav-link.is-contact').addClass('is-inactive');
             } else {
                 $('.navigation_dropdown-toggle.is-about').removeClass('is-inactive');
                 $('.navigation_dropdown-toggle.is-case_studies').removeClass('is-inactive');
                 $('.navigation_dropdown-toggle.is-investors').removeClass('is-inactive');
+                $('.nav-link-icon-wrap.is-search').removeClass('is-inactive');
+                $('.nav-search-wrap').removeClass('is-active');
+                $('.c_search_component').removeClass('is-active');
+                $('.c_search_results').removeClass('is-active');
                 $('.nav-link.is-news').removeClass('is-inactive');
                 $('.nav-link.is-contact').removeClass('is-inactive');
             }
@@ -1446,15 +1565,23 @@ $(document).ready(function() {
         function updateCasestudies() {
             if ($('.navigation_dropdown-toggle.is-case_studies').hasClass('w--open')) {
                 $('.navigation_dropdown-toggle.is-case_studies').removeClass('is-inactive');
+                $('.nav-search-wrap').removeClass('is-active');
+                $('.c_search_component').removeClass('is-active');
+                $('.c_search_results').removeClass('is-active');
                 $('.navigation_dropdown-toggle.is-about').addClass('is-inactive');
                 $('.navigation_dropdown-toggle.is-services').addClass('is-inactive');
                 $('.navigation_dropdown-toggle.is-investors').addClass('is-inactive');
+                $('.nav-link-icon-wrap.is-search').addClass('is-inactive');
                 $('.nav-link.is-news').addClass('is-inactive');
                 $('.nav-link.is-contact').addClass('is-inactive');
             } else {
                 $('.navigation_dropdown-toggle.is-about').removeClass('is-inactive');
                 $('.navigation_dropdown-toggle.is-services').removeClass('is-inactive');
                 $('.navigation_dropdown-toggle.is-investors').removeClass('is-inactive');
+                $('.nav-link-icon-wrap.is-search').removeClass('is-inactive');
+                $('.nav-search-wrap').removeClass('is-active');
+                $('.c_search_component').removeClass('is-active');
+                $('.c_search_results').removeClass('is-active');
                 $('.nav-link.is-news').removeClass('is-inactive');
                 $('.nav-link.is-contact').removeClass('is-inactive');
             }
@@ -1464,15 +1591,48 @@ $(document).ready(function() {
         function updateInvestors() {
             if ($('.navigation_dropdown-toggle.is-investors').hasClass('w--open')) {
                 $('.navigation_dropdown-toggle.is-investors').removeClass('is-inactive');
+                $('.nav-search-wrap').removeClass('is-active');
+                $('.c_search_component').removeClass('is-active');
+                $('.c_search_results').removeClass('is-active');
                 $('.navigation_dropdown-toggle.is-about').addClass('is-inactive');
                 $('.navigation_dropdown-toggle.is-services').addClass('is-inactive');
                 $('.navigation_dropdown-toggle.is-case_studies').addClass('is-inactive');
+                $('.nav-link-icon-wrap.is-search').addClass('is-inactive');
                 $('.nav-link.is-news').addClass('is-inactive');
                 $('.nav-link.is-contact').addClass('is-inactive');
             } else {
                 $('.navigation_dropdown-toggle.is-about').removeClass('is-inactive');
                 $('.navigation_dropdown-toggle.is-services').removeClass('is-inactive');
                 $('.navigation_dropdown-toggle.is-case_studies').removeClass('is-inactive');
+                $('.nav-link-icon-wrap.is-search').removeClass('is-inactive');
+                $('.nav-search-wrap').removeClass('is-active');
+                $('.c_search_component').removeClass('is-active');
+                $('.c_search_results').removeClass('is-active');
+                $('.nav-link.is-news').removeClass('is-inactive');
+                $('.nav-link.is-contact').removeClass('is-inactive');
+            }
+        }
+        // Navigation search open
+        function updateSearch() {
+            if ($('.nav-search-wrap').hasClass('is-active')) {
+                $('.nav-link-icon-wrap.is-search').removeClass('is-inactive');
+                $('.c_search_results').addClass('is-active');
+                $('.navigation_dropdown-toggle.is-about').addClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-services').addClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-case_studies').addClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-investors').addClass('is-inactive');
+                $('.c_search_component').addClass('is-active');
+                $('.nav-link.is-news').addClass('is-inactive');
+                $('.nav-link.is-contact').addClass('is-inactive');
+            } else {
+                $('.navigation_dropdown-toggle.is-about').removeClass('is-inactive');
+                $('.nav-link-icon-wrap.is-search').removeClass('is-inactive');
+                $('.c_search_results').removeClass('is-active');
+                $('.navigation_dropdown-toggle.is-services').removeClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-case_studies').removeClass('is-inactive');
+                $('.navigation_dropdown-toggle.is-investors').removeClass('is-inactive');
+                $('.nav-search-wrap').removeClass('is-active');
+                $('.c_search_component').removeClass('is-active');
                 $('.nav-link.is-news').removeClass('is-inactive');
                 $('.nav-link.is-contact').removeClass('is-inactive');
             }
@@ -1504,7 +1664,7 @@ function aboutHoverIn() {
 function aboutHoverOut() {
     if ($('.navigation_dropdown-toggle.is-about').hasClass('w--open')) {
         $('.navigation_dropdown-toggle.is-about').removeClass('is-inactive');
-    } else if ($('.navigation_dropdown-toggle.is-services').hasClass('w--open') || $('.navigation_dropdown-toggle.is-case_studies').hasClass('w--open') || $('.navigation_dropdown-toggle.is-investors').hasClass('w--open')) {
+    } else if ($('.navigation_dropdown-toggle.is-services').hasClass('w--open') || $('.navigation_dropdown-toggle.is-case_studies').hasClass('w--open') || $('.navigation_dropdown-toggle.is-investors').hasClass('w--open') || $('.nav-search-wrap').hasClass('is-active')) {
         $('.navigation_dropdown-toggle.is-about').addClass('is-inactive');
     }
 }
@@ -1531,7 +1691,7 @@ function servicesHoverIn() {
 function servicesHoverOut() {
     if ($('.navigation_dropdown-toggle.is-services').hasClass('w--open')) {
         $('.navigation_dropdown-toggle.is-services').removeClass('is-inactive');
-    } else if ($('.navigation_dropdown-toggle.is-about').hasClass('w--open') || $('.navigation_dropdown-toggle.is-case_studies').hasClass('w--open') || $('.navigation_dropdown-toggle.is-investors').hasClass('w--open')) {
+    } else if ($('.navigation_dropdown-toggle.is-about').hasClass('w--open') || $('.navigation_dropdown-toggle.is-case_studies').hasClass('w--open') || $('.navigation_dropdown-toggle.is-investors').hasClass('w--open') || $('.nav-search-wrap').hasClass('is-active')) {
         $('.navigation_dropdown-toggle.is-services').addClass('is-inactive');
     }
 }
@@ -1558,7 +1718,7 @@ function casestudiesHoverIn() {
 function casestudiesHoverOut() {
     if ($('.navigation_dropdown-toggle.is-case_studies').hasClass('w--open')) {
         $('.navigation_dropdown-toggle.is-case_studies').removeClass('is-inactive');
-    } else if ($('.navigation_dropdown-toggle.is-about').hasClass('w--open') || $('.navigation_dropdown-toggle.is-services').hasClass('w--open') || $('.navigation_dropdown-toggle.is-investors').hasClass('w--open')) {
+    } else if ($('.navigation_dropdown-toggle.is-about').hasClass('w--open') || $('.navigation_dropdown-toggle.is-services').hasClass('w--open') || $('.navigation_dropdown-toggle.is-investors').hasClass('w--open') || $('.nav-search-wrap').hasClass('is-active')) {
         $('.navigation_dropdown-toggle.is-case_studies').addClass('is-inactive');
     }
 }
@@ -1585,8 +1745,35 @@ function investorsHoverIn() {
 function investorsHoverOut() {
     if ($('.navigation_dropdown-toggle.is-investors').hasClass('w--open')) {
         $('.navigation_dropdown-toggle.is-investors').removeClass('is-inactive');
-    } else if ($('.navigation_dropdown-toggle.is-about').hasClass('w--open') || $('.navigation_dropdown-toggle.is-services').hasClass('w--open') || $('.navigation_dropdown-toggle.is-case_studies').hasClass('w--open')) {
+    } else if ($('.navigation_dropdown-toggle.is-about').hasClass('w--open') || $('.navigation_dropdown-toggle.is-services').hasClass('w--open') || $('.navigation_dropdown-toggle.is-case_studies').hasClass('w--open') || $('.nav-search-wrap').hasClass('is-active')) {
         $('.navigation_dropdown-toggle.is-investors').addClass('is-inactive');
+    }
+}
+
+// Navigation search hover
+$(document).ready(function() {
+    if ($(window).width() >= 991) {
+        $('.nav-search-wrap').hover(function() {
+            searchHoverIn();
+        }, function() {
+            searchHoverOut();
+        });
+    }
+});
+
+// Search hover in
+function searchHoverIn() {
+    if ($('.nav-link-icon-wrap.is-search').hasClass('is-inactive')) {
+        $('.nav-link-icon-wrap.is-search').removeClass('is-inactive');
+    }
+}
+
+// Search hover out
+function searchHoverOut() {
+    if ($('.nav-link-icon-wrap.is-search').hasClass('is-active')) {
+        $('.nav-link-icon-wrap.is-search').removeClass('is-inactive');
+    } else if ($('.navigation_dropdown-toggle.is-about').hasClass('w--open') || $('.navigation_dropdown-toggle.is-services').hasClass('w--open') || $('.navigation_dropdown-toggle.is-case_studies').hasClass('w--open') || $('.navigation_dropdown-toggle.is-investors').hasClass('w--open')) {
+        $('.nav-link-icon-wrap.is-search').addClass('is-inactive');
     }
 }
 
@@ -1610,7 +1797,7 @@ function newsHoverIn() {
 
 // News hover out
 function newsHoverOut() {
-    if ($('.navigation_dropdown-toggle').hasClass('w--open')) {
+    if ($('.navigation_dropdown-toggle').hasClass('w--open') || $('.nav-search-wrap').hasClass('is-active')) {
         $('.nav-link.is-news').addClass('is-inactive');
     } else {
         $('.nav-link.is-news').removeClass('is-inactive');
@@ -1637,7 +1824,7 @@ function contactHoverIn() {
 
 // Contact hover out
 function contactHoverOut() {
-    if ($('.navigation_dropdown-toggle').hasClass('w--open')) {
+    if ($('.navigation_dropdown-toggle').hasClass('w--open') || $('.nav-search-wrap').hasClass('is-active')) {
         $('.nav-link.is-contact').addClass('is-inactive');
     } else {
         $('.nav-link.is-contact').removeClass('is-inactive');
