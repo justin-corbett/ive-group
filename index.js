@@ -1353,7 +1353,7 @@ $(document).ready(function() {
                 tl.play();
                 lenis.stop();	
             } else {
-                tl.reverse() && $('.nav-link').removeClass('is-inactive') && $('.navigation_dropdown-toggle').removeClass('is-inactive') && $('.c_search_component').removeClass('is-active') && $('.nav-search-wrap').removeClass('is-active') && $('.nav-link-icon-wrap.is-search').removeClass('is-inactive') && $('.c_search_results').removeClass('is-active');
+                tl.reverse() && $('.nav-link').removeClass('is-inactive') && $('.navigation_dropdown-toggle').removeClass('is-inactive') && $('.c_search_component').removeClass('is-active') && $('.nav-search-wrap').removeClass('is-active') && $('.nav-link-icon-wrap.is-search').removeClass('is-inactive') && $('.c_search_results').removeClass('is-active') && $('.nav-link-icon-wrap.is-search').removeClass('is-disabled');
                 lenis.start();	
             }
         }
@@ -1384,6 +1384,7 @@ $(document).ready(function () {
         // When the search toggle is clicked
         $('.nav-search-wrap').on('click', function () {
             $(this).addClass('is-active'); // add the active class
+            $('.nav-link-icon-wrap.is-search').addClass('is-disabled');
             // Give Webflow a tiny delay to register the dropdown open
             setTimeout(() => {
                 $('.c_search_input').focus();
@@ -1413,7 +1414,7 @@ $(document).ready(function() {
     }
 });
 
-// Hide search nav item when search bar is typed
+// Hide search nav item, search tags, and show search results when search bar is typed
 $(document).ready(function () {
     if ($(window).width() > 991) {
 
@@ -1421,9 +1422,29 @@ $(document).ready(function () {
             const hasText = $(this).val().trim().length > 0;
 
             if (hasText) {
+                // Hide the search nav item
                 $('.nav-link.is-search').addClass('is-hidden');
+
+                // Hide the tags
+                $('.search-tags-wrap').removeClass('is-active');
+
+                // Show the results container
+                $('.c_search_results-container').addClass('is-active');
+
+                // Disable search text and icon
+                $('.nav-link-icon-wrap.is-search').addClass('is-disabled');
             } else {
+                // Restore nav item
                 $('.nav-link.is-search').removeClass('is-hidden');
+
+                // Show the tags again
+                $('.search-tags-wrap').addClass('is-active');
+
+                // Hide results container
+                $('.c_search_results-container').removeClass('is-active');
+
+                // Activate search text and icon
+                $('.nav-link-icon-wrap.is-search').removeClass('is-disabled');
             }
         });
 
@@ -1463,7 +1484,7 @@ $(document).ready(function () {
   }
 });
 
-//Change nav search title to 'showing results' when search input is typed in
+// Change nav search title to 'showing results' when search input is typed in
 $(document).on('input', '.c_search_input', function () {
   const hasText = this.value.trim().length > 0;
   const $title = $('.text-link_p.is-nav-search_title');
@@ -1472,6 +1493,55 @@ $(document).on('input', '.c_search_input', function () {
   if ($title.text() !== newText) {
     $title.text(newText);
   }
+});
+
+// Search Tag Hover Animation
+$(document).ready(function () {
+
+  $('.search-tag').each(function () {
+    const $tag = $(this);
+    const $bg = $tag.find('.search-tag-background');
+    const $text = $tag.find('.search-tag-text-main');
+
+    const tl = gsap.timeline({ paused: true });
+
+    tl.to($bg, {
+      y: '0%',
+      duration: 0.35,
+      ease: 'power2.out'
+    }, 0)
+    .to($text, {
+      y: '-110%',
+      duration: 0.35,
+      ease: 'power2.out'
+    }, 0);
+
+    $tag.on('mouseenter', function () {
+      tl.play();
+    });
+
+    $tag.on('mouseleave', function () {
+      tl.reverse();
+    });
+  });
+
+});
+
+// Copy search tag main text and use it for the hover text
+$(document).ready(function () {
+  $('.search-tag').each(function () {
+    const $tag = $(this);
+    const mainText = $tag.find('.search-tag-text-main').text();
+    $tag.find('.search-tag-text-hover').text(mainText);
+  });
+});
+
+// Search tag text input into search on click
+$(document).ready(function () {
+  $(document).on('click', '.search-tag', function () {
+    const mainText = $(this).find('.search-tag-text-main').text().trim();
+    $('.c_search_input').val(mainText).trigger('input'); // trigger input for any listeners
+  });
 });
 
 
@@ -1616,6 +1686,7 @@ $(document).ready(function() {
         function updateSearch() {
             if ($('.nav-search-wrap').hasClass('is-active')) {
                 $('.nav-link-icon-wrap.is-search').removeClass('is-inactive');
+                $('.nav-link-icon-wrap.is-search').addClass('is-disabled');
                 $('.c_search_results').addClass('is-active');
                 $('.navigation_dropdown-toggle.is-about').addClass('is-inactive');
                 $('.navigation_dropdown-toggle.is-services').addClass('is-inactive');
@@ -1627,6 +1698,7 @@ $(document).ready(function() {
             } else {
                 $('.navigation_dropdown-toggle.is-about').removeClass('is-inactive');
                 $('.nav-link-icon-wrap.is-search').removeClass('is-inactive');
+                $('.nav-link-icon-wrap.is-search').removeClass('is-disabled');
                 $('.c_search_results').removeClass('is-active');
                 $('.navigation_dropdown-toggle.is-services').removeClass('is-inactive');
                 $('.navigation_dropdown-toggle.is-case_studies').removeClass('is-inactive');
