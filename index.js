@@ -385,6 +385,60 @@ $(".image-case_study_list-landscape").each(function (index, element) {
     );
 });
 
+// Search – Case study image hover – landscape
+$(".search-case_study-link").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".image");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                scale: 1.05,
+                filter: "blur(10px)",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                scale: 1,
+                filter: "blur(0px)",
+                duration: 0.5,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
+
+
+// Search – Case study image hover – landscape – cursor
+$(".search-case_study-link").each(function (index, element) {
+    let triggerElement = $(this);
+    let targetElement = $(this).find(".cursor-hover");
+
+    $(triggerElement).hover(
+        function() { // Hover in
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 1,
+                duration: 0.2,
+                ease: "power1.out",
+            });
+        },
+        function() { // Hover out
+            let tl = gsap.timeline();
+            tl.to(targetElement, {
+                opacity: 0,
+                duration: 0.2,
+                ease: "power1.out",
+            });
+        }
+    );
+});
+
 // Service list hover – cursor
 $(".service-image-wrapper").each(function (index, element) {
     let triggerElement = $(this);
@@ -1306,6 +1360,22 @@ $(".section-footer").each(function (index) {
 // Mobile Navigation Start
 $(document).ready(function() {
     if ($(window).width() < 991) {
+
+        function forceBackspace($input) {
+          const text = $input.val();
+          for (let i = text.length - 1; i >= 0; i--) {
+            const event = new KeyboardEvent('keydown', { key: 'Backspace', code: 'Backspace', keyCode: 8, which: 8, bubbles: true });
+            $input[0].dispatchEvent(event);
+
+            // Remove one character manually (simulating a backspace)
+            $input.val($input.val().slice(0, -1));
+
+            // Trigger input so any listeners react
+            const inputEvent = new Event('input', { bubbles: true });
+            $input[0].dispatchEvent(inputEvent);
+          }
+        }
+
         // Function to add or remove class based on the state of .navigation_dropdown-toggle
         function updateNavMobile() {
             var navButton = $('.navigation_menu-button.w-nav-button');
@@ -1315,11 +1385,24 @@ $(document).ready(function() {
                 tl.play();
                 lenis.stop()	
                 navButtonText.text('Close');
+                $('.c_search_bar').addClass('is-inactive');
+                $('.nav-link-icon-wrap.is-search').addClass('is-inactive');
                 
             } else {
                 tl.reverse();
                 lenis.start()	
                 navButtonText.text('Menu');
+                $('.c_search_bar').removeClass('is-inactive');
+                $('.c_search_bar').removeClass('is-focused');
+                $('.nav-link-icon-wrap.is-search').removeClass('is-inactive');
+                $('.nav-link-icon-wrap.is-search').removeClass('is-focused');
+                $('.nav-link-icon-wrap.is-search').removeClass('is-disabled');
+                $('.nav-link.is-search').removeClass('is-hidden');
+                $('.c_search_results').removeClass('is-active');
+                
+                const $searchInput = $('.c_search_input');
+                forceBackspace($searchInput);
+                $searchInput.blur(); // remove focus
                 
             }
         }
@@ -1341,6 +1424,64 @@ $(document).ready(function() {
         // Start observing changes to attributes of elements with class 'navigation_dropdown-toggle'
         observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['class'] });
     }
+});
+
+// Mobile search handling
+$(document).ready(function () {
+
+  let removeTimeout;
+
+  function bindMobileSearch() {
+
+    if ($(window).width() <= 991) {
+
+      function activate() {
+        clearTimeout(removeTimeout);
+
+        $('.navigation_menu-dropdown, .nav-mobile-menu-title-wrapper, .nav-link.is-news, .nav-link.is-contact')
+          .addClass('is-inactive');
+
+        $('.c_search_bar, .nav-link-icon-wrap.is-search')
+          .addClass('is-focused');
+
+        $('.c_search_results')
+          .addClass('is-active');
+      }
+
+      function deactivate() {
+        removeTimeout = setTimeout(function () {
+
+          const hasText = $('.c_search_input').val().trim().length > 0;
+          const isFocused = $('.c_search_input').is(':focus');
+
+          // Only remove if still not focused and empty
+          if (!hasText && !isFocused) {
+
+            $('.navigation_menu-dropdown, .nav-mobile-menu-title-wrapper, .nav-link.is-news, .nav-link.is-contact')
+              .removeClass('is-inactive');
+
+            $('.c_search_bar, .nav-link-icon-wrap.is-search')
+              .removeClass('is-focused');
+
+            $('.c_search_results')
+              .removeClass('is-active');
+          }
+
+        }, 0); // ← delay in ms
+      }
+
+      $(document).on('focus input', '.c_search_input', activate);
+      $(document).on('blur', '.c_search_input', deactivate);
+    }
+  }
+
+  bindMobileSearch();
+
+  $(window).on('resize', function () {
+    $(document).off('focus input blur', '.c_search_input');
+    bindMobileSearch();
+  });
+
 });
 
 // Desktop Navigation Start
@@ -1416,8 +1557,6 @@ $(document).ready(function() {
 
 // Hide search nav item, search tags, and show search results when search bar is typed
 $(document).ready(function () {
-    if ($(window).width() > 991) {
-
         $(document).on('input', '.c_search_input', function () {
             const hasText = $(this).val().trim().length > 0;
 
@@ -1428,6 +1567,9 @@ $(document).ready(function () {
                 // Hide the tags
                 $('.search-tags-wrap').removeClass('is-active');
 
+                // Hide the case studies
+                $('.search-case_studies-block').removeClass('is-active');
+
                 // Show the results container
                 $('.c_search_results-container').addClass('is-active');
 
@@ -1437,8 +1579,11 @@ $(document).ready(function () {
                 // Restore nav item
                 $('.nav-link.is-search').removeClass('is-hidden');
 
-                // Show the tags again
+                // Show the tags
                 $('.search-tags-wrap').addClass('is-active');
+
+                // Show the case studies 
+                $('.search-case_studies-block').addClass('is-active');
 
                 // Hide results container
                 $('.c_search_results-container').removeClass('is-active');
@@ -1446,12 +1591,12 @@ $(document).ready(function () {
                 // Activate search text and icon
                 $('.nav-link-icon-wrap.is-search').removeClass('is-disabled');
             }
-        });
+      });
 
-    }
+    
 });
 
-// Clear search input when nav closes
+// Clear search input when nav closes – Desktop
 $(document).ready(function () {
   if ($(window).width() > 991) {
 
@@ -1497,34 +1642,34 @@ $(document).on('input', '.c_search_input', function () {
 
 // Search Tag Hover Animation
 $(document).ready(function () {
+  if ($(window).width() > 991) {
+    $('.search-tag').each(function () {
+      const $tag = $(this);
+      const $bg = $tag.find('.search-tag-background');
+      const $text = $tag.find('.search-tag-text-main');
 
-  $('.search-tag').each(function () {
-    const $tag = $(this);
-    const $bg = $tag.find('.search-tag-background');
-    const $text = $tag.find('.search-tag-text-main');
+      const tl = gsap.timeline({ paused: true });
 
-    const tl = gsap.timeline({ paused: true });
+      tl.to($bg, {
+        y: '0%',
+        duration: 0.35,
+        ease: 'power2.out'
+      }, 0)
+      .to($text, {
+        y: '-110%',
+        duration: 0.35,
+        ease: 'power2.out'
+      }, 0);
 
-    tl.to($bg, {
-      y: '0%',
-      duration: 0.35,
-      ease: 'power2.out'
-    }, 0)
-    .to($text, {
-      y: '-110%',
-      duration: 0.35,
-      ease: 'power2.out'
-    }, 0);
+      $tag.on('mouseenter', function () {
+        tl.play();
+      });
 
-    $tag.on('mouseenter', function () {
-      tl.play();
+      $tag.on('mouseleave', function () {
+        tl.reverse();
+      });
     });
-
-    $tag.on('mouseleave', function () {
-      tl.reverse();
-    });
-  });
-
+  }
 });
 
 // Copy search tag main text and use it for the hover text
