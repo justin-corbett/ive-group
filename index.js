@@ -959,18 +959,72 @@ $(".image_full-service_hero-video").each(function (index) {
 });
 
 // Navigation Open Desktop
-var tl = gsap.timeline();
+var tl = gsap.timeline({
+  paused: true,
+  reversed: true
+});
 
-tl.set('.navigation-dropdown-bg-wrapper', { display: "block" })
-  .to('.navigation-dropdown-slide', { duration: 0.5, opacity: 1, y: "0%", ease: "power2.out" })
-  .to('.navigation-bg-main', { duration: 0.5, opacity: 1, ease: "power2.out" }, "-=0.5")
-  .to('.hr-navigation', { duration: 0.5, y: "6rem", ease: "power2.out" }, "-=0.5")
-  .to('.navigation-bg-title', { 
-      duration: 0.5, 
-      y: "0%", 
-      ease: "power2.out",
-      onComplete: () => lenis.stop() // Stops Lenis smooth scrolling
+tl
+  // Ensure it's interactable before animating
+  .set('.navigation_menu', {
+    display: 'block',
+    pointerEvents: 'auto'
+  })
+
+  // Animate menu visibility IN
+  .fromTo('.navigation_menu',
+    {
+      opacity: 0,
+    },
+    {
+      opacity: 1,
+      duration: 0.4,
+      ease: 'power2.out'
+    }
+  )
+
+  .set('.navigation-dropdown-bg-wrapper', { display: "block" })
+
+  .to('.navigation-dropdown-slide', {
+    duration: 0.5,
+    opacity: 1,
+    y: "0%",
+    ease: "power2.out"
+  }, '-=0.3')
+
+  .to('.navigation-bg-main', {
+    duration: 0.5,
+    opacity: 1,
+    ease: "power2.out"
+  }, "-=0.5")
+
+  .to('.hr-navigation', {
+    duration: 0.5,
+    y: "6rem",
+    ease: "power2.out"
+  }, "-=0.5")
+
+  .to('.navigation-bg-title', {
+    duration: 0.5,
+    y: "0%",
+    ease: "power2.out",
+    onComplete: () => lenis.stop()
   }, "-=0.5");
+
+
+// Smooth OUT animation (when reversing)
+tl.eventCallback('onReverseComplete', () => {
+  gsap.set('.navigation_menu', {
+    display: 'none',
+    clearProps: 'all'
+  });
+
+  gsap.set('.navigation-dropdown-bg-wrapper', {
+    display: ''
+  });
+
+  lenis.start();
+});
 
 
 // Home hero title animation
@@ -1378,33 +1432,29 @@ $(document).ready(function() {
 
         // Function to add or remove class based on the state of .navigation_dropdown-toggle
         function updateNavMobile() {
-            var navButton = $('.navigation_menu-button.w-nav-button');
-            var navButtonText = $('.nav-mobile-menu-btn-text');
+          var navButton = $('.navigation_menu-button.w-nav-button');
+          var navButtonText = $('.nav-mobile-menu-btn-text');
 
-            if (navButton.hasClass('w--open')) {
-                tl.play();
-                lenis.stop()	
-                navButtonText.text('Close');
-                $('.c_search_bar').addClass('is-inactive');
-                $('.nav-link-icon-wrap.is-search').addClass('is-inactive');
-                
-            } else {
-                tl.reverse();
-                lenis.start()	
-                navButtonText.text('Menu');
-                $('.c_search_bar').removeClass('is-inactive');
-                $('.c_search_bar').removeClass('is-focused');
-                $('.nav-link-icon-wrap.is-search').removeClass('is-inactive');
-                $('.nav-link-icon-wrap.is-search').removeClass('is-focused');
-                $('.nav-link-icon-wrap.is-search').removeClass('is-disabled');
-                $('.nav-link.is-search').removeClass('is-hidden');
-                $('.c_search_results').removeClass('is-active');
-                
-                const $searchInput = $('.c_search_input');
-                forceBackspace($searchInput);
-                $searchInput.blur(); // remove focus
-                
-            }
+          if (navButton.hasClass('w--open')) {
+            tl.play();
+            navButtonText.text('Close');
+            $('.c_search_bar').addClass('is-inactive');
+            $('.nav-link-icon-wrap.is-search').addClass('is-inactive');
+          } else {
+            tl.reverse();
+            navButtonText.text('Menu');
+            $('.c_search_bar').removeClass('is-inactive');
+            $('.c_search_bar').removeClass('is-focused');
+            $('.nav-link-icon-wrap.is-search').removeClass('is-inactive');
+            $('.nav-link-icon-wrap.is-search').removeClass('is-focused');
+            $('.nav-link-icon-wrap.is-search').removeClass('is-disabled');
+            $('.nav-link.is-search').removeClass('is-hidden');
+            $('.c_search_results').removeClass('is-active');
+
+            const $searchInput = $('.c_search_input');
+            forceBackspace($searchInput);
+            $searchInput.blur();
+          }
         }
 
         // Initial call to update classes
@@ -1422,7 +1472,10 @@ $(document).ready(function() {
         });
 
         // Start observing changes to attributes of elements with class 'navigation_dropdown-toggle'
-        observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['class'] });
+        const navButtonEl = document.querySelector('.navigation_menu-button.w-nav-button');
+          if (navButtonEl) {
+            observer.observe(navButtonEl, { attributes: true, attributeFilter: ['class'] });
+        }
     }
 });
 
@@ -1467,7 +1520,7 @@ $(document).ready(function () {
               .removeClass('is-active');
           }
 
-        }, 0); // ← delay in ms
+        }, 10); // ← delay in ms
       }
 
       $(document).on('focus input', '.c_search_input', activate);
